@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Discover Test</title>
+    </head>
+    <body>
+        <h1>Discover Testing</h1>
+        <script type="text/javascript" src="olap.js"></script>
+        <script type="text/javascript" src="../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="olap-xmla.js"></script>
+        <script type="text/javascript" src="prettyprint.js"></script>
+        <script type="text/javascript">
+		var olapConn = new olapXmla.Connection({});
+		var sources = olapConn.getOlapDatabases(), idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		for (idx in sources) {
+		    source = sources[idx];
+		    catalogs = source.getCatalogs();
+		    for (idx in catalogs){
+			catalog = catalogs[idx];
+			cubes = catalog.getCubes();
+		    	for (idx in cubes){
+			    cube = cubes[idx];
+			    measures = cube.getMeasures();
+			    for (idx in measures){
+				measure = measures[idx];
+			    }
+			    dimensions = cube.getDimensions();
+			    for (idx in dimensions){
+				dimension = dimensions[idx];
+				hierarchies = dimension.getHierarchies();
+				for (idx in hierarchies){
+				    hierarchy = hierarchies[idx];
+				    levels = hierarchy.getLevels();
+				    for (idx in levels){
+					level = levels[idx];
+					members = level.getMembers();
+					for (idx in members){
+					    member = members[idx];
+					}	    
+				    }	    
+				}	    
+			    }	    
+			}
+		    }
+		}
+		document.body.appendChild(prettyPrint(sources, { maxDepth:10 } ));
+        </script>
+    </body>
+</html>
