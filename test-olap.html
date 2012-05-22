@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Object Test</title>
+    </head>
+    <body>
+        <h1>OLAP Object Testing</h1>
+        <script type="text/javascript" src="olap.js"></script>
+        <script type="text/javascript" src="../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="olap-xmla.js"></script>
+        <script type="text/javascript" src="prettyprint.js"></script>
+        <script type="text/javascript">
+		//document.body.appendChild(prettyPrint(olapConn, { maxDepth:10 } ));
+		var sources, idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		var mysrc = {
+		    AUTHENTICATION_MODE:"Unauthenticated",
+		    DATA_SOURCE_DESCRIPTION: "Pentaho BI Platform Datasources",
+		    DATA_SOURCE_INFO:"Provider=Mondrian;DataSource=Pentaho",
+		    DATA_SOURCE_NAME:"Provider=Mondrian;DataSource=Pentaho",
+		    PROVIDER_NAME:"PentahoXMLA",
+		    PROVIDER_TYPE:["MDP"],
+		    URL: "http://localhost:8080/pentaho/Xmla?userid=joe&password=password",
+		    catalogs: [
+			{
+			CATALOG_NAME: "SampleData",	
+			DESCRIPTION:"No description available"
+			}			
+		    ]
+		}, olapConn;
+		
+		//test olap.connection with empty source data
+		olapConn = new olap.Connection({});
+		console.log(olapConn instanceof olap.Connection)
+		sources = olapConn.getOlapDatabases();
+		console.log(sources[0] instanceof olap.Datasource)
+
+		//test olap.connection with sample source data
+		olapConn = new olap.Connection({sources:[mysrc]});
+		console.log(olapConn instanceof olap.Connection)
+		sources = olapConn.getOlapDatabases();
+		console.log(sources[0] instanceof olap.Datasource)
+		console.log(sources[0].PROVIDER_NAME == "PentahoXMLA");
+
+		source = sources[0];
+		catalogs = source.getCatalogs();
+		for (idx in catalogs){
+		    catalog = catalogs[idx];
+		    console.log(catalog)
+		    console.log('Catalog local: '+ catalog.CATALOG_NAME)
+		    console.log(catalog instanceof olap.Catalog)
+		}
+	    
+		//test olapXmla.connection with sample source data
+		olapConn = new olapXmla.Connection({sources:[mysrc]});
+		console.log(olapConn instanceof olap.Connection)
+		console.log(olapConn instanceof olapXmla.Connection)
+		sources = olapConn.getOlapDatabases();
+		console.log(sources[0] instanceof olap.Datasource)
+		console.log(sources[0] instanceof olapXmla.Datasource)
+		console.log(sources[0].PROVIDER_NAME == "PentahoXMLA");
+
+		source = sources[0];
+		catalogs = source.getCatalogs();
+		for (idx in catalogs){
+		    catalog = catalogs[idx];
+		    console.log(catalog)
+		    console.log('Catalog local Xmla: '+ catalog.CATALOG_NAME)
+		    console.log(catalog instanceof olap.Catalog)
+		    console.log(catalog instanceof olapXmla.Catalog)
+		}
+
+		//test olapXmla.connection with empty source data
+		olapConn = new olapXmla.Connection({});
+		console.log(olapConn instanceof olap.Connection)
+		console.log(olapConn instanceof olapXmla.Connection)
+		sources = olapConn.getOlapDatabases();
+		console.log(sources[0] instanceof olap.Datasource)
+		console.log(sources[0] instanceof olapXmla.Datasource)
+
+		source = sources[0];
+		catalogs = source.getCatalogs();
+		for (idx in catalogs){
+		    catalog = catalogs[idx];
+		    console.log(catalog)
+		    console.log('Catalog: '+ catalog.CATALOG_NAME)
+		    console.log(catalog instanceof olap.Catalog)
+		    console.log(catalog instanceof olapXmla.Catalog)
+		}
+        </script>
+    </body>
+</html>

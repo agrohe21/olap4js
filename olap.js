@@ -11,19 +11,43 @@
 	olap.Connection
 	*/
 	olap.Connection = function Connection($connection){
+		console.debug('func Call: ' + arguments.callee.name);
+		
+		var src = {}, that=this;
 		this.sources = [];
+		if ($connection instanceof Object) { //have we been passed a valid JS object?
+			if ($connection.sources instanceof Array) {
+				for (var idx in $connection.sources){
+					src = $connection.sources[idx];	
+					//ds = new olap.Datasource(src, this)
+					this.addDataSource(src);
+				}
+			}
+		}
+		
 	}
 	/*
 	 olap.Connection.prototype.executeOlapQuery = function createStatement(){
 		throw new Error('olap.Connection.executeOlapQuery should not be called directly');
-	}
+	}*/
 	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(){
+		if (this.sources.length ==0) {
+			this.fetchOlapDatasources();
+		}
+		return this.sources;
 	}
-	*/
+	olap.Connection.prototype.fetchOlapDatasources = function fetchOlapDatasources(){
+		//empty function that does not fetch anything
+	}
 	olap.Connection.prototype.addDataSource = function addDataSource(source, callback) {
+		if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
+			source = new olap.Datasource(source);
+		} else {
+			//console.log('already have Datasource')
+		}
 		this.sources.push(source);
 		if (callback && typeof callback == 'function') {
-			callback(ds);
+			callback(source);
 		}
 		return source;
 	}
@@ -41,20 +65,41 @@
 	*   @param {Xmla} xmla The Xmla instance to be used to communicate with the server
 	*/
 	olap.Datasource = function Datasource(source, $conn) {
-		this.DATA_SOURCE_DESCRIPTION = source.DATA_SOURCE_DESCRIPTION || "";
-		this.DATA_SOURCE_NAME        = source.DATA_SOURCE_NAME || "";
-		this.DATA_SOURCE_INFO        = source.DATA_SOURCE_INFO || "";
-		this.PROVIDER_NAME           = source.PROVIDER_NAME   || "";
-		this.PROVIDER_TYPE           = source.PROVIDER_TYPE || "";
-		this.URL                     = source.URL            || "";
-		this.AUTHENTICATION_MODE     = source.AUTHENTICATION_MODE || "";
-		this.catalogs                = source.catalogs       || [];
+		var idx, cat;
+		this.catalogs = [];
+		if (source instanceof Object) { //have we been passed a valid JS object?
+			this.DATA_SOURCE_DESCRIPTION = source.DATA_SOURCE_DESCRIPTION || "";
+			this.DATA_SOURCE_NAME        = source.DATA_SOURCE_NAME || "";
+			this.DATA_SOURCE_INFO        = source.DATA_SOURCE_INFO || "";
+			this.PROVIDER_NAME           = source.PROVIDER_NAME   || "";
+			this.PROVIDER_TYPE           = source.PROVIDER_TYPE || "";
+			this.URL                     = source.URL            || "";
+			this.AUTHENTICATION_MODE     = source.AUTHENTICATION_MODE || "";
+			if (source.catalogs instanceof Array) {
+				for (var idx in source.catalogs){
+					cat = source.catalogs[idx];	
+					this.addCatalog(cat);
+				}
+			}
+		}
+		
 		this.connection = $conn
 	}
 	olap.Datasource.prototype.getCatalogs = function getCatalogs() {
+		if (this.catalogs.length == 0) {
+			this.fetchCatalogs();
+		}
 		return this.catalogs;
 	}
+	olap.Datasource.prototype.fetchCatalogs = function fetchCatalogs() {	
+		//empty function that does not fetch anything
+	}
 	olap.Datasource.prototype.addCatalog = function addCatalog(catalog, callback) {
+		if ((catalog instanceof Object) && (catalog instanceof olap.Catalog == false)) { //do we have an object as param and it is not already a Catalog
+			catalog = new olap.Catalog(catalog, this);
+		} else {
+			//console.log('already have Catalog')
+		}
 
 		this.catalogs.push(catalog);
 		if (typeof callback == 'function') {
@@ -311,6 +356,129 @@
 	olap.CellSet.prototype.getCell = function getCell(index){
 		return this.cells;
 	}
+
+	olap.Query = function Query(query, $cube) {
+		this.cube    = $cube || {};
+		this.sets    = query.sets    || []; //sets are Named Sets that are represented in WITH statement
+		this.members = query.members || []; //members are calculated members that are represented in WITH statement
+		this.columns = query.columns || []; //columns represent a set or array in JavaScript
+		this.rows    = query.rows    || []; //rows represent a set or array in JavaScript
+		this.pages   = query.page    || []; //pages represent a set or array in JavaScript
+		this.slicer  = query.slicer  || []; //a slicer is a single tuple or object in JavaScript
+		this.text    = query.text    || '';
+	}
+	olap.Query.prototype.beforeAdd2Axis = function(obj, axis){
+		if ((!obj instanceof olap.Level) && (!obj instanceof olap.Measure)) {
+			throw new Error('Axis members must be olap.Level or measure objects');
+		}
+		if (axis != 'ROW' && axis != 'COLUMN' && axis != 'PAGE') {
+			throw new Error('Unknow axis specified: ' + axis);
+		}
+		if (axis == 'ROWS' && this.columns.length == 0){
+			throw new Error('Columns must be specified before Rows')
+		}
+		if (axis == 'PAGE' && this.rows.length == 0){
+			throw new Error('Rows must be specified before Pages')
+		}
+		/* check to see if dimension hierarchy exists on another axis
+		*/
+		var level = findHierarchy(obj);
+		if (level.hierarchy != obj.hierarchy) {
+			throw new Error('Cannot add level to more than one axis.')
+		}
+		return true;
+	}
+	olap.Query.prototype.findHierarchy = function(level){
+		var page, row, col, i=0,j=0;
+		for (i=0,j=this.pages.length;i<j;i++){
+			page = this.pages[i];
+			/* look in each page to see if the level's hierarchy already exist
+			*/
+			if (page.hierarchy == level.hierarchy) {
+				return page;
+			}
+		}
+		for (i=0,j=this.rows.length;i<j;i++){
+			row = this.rows[i];
+			/* look in each row to see if the level's hierarchy already exist
+			*/
+			if (row.hierarchy == level.hierarchy) {
+				return row;
+			}
+		}
+		for (i=0,j=this.columns.length;i<j;i++){
+			col = this.columns[i];
+			/* look in each row to see if the level's hierarchy already exist
+			*/
+			if (col.hierarchy == level.hierarchy) {
+				return col;
+			}
+		}
+		/* default is an empty object instead of null
+		*/
+		return false;
+	}
+	olap.Query.prototype.add2Axis = function(obj, axis, callback) {
+		if (this.beforeAdd2Axis()){
+			switch (axis) {
+				case 'COLUMN':
+					this.columns.push(obj);
+					break;
+				case 'ROW':
+					this.rows.push(obj);
+					break;
+				case 'SLICER':
+					this.slicer.push(obj);
+					break;
+				case 'PAGE':
+					this.pages.push(obj);
+					break;
+				default:
+					this.columns.push(obj);
+			}
+		}
+	}
+	olap.Query.prototype.getAxisMDX = function(axis){
+		var mdx = '', i=0,j=axis.length, amemb;
+		if (j>1) {
+			mdx += 'non empty crossjoin(';
+		}
+		for (i=0;i<j;i++){
+			amemb = axis[i];
+			if (amemb instanceof olap.Level) {
+				if (amemb.LEVEL_NUMBER == 0) {//root level, must be all
+					mdx += amemb.hierarchy.ALL_MEMBER;
+				} else {
+					mdx += amemb.LEVEL_UNIQUE_NAME + '.members';
+				}
+			} else { //must be a measure
+				mdx += amemb.MEASURE_UNIQUE_NAME;
+			}
+			if (i != j-1 && i < j-1) {
+				mdx += ', '
+			}
+		}
+		if (j>1) {
+			mdx += ')';
+		}
+	}
+	olap.Query.prototype.getMDX = function() {
+		var mdx = 'SELECT ';
+		if (this.columns.length == 0){
+			throw new Error('MDX Query must have Column axis');
+		}
+		mdx += getAxisMDX(this.columns);
+		mdx += ' ON COLUMNS ';
+		if (this.rows.length != 0){
+			mdx += getAxisMDX(this.rows)
+			mdx += ' ON ROWS, ';
+		}
+		mdx += ' FROM [' + this.cube.CUBE_NAME + ']';
+		//TODO Add Slicer
+		//TODO Add Pages and other axis
+		return mdx;
+	}
+	
 })(this);
 
 /*

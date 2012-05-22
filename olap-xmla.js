@@ -39,26 +39,30 @@ olapXmla.Connection.prototype.executeOlapQuery = function XmlaExecuteOlapQuery(o
     });
 };
 
-olapXmla.Connection.prototype.getOlapDatabases = function XmlaGetOlapDatabases(options){
-	//this.sources = [];
-	var that = this, raw_sources, source, ds;
-	raw_sources = this.xmla.discoverDataSources({});
-	
-	while (source = raw_sources.fetchAsObject()) {
-		ds = new olapXmla.Datasource({
-		    DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
-		    DATA_SOURCE_NAME:source.DataSourceName || "",
-		    DATA_SOURCE_INFO:source.DataSourceInfo || "",
-		    PROVIDER_NAME:source.ProviderName   || "",
-		    PROVIDER_TYPE:source.ProviderType || "",
-		    URL:source.URL            || "",
-		    AUTHENTICATION_MODE:source.AuthenticationMode || ""
-		}, this)
-		that.addDataSource(ds);
-	}
-	raw_sources.close();
-	delete raw_sources;
-	return this.sources;
+olapXmla.Connection.prototype.addDataSource = function XmlaAddDataSource(source, callback) {
+	var ds = new olapXmla.Datasource(source, this)
+	olap.Connection.prototype.addDataSource.call(this, ds)
+	return ds;
+}
+
+olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(){
+    var that = this, raw_sources, source, ds;
+    raw_sources = this.xmla.discoverDataSources({});
+    
+    while (source = raw_sources.fetchAsObject()) {
+	    ds = new olapXmla.Datasource({
+		DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
+		DATA_SOURCE_NAME:source.DataSourceName || "",
+		DATA_SOURCE_INFO:source.DataSourceInfo || "",
+		PROVIDER_NAME:source.ProviderName   || "",
+		PROVIDER_TYPE:source.ProviderType || "",
+		URL:source.URL            || "",
+		AUTHENTICATION_MODE:source.AuthenticationMode || ""
+	    }, this)
+	    that.addDataSource.call(this, ds);
+    }
+    raw_sources.close();
+    delete raw_sources;
 }
 
 olapXmla.Datasource = function XmlaDatasource($datasource, conn){
@@ -68,7 +72,7 @@ olapXmla.Datasource = function XmlaDatasource($datasource, conn){
 
 inheritPrototype(olapXmla.Datasource, olap.Datasource);
 
-olapXmla.Datasource.prototype.getCatalogs = function XmlagetCatalogs(filter, callback) {
+olapXmla.Datasource.prototype.fetchCatalogs = function XmlaFetchCatalogs() {
 
 	var properties = {}, rowset, catalog, that=this;
 	rowset = this.connection.xmla.discoverDBCatalogs({
@@ -76,13 +80,23 @@ olapXmla.Datasource.prototype.getCatalogs = function XmlagetCatalogs(filter, cal
 	});
 	if (rowset.hasMoreRows()) {
 		while (catalog = rowset.fetchAsObject()){
-			this.addCatalog(new olapXmla.Catalog(catalog, this), callback);
+			this.addCatalog(catalog);
 		}
 	} 
     return this.catalogs;
 }
 
+olapXmla.Datasource.prototype.addCatalog = function XmlaAddCatalog(catalog, callback) {
+	var cat = new olapXmla.Catalog(catalog, this)
+	olap.Datasource.prototype.addCatalog.call(this, cat)
+	return cat;
+}
 
+/*
+ * olapXmla.Catalog
+ *
+*/
+  
 olapXmla.Catalog = function XmlaCatalog($catalog,$datasource){
     olap.Catalog.call(this, $catalog, $datasource);
 }
@@ -237,3 +251,77 @@ olapXmla.Measure = function XmlaMeasure($Measure,$cube){
 }
 
 inheritPrototype(olapXmla.Measure, olap.Measure);
+
+olapXmla.Query= function XmlaMeasure($Query,$cube){
+    olap.Query.call(this, $Query, $cube);
+}
+
+inheritPrototype(olapXmla.Query, olap.Query);
+
+olapXmla.Query.prototype.execute = function(callback) {
+	var that=this, properties = {}, mdx, results, dataset, cells, tmp_results, axis;
+	properties[olap.PROP_DATASOURCEINFO] = this.cube.catalog.datasource[olap.PROP_DATASOURCEINFO];
+	properties[olap.PROP_CATALOG]        = this.cube.catalog.CATALOG_NAME;
+	properties[olap.PROP_FORMAT]         = olap.PROP_FORMAT_MULTIDIMENSIONAL;
+	
+	mdx = this.text || this.getMDX();
+	//TODO Add asynch capability
+	//try {
+		dataset = this.cube.catalog.datasource.olap.execute({
+			statement: mdx,
+			properties: properties
+			});
+		//results = new olap.Results.Tabular({columns:dataset.getFields(), data:dataset.fetchAllAsArray()}, this)
+		cells = dataset.getCellset();
+		
+		tmp_results = {
+			metadata: {axis:[], slicer:{}},
+			resultset:cells.fetchAllAsArrayOfValues()
+		};
+		console.log(dataset._numAxes)
+		for (var i=0, j=dataset._numAxes-1;j>=i;j--){
+			axis = dataset.getAxis(j);
+			if (axis instanceof olap.Dataset.Axis) {
+				console.log(axis.name)
+				tmp_results.metadata[axis.name] = new olap.Axis({
+					name:axis.name,
+					hierarchies: axis.getHierarchyNames(),
+					tuples: axis.fetchAllAsObject()
+				})
+			} else {
+				console.log(axis)
+			}
+		}
+		axis = null;
+		axis = dataset.getSlicerAxis();
+		if (axis instanceof olap.Dataset.Axis) {
+			tmp_results.metadata.slicer = new olap.Axis({
+				name: axis.name,
+				hierarchies: axis.getHierarchyNames(),
+				tuples: axis.fetchAllAsObject()
+			})
+		} else {
+			tmp_results.metadata.slicer = {};	
+		}
+		
+		dataset.close();		
+		delete dataset;
+		//TODO split up data and metadata
+		//document.body.appendChild(prettyPrint(tmp_results, { maxDepth:4 } ));
+		results = new olap.Results.Dimensional(tmp_results, this)
+		delete tmp_results;
+		/*
+		 } catch(e) {
+			alert(e);
+			return;
+		}
+		*/
+	if (typeof callback == 'function') {
+		callback.call(this, results);
+		delete results;
+	} else {
+		return results;
+	}
+}
+
+
