@@ -6,13 +6,12 @@
     </head>
     <body>
         <h1>OLAP Object Testing</h1>
-        <script type="text/javascript" src="olap.js"></script>
-        <script type="text/javascript" src="../xmla4js/src/Xmla.js"></script>
-        <script type="text/javascript" src="olap-xmla.js"></script>
-        <script type="text/javascript" src="prettyprint.js"></script>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script type="text/javascript" src="../../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="../olap-xmla.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
         <script type="text/javascript">
-		//document.body.appendChild(prettyPrint(olapConn, { maxDepth:10 } ));
-		var sources, idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		var sources, idx, catalogs, catalog, cuubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
 		var mysrc = {
 		    AUTHENTICATION_MODE:"Unauthenticated",
 		    DATA_SOURCE_DESCRIPTION: "Pentaho BI Platform Datasources",
@@ -29,19 +28,63 @@
 		    ]
 		}, olapConn;
 		
-		//test olap.connection with empty source data
-		olapConn = new olap.Connection({});
-		console.log(olapConn instanceof olap.Connection)
-		sources = olapConn.getOlapDatabases();
-		console.log(sources[0] instanceof olap.Datasource)
+		YUI().use('test', function (Y) {
 
+		    var suite = new Y.Test.Suite("Test olap.Connection Objects");
+		    var testCase1 = new Y.Test.Case({
+			name: "olap.Datasource type empty source data",
+			setUp : function () {
+			    olapConn = new olap.Connection({});
+			    sources = olapConn.getOlapDatabases();
+			},
+			tearDown: function() {
+			    olapConn = null;
+			},
+			testOlapConn: function () {
+			    Y.Assert.areEqual(true, olapConn instanceof olap.Connection);
+			},
+			testObject: function () {
+			    Y.Assert.isObject(olapConn);
+			}
+			
+		    });
+		    suite.add(testCase1);
+		    
+		    var testCase2 = new Y.Test.Case({
+			name: "olap.Datasource type sample source data",
+			setUp : function () {
+			    olapConn = new olap.Connection({sources:[mysrc]});
+			    sources = olapConn.getOlapDatabases();
+			},
+			tearDown: function() {
+			    olapConn = null;
+			},
+			testObject: function () {
+			    Y.Assert.isObject(olapConn);
+			},
+			testOlapConn: function () {
+			    Y.Assert.areEqual("PentahoXMLA",sources[0].PROVIDER_NAME);
+			}
+			
+		    });		    
+		    suite.add(testCase2);
+		    
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+		/*
+    
 		//test olap.connection with sample source data
-		olapConn = new olap.Connection({sources:[mysrc]});
+		olapConn = new olap.Connection();
 		console.log(olapConn instanceof olap.Connection)
 		sources = olapConn.getOlapDatabases();
 		console.log(sources[0] instanceof olap.Datasource)
 		console.log(sources[0].PROVIDER_NAME == "PentahoXMLA");
-
+		
 		source = sources[0];
 		catalogs = source.getCatalogs();
 		for (idx in catalogs){
@@ -87,6 +130,7 @@
 		    console.log(catalog instanceof olap.Catalog)
 		    console.log(catalog instanceof olapXmla.Catalog)
 		}
+		*/
         </script>
     </body>
 </html>

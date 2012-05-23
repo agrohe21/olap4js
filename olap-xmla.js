@@ -16,7 +16,7 @@ olapXmla.Connection = function XmlaConnection($connection){
 inheritPrototype(olapXmla.Connection, olap.Connection);
 
 olapXmla.Connection.prototype.executeOlapQuery = function XmlaExecuteOlapQuery(options){
-    console.debug('func Call: ' + arguments.callee.name);
+    //console.debug('func Call: ' + arguments.callee.name);
     var that=this, properties = {}, results, dataset, cells, tmp_results, axis;
     properties[Xmla.PROP_FORMAT]         = Xmla.PROP_FORMAT_MULTIDIMENSIONAL;
     if (options.catalog && options.catalog !== "") {
@@ -28,7 +28,7 @@ olapXmla.Connection.prototype.executeOlapQuery = function XmlaExecuteOlapQuery(o
 	statement: options.mdx,
 	properties: properties,
 	success: function xmlaExecuteSuccess($xmla, $options, xmla_dataset){
-	    console.debug('func Call: ' + arguments.callee.name);
+	    //console.debug('func Call: ' + arguments.callee.name);
 	    var cellset = xmla_dataset.fetchAsObject();
 	    results = new olap.CellSet(cellset);
 	    if (typeof options.success ==  'function') {
@@ -193,7 +193,6 @@ inheritPrototype(olapXmla.Hierarchy, olap.Hierarchy);
 
 olapXmla.Hierarchy.prototype.getLevels = function getLevels(filter, callback) {
     var properties = {}, rowset, obj, that=this;
-    //properties[olap.PROP_DATASOURCEINFO] = this.dimension.cube.catalog.datasource[olap.PROP_DATASOURCEINFO];
     properties[olap.PROP_CATALOG] = this.dimension.cube.catalog.CATALOG_NAME;
     var restrictions = {};
     restrictions["CATALOG_NAME"] = this.dimension.cube.catalog.CATALOG_NAME;
@@ -207,8 +206,6 @@ olapXmla.Hierarchy.prototype.getLevels = function getLevels(filter, callback) {
 	    while (obj = rowset.fetchAsObject()){
 		this.addLevel(new olapXmla.Level(obj, this), callback);
 	    }                        
-    } else {
-	console.error('hierarchy has no levels')
     }
     return this.levels;
 }
@@ -278,18 +275,18 @@ olapXmla.Query.prototype.execute = function(callback) {
 			metadata: {axis:[], slicer:{}},
 			resultset:cells.fetchAllAsArrayOfValues()
 		};
-		console.log(dataset._numAxes)
+		//console.log(dataset._numAxes)
 		for (var i=0, j=dataset._numAxes-1;j>=i;j--){
 			axis = dataset.getAxis(j);
 			if (axis instanceof olap.Dataset.Axis) {
-				console.log(axis.name)
+				//console.log(axis.name)
 				tmp_results.metadata[axis.name] = new olap.Axis({
 					name:axis.name,
 					hierarchies: axis.getHierarchyNames(),
 					tuples: axis.fetchAllAsObject()
 				})
 			} else {
-				console.log(axis)
+				//console.log(axis)
 			}
 		}
 		axis = null;

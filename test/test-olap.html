@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Object Test</title>
+    </head>
+    <body>
+        <h1>OLAP Object Testing</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script type="text/javascript" src="../../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="../olap-xmla.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		var sources, idx, catalogs, catalog, cuubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		var mysrc = {
+		    AUTHENTICATION_MODE:"Unauthenticated",
+		    DATA_SOURCE_DESCRIPTION: "Pentaho BI Platform Datasources",
+		    DATA_SOURCE_INFO:"Provider=Mondrian;DataSource=Pentaho",
+		    DATA_SOURCE_NAME:"Provider=Mondrian;DataSource=Pentaho",
+		    PROVIDER_NAME:"PentahoXMLA",
+		    PROVIDER_TYPE:["MDP"],
+		    URL: "http://localhost:8080/pentaho/Xmla?userid=joe&password=password",
+		    catalogs: [
+			{
+			CATALOG_NAME: "SampleData",	
+			DESCRIPTION:"No description available"
+			}			
+		    ]
+		}, olapConn;
+		
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test olap.Connection Objects");
+		    var testCase1 = new Y.Test.Case({
+			name: "olap.Datasource type empty source data",
+			setUp : function () {
+			    olapConn = new olap.Connection({});
+			    sources = olapConn.getOlapDatabases();
+			},
+			tearDown: function() {
+			    olapConn = null;
+			},
+			testOlapConn: function () {
+			    Y.Assert.areEqual(true, olapConn instanceof olap.Connection);
+			},
+			testObject: function () {
+			    Y.Assert.isObject(olapConn);
+			}
+			
+		    });
+		    suite.add(testCase1);
+		    
+		    var testCase2 = new Y.Test.Case({
+			name: "olap.Datasource type sample source data",
+			setUp : function () {
+			    olapConn = new olap.Connection({sources:[mysrc]});
+			    sources = olapConn.getOlapDatabases();
+			},
+			tearDown: function() {
+			    olapConn = null;
+			},
+			testObject: function () {
+			    Y.Assert.isObject(olapConn);
+			},
+			testOlapConn: function () {
+			    Y.Assert.areEqual("PentahoXMLA",sources[0].PROVIDER_NAME);
+			}
+			
+		    });		    
+		    suite.add(testCase2);
+
+		    var testCase3 = new Y.Test.Case({
+			name: "olapXmla.Catalog type sample source data",
+			setUp : function () {
+			    olapConn = new olapXmla.Connection({sources:[mysrc]});
+			    sources = olapConn.getOlapDatabases();
+			    source = sources[0];
+			    catalogs = source.getCatalogs();
+			    
+			},
+			tearDown: function() {
+			    olapConn = null;
+			},
+			testObject: function () {
+			    for (idx in catalogs){
+				catalog = catalogs[idx];
+				Y.Assert.areEqual(true, catalog instanceof olap.Catalog)
+			    }
+			}
+			
+		    });		    
+		    suite.add(testCase3);
+
+		    var testCase4 = new Y.Test.Case({
+			name: "olapXmla.Catalog type empty source data",
+			setUp : function () {
+			    olapConn = new olapXmla.Connection({});
+			    sources = olapConn.getOlapDatabases();
+			    source = sources[0];
+			    catalogs = source.getCatalogs();
+			},
+			tearDown: function() {
+			    olapConn = null;
+			},
+			testObject: function () {
+			    for (idx in catalogs){
+				catalog = catalogs[idx];
+				console.log(catalog)
+				Y.Assert.areEqual(true, catalog instanceof olapXmla.Catalog)
+			    }
+			}
+			
+		    });		    
+		    suite.add(testCase4);
+		    
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: MDX Test</title>
+    </head>
+    <body>
+        <h1>OLAP Xmla MDX Testing</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script type="text/javascript" src="../../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="../olap-xmla.js"></script>
+        <script type="text/javascript" src="../prettyprint.js"></script>
+        <script type="text/javascript">
+		var olapConn = new olapXmla.Connection({});
+		olapConn.executeOlapQuery({
+		    catalog:"SampleData",
+		    mdx: "select [Region].members ON ROWS,[Department].[All Departments].Children ON COLUMNS from [Quadrant Analysis] WHERE [Measures].[Actual]",
+		    success: function ExecuteOlapQuerySuccess(result){
+			console.debug('func Call: ' + arguments.callee.name);
+			document.body.appendChild(prettyPrint(result, { maxDepth:10 } ));
+		    }
+		});
+        </script>
+    </body>
+</html>

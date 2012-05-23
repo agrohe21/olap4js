@@ -11,7 +11,7 @@
 	olap.Connection
 	*/
 	olap.Connection = function Connection($connection){
-		console.debug('func Call: ' + arguments.callee.name);
+		//console.debug('func Call: ' + arguments.callee.name);
 		
 		var src = {}, that=this;
 		this.sources = [];
@@ -342,7 +342,7 @@
 	olap.CellSet
 	*/
 	olap.CellSet = function CellSet($cellset){
-	    console.debug('func Call: ' + arguments.callee.name);
+	    //console.debug('func Call: ' + arguments.callee.name);
 		this.axes       = $cellset.axes || [];
 		this.filterAxis = $cellset.filterAxis || {};
 		this.cells      = $cellset.cells || [];
