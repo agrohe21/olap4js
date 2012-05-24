@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Query Model Test</title>
+    </head>
+    <body>
+        <h1>OLAP Xmla Query Model Testing</h1>
+        <script src="../olap.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects");
+		    var testCase1 = new Y.Test.Case({
+			name: "my Test case Name",
+			setUp : function () {
+			    this.qry = new olap.Query({name:"test", axes:[{name:'cols', location:0}]}, {CUBE_NAME:'TEST_NAME'});
+			},
+			tearDown: function() {
+			    delete this.qry;
+			},
+			testName: function () {
+			    Y.Assert.areEqual('test', this.qry.getName());
+			},
+			testCubeName: function () {
+			    Y.Assert.areEqual('TEST_NAME', this.qry.getCube().getName());
+			},
+			testAxisColName: function () {
+			    var axes = this.qry.getAxes();
+			    Y.Assert.areEqual('cols', axes[0].getName());
+			},
+			testAxisColLocation: function () {
+			    var axes = this.qry.getAxes();
+			    Y.Assert.areEqual('0', axes[0].getLocation());
+			}			
+		    });
+		    suite.add(testCase1);
+		      
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+        </script>
+    </body>
+</html>
