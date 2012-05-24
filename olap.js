@@ -1,5 +1,8 @@
 (function olap(global){
 
+	/* olap module boiler plate
+	  *
+	*/
 	var olap;
 	if (typeof exports !== 'undefined') {
 		olap = exports;
@@ -7,8 +10,7 @@
 		olap = global.olap = {};
 	}
 
-	/*
-	olap.Connection
+	/* olap.Connection
 	*/
 	olap.Connection = function Connection($connection){
 		//console.debug('func Call: ' + arguments.callee.name);
@@ -26,10 +28,6 @@
 		}
 		
 	}
-	/*
-	 olap.Connection.prototype.executeOlapQuery = function createStatement(){
-		throw new Error('olap.Connection.executeOlapQuery should not be called directly');
-	}*/
 	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(){
 		if (this.sources.length ==0) {
 			this.fetchOlapDatasources();
@@ -156,6 +154,10 @@
 		this.measures   = [];
 		this.dimensions = [];
 		this.catalog    = $cat;
+	}
+	
+	olap.Cube.prototype.getName = function getName() {
+		return this.CUBE_NAME;
 	}
 	olap.Cube.prototype.addDimension = function addDimension(dimension, callback) {
 		this.dimensions.push(dimension);
@@ -338,8 +340,8 @@
 	}
 
 	
-	/*
-	olap.CellSet
+	/* olap.CellSet
+	  *
 	*/
 	olap.CellSet = function CellSet($cellset){
 	    //console.debug('func Call: ' + arguments.callee.name);
@@ -357,15 +359,54 @@
 		return this.cells;
 	}
 
+	/* olap.Query
+	  *
+	*/
 	olap.Query = function Query(query, $cube) {
-		this.cube    = $cube || {};
-		this.sets    = query.sets    || []; //sets are Named Sets that are represented in WITH statement
-		this.members = query.members || []; //members are calculated members that are represented in WITH statement
-		this.columns = query.columns || []; //columns represent a set or array in JavaScript
-		this.rows    = query.rows    || []; //rows represent a set or array in JavaScript
-		this.pages   = query.page    || []; //pages represent a set or array in JavaScript
-		this.slicer  = query.slicer  || []; //a slicer is a single tuple or object in JavaScript
+		var idx, axis;
+		query = query || {};
+		this.axes = [];
+		if (($cube instanceof Object) && ($cube instanceof olap.Cube == false)) {
+			this.cube = new olap.Cube($cube)
+		} else {
+			this.cube = {};
+		}
+		this.name    = query.name    || '';
+		//this.sets    = query.sets    || []; //sets are Named Sets that are represented in WITH statement
+		//this.members = query.members || []; //members are calculated members that are represented in WITH statement
+		if (query.axes instanceof Array) {
+			for (idx in query.axes){
+				this.addAxis(query.axes[idx])
+			}
+		}
 		this.text    = query.text    || '';
+	}
+	olap.Query.prototype.addAxis = function addAxis(axis){
+		//console.log(axis)
+		if ((axis instanceof Object) && (axis instanceof olap.Axis == false)) { //do we have an object as param and it is not already an Axis
+			axis = new olap.Axis(axis, this);
+		}
+		if (axis instanceof olap.Axis){
+			this.axes.push(axis);
+		}
+	}
+	olap.Query.prototype.getAxes = function getAxes(){
+		if (this.axes.length == 0) {
+			this.fetchAxes();
+		}		
+		return this.axes;
+	}
+	olap.Query.prototype.fetchAxes = function fetchAxes(){
+		//empty function that does not fetch anything
+	}
+	olap.Query.prototype.getAxis = function getAxis(axis){
+		return this.axes[axis];
+	}
+	olap.Query.prototype.getCube = function getCube(){
+		return this.cube;
+	}
+	olap.Query.prototype.getName = function getName(){
+		return this.name;
 	}
 	olap.Query.prototype.beforeAdd2Axis = function(obj, axis){
 		if ((!obj instanceof olap.Level) && (!obj instanceof olap.Measure)) {
@@ -478,7 +519,20 @@
 		//TODO Add Pages and other axis
 		return mdx;
 	}
-	
+
+	olap.Axis = function Axis(axis, $query){
+		this.query       = $query || {};
+		this.name        = axis.name        || 'Column';
+		this.location    = axis.location    || 0;
+		this.hierarchies = axis.hierarchies || [];
+		this.tuples      = axis.tuples      || [];
+	}
+	olap.Axis.prototype.getLocation = function getLocation(){
+		return this.location;
+	}	
+	olap.Axis.prototype.getName = function getName(){
+		return this.name;
+	}	
 })(this);
 
 /*

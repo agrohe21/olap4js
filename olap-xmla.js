@@ -249,7 +249,7 @@ olapXmla.Measure = function XmlaMeasure($Measure,$cube){
 
 inheritPrototype(olapXmla.Measure, olap.Measure);
 
-olapXmla.Query= function XmlaMeasure($Query,$cube){
+olapXmla.Query= function XmlaQuery($Query,$cube){
     olap.Query.call(this, $Query, $cube);
 }
 
