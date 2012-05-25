@@ -7,6 +7,8 @@
     <body>
         <h1>OLAP Xmla Query Model Testing</h1>
         <script src="../olap.js"></script>
+        <script src="../../xmla4js/src/Xmla.js"></script>
+        <script src="../olap-xmla.js"></script>
 	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
         <script type="text/javascript">
 		YUI().use('test', function (Y) {
@@ -15,7 +17,8 @@
 		    var testCase1 = new Y.Test.Case({
 			name: "Create basic query",
 			setUp : function () {
-			    this.qry = new olap.Query({name:"test", axes:[{name:'cols', location:0}]}, {CUBE_NAME:'TEST_NAME'});
+			    var olapConn = new olapXmla.Connection();
+			    this.qry = new olapXmla.Query({name:"test", axes:[{name:'cols', location:0}]}, {CUBE_NAME:'TEST_NAME'}, olapConn);
 			},
 			tearDown: function() {
 			    delete this.qry;
@@ -39,12 +42,13 @@
 			    Y.Assert.areEqual(true, this.qry.getAxes()[0] instanceof olap.Axis);
 			}			
 		    });
-		    suite.add(testCase1);
+		    //suite.add(testCase1);
 
 		    var testCase2 = new Y.Test.Case({
 			name: "Add member to column axis",
 			setUp : function () {
-			    this.qry = new olap.Query({
+			    var olapConn = new olapXmla.Connection();
+			    this.qry = new olapXmla.Query({
 				name:"All Customers",
 				axes:[{
 				    name:'COLUMN',
@@ -56,8 +60,10 @@
 					}
 				    ]
 				}]},
-				{CUBE_NAME:'SteelWheelsSales'});
-			    this.result = this.qry.execute();   
+				{CUBE_NAME:'SteelWheelsSales'},
+				olapConn,
+				'SteelWheels');
+			    
 			},
 			tearDown: function() {
 			    delete this.qry;
@@ -80,8 +86,10 @@
 			    var axes = this.qry.getAxes();
 			    Y.Assert.areEqual(1, axes[0].members.length);
 			},
-			testResult: function () {
-			    Y.Assert.areEqual(true, this.result instanceof olap.CellSet);
+			"Results Instance of olap.CellSet": function () {
+			    var result = this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });   
 			}
 			
 		    });

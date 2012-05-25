@@ -3,13 +3,14 @@ var olapXmla = function olapXmla(){
 };
 
 olapXmla.Connection = function XmlaConnection($connection){
-    olap.Connection.call(this, $connection);
+    var conn = $connection || {};
+    olap.Connection.call(this, conn);
     this.xmla = new Xmla({});
     this.xmla.setOptions({
 	async: false,
-	url: $connection.url || "http://localhost:8080/pentaho/Xmla",
-	roles: $connection.roles || [],
-	DataSourceInfo: 'Provider=' + $connection.provider || 'Mondrian' + ';DataSource=' + $connection.datasource || 'Pentaho'
+	url: conn.url || "http://localhost:8080/pentaho/Xmla",
+	roles: conn.roles || [],
+	DataSourceInfo: 'Provider=' + conn.provider || 'Mondrian' + ';DataSource=' + conn.datasource || 'Pentaho'
 	});
 }
 
@@ -234,7 +235,7 @@ olap.Level.prototype.getMembers = function getMembers(filter, callback) {
 		this.addMember(new olapXmla.Member(obj, this), callback);
 	    }                        
     } 
-    return this.members;
+    return this.members
 }
 
 olapXmla.Member = function XmlaMember($Member,$level){
@@ -249,76 +250,28 @@ olapXmla.Measure = function XmlaMeasure($Measure,$cube){
 
 inheritPrototype(olapXmla.Measure, olap.Measure);
 
-olapXmla.Query= function XmlaQuery($Query,$cube){
+olapXmla.Query= function XmlaQuery($Query, $cube, $connection, $catalog){
     olap.Query.call(this, $Query, $cube);
+    this.connection = $connection || {};
+    this.catalog = $catalog ||{};
 }
 
 inheritPrototype(olapXmla.Query, olap.Query);
 
-olapXmla.Query.prototype.execute = function(callback) {
+olapXmla.Query.prototype.execute = function execute(callback) {
 	var that=this, properties = {}, mdx, results, dataset, cells, tmp_results, axis;
-	properties[olap.PROP_DATASOURCEINFO] = this.cube.catalog.datasource[olap.PROP_DATASOURCEINFO];
-	properties[olap.PROP_CATALOG]        = this.cube.catalog.CATALOG_NAME;
-	properties[olap.PROP_FORMAT]         = olap.PROP_FORMAT_MULTIDIMENSIONAL;
 	
-	mdx = this.text || this.getMDX();
-	//TODO Add asynch capability
-	//try {
-		dataset = this.cube.catalog.datasource.olap.execute({
-			statement: mdx,
-			properties: properties
-			});
-		//results = new olap.Results.Tabular({columns:dataset.getFields(), data:dataset.fetchAllAsArray()}, this)
-		cells = dataset.getCellset();
-		
-		tmp_results = {
-			metadata: {axis:[], slicer:{}},
-			resultset:cells.fetchAllAsArrayOfValues()
-		};
-		//console.log(dataset._numAxes)
-		for (var i=0, j=dataset._numAxes-1;j>=i;j--){
-			axis = dataset.getAxis(j);
-			if (axis instanceof olap.Dataset.Axis) {
-				//console.log(axis.name)
-				tmp_results.metadata[axis.name] = new olap.Axis({
-					name:axis.name,
-					hierarchies: axis.getHierarchyNames(),
-					tuples: axis.fetchAllAsObject()
-				})
-			} else {
-				//console.log(axis)
-			}
+	mdx = this.getMDX();
+	dataset = this.connection.executeOlapQuery({
+		mdx: mdx,
+		catalog: this.catalog,
+		success: function(results){
+		    if (typeof callback == 'function') {
+			callback.call(this, results);
+			delete results;
+		    }
 		}
-		axis = null;
-		axis = dataset.getSlicerAxis();
-		if (axis instanceof olap.Dataset.Axis) {
-			tmp_results.metadata.slicer = new olap.Axis({
-				name: axis.name,
-				hierarchies: axis.getHierarchyNames(),
-				tuples: axis.fetchAllAsObject()
-			})
-		} else {
-			tmp_results.metadata.slicer = {};	
-		}
-		
-		dataset.close();		
-		delete dataset;
-		//TODO split up data and metadata
-		//document.body.appendChild(prettyPrint(tmp_results, { maxDepth:4 } ));
-		results = new olap.Results.Dimensional(tmp_results, this)
-		delete tmp_results;
-		/*
-		 } catch(e) {
-			alert(e);
-			return;
-		}
-		*/
-	if (typeof callback == 'function') {
-		callback.call(this, results);
-		delete results;
-	} else {
-		return results;
-	}
+	});
 }
 
 
