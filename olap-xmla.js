@@ -46,24 +46,27 @@ olapXmla.Connection.prototype.addDataSource = function XmlaAddDataSource(source,
 	return ds;
 }
 
-olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(){
+olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(callback){
     var that = this, raw_sources, source, ds;
-    raw_sources = this.xmla.discoverDataSources({});
+    FIX ME
+    this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
+	while (source = raw_sources.fetchAsObject()) {
+		ds = new olapXmla.Datasource({
+		    DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
+		    DATA_SOURCE_NAME:source.DataSourceName || "",
+		    DATA_SOURCE_INFO:source.DataSourceInfo || "",
+		    PROVIDER_NAME:source.ProviderName   || "",
+		    PROVIDER_TYPE:source.ProviderType || "",
+		    URL:source.URL            || "",
+		    AUTHENTICATION_MODE:source.AuthenticationMode || ""
+		}, this)
+		that.addDataSource.call(this, ds);
+	}
+	raw_sources.close();
+	delete raw_sources;
+	callback.call(this, this.sources)
+    }});
     
-    while (source = raw_sources.fetchAsObject()) {
-	    ds = new olapXmla.Datasource({
-		DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
-		DATA_SOURCE_NAME:source.DataSourceName || "",
-		DATA_SOURCE_INFO:source.DataSourceInfo || "",
-		PROVIDER_NAME:source.ProviderName   || "",
-		PROVIDER_TYPE:source.ProviderType || "",
-		URL:source.URL            || "",
-		AUTHENTICATION_MODE:source.AuthenticationMode || ""
-	    }, this)
-	    that.addDataSource.call(this, ds);
-    }
-    raw_sources.close();
-    delete raw_sources;
 }
 
 olapXmla.Datasource = function XmlaDatasource($datasource, conn){

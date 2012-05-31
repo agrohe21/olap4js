@@ -13,39 +13,41 @@
         <script type="text/javascript">
 		var olapConn = new olapXmla.Connection();
 		console.log(olapConn)
-		var sources = olapConn.getOlapDatabases(), idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
-		for (idx in sources) {
-		    source = sources[idx];
-		    catalogs = source.getCatalogs();
-		    for (idx in catalogs){
-			catalog = catalogs[idx];
-			cubes = catalog.getCubes();
-		    	for (idx in cubes){
-			    cube = cubes[idx];
-			    measures = cube.getMeasures();
-			    for (idx in measures){
-				measure = measures[idx];
-			    }
-			    dimensions = cube.getDimensions();
-			    for (idx in dimensions){
-				dimension = dimensions[idx];
-				hierarchies = dimension.getHierarchies();
-				for (idx in hierarchies){
-				    hierarchy = hierarchies[idx];
-				    levels = hierarchy.getLevels();
-				    for (idx in levels){
-					level = levels[idx];
-					members = level.getMembers();
-					for (idx in members){
-					    member = members[idx];
+		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		olapConn.getOlapDatabases(function(sources){
+		    for (idx in sources) {
+			source = sources[idx];
+			catalogs = source.getCatalogs();
+			for (idx in catalogs){
+			    catalog = catalogs[idx];
+			    cubes = catalog.getCubes();
+			    for (idx in cubes){
+				cube = cubes[idx];
+				measures = cube.getMeasures();
+				for (idx in measures){
+				    measure = measures[idx];
+				}
+				dimensions = cube.getDimensions();
+				for (idx in dimensions){
+				    dimension = dimensions[idx];
+				    hierarchies = dimension.getHierarchies();
+				    for (idx in hierarchies){
+					hierarchy = hierarchies[idx];
+					levels = hierarchy.getLevels();
+					for (idx in levels){
+					    level = levels[idx];
+					    members = level.getMembers();
+					    for (idx in members){
+						member = members[idx];
+					    }	    
 					}	    
 				    }	    
 				}	    
-			    }	    
+			    }
 			}
 		    }
-		}
-		document.body.appendChild(prettyPrint(sources, { maxDepth:10 } ));
+		    document.body.appendChild(prettyPrint(sources, { maxDepth:10 } ));
+		})
         </script>
     </body>
 </html>

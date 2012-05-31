@@ -28,13 +28,19 @@
 		}
 		
 	}
-	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(){
+	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(callback){
 		if (this.sources.length ==0) {
-			this.fetchOlapDatasources();
+			this.fetchOlapDatasources(function(sources){
+				callback.call(this, sources);
+			});
+		} else {
+			if (callback && typeof callback == 'function') {
+				callback.call(this, this.sources);
+			}
+			return this.sources;
 		}
-		return this.sources;
 	}
-	olap.Connection.prototype.fetchOlapDatasources = function fetchOlapDatasources(){
+	olap.Connection.prototype.fetchOlapDatasources = function fetchOlapDatasources(callback){
 		//empty function that does not fetch anything
 	}
 	olap.Connection.prototype.addDataSource = function addDataSource(source, callback) {
