@@ -340,6 +340,12 @@
 		//this.properties   = [];
 		this.level = $level;
 	}
+	olap.Member.prototype.getName = function getName(){
+		return this.MEMBER_NAME;
+	}
+	olap.Member.prototype.getUniqueName = function getUniqueName(){
+		return this.MEMBER_UNIQUE_NAME;
+	}
 	
 	/* olap.CellSet
 	  *
@@ -349,6 +355,8 @@
 		this.axes       = $cellset.axes || [];
 		this.filterAxis = $cellset.filterAxis || {};
 		this.cells      = $cellset.cells || [];
+		//console.log('ctor');
+		//console.log($cellset.cells)
 	}
 	olap.CellSet.prototype.getAxes = function getAxes(){
 		return this.axes;
@@ -357,7 +365,7 @@
 		return this.filterAxis;
 	}
 	olap.CellSet.prototype.getCell = function getCell(index){
-		return this.cells;
+		return this.cells[index];
 	}
 
 	/* olap.Query
@@ -369,7 +377,7 @@
 		if (($cube instanceof Object) && ($cube instanceof olap.Cube == false)) {
 			this.cube = new olap.Cube($cube)
 		} else {
-			this.cube = {};
+			this.cube = $cube;
 		}
 		this.name    = query.name    || '';
 		//this.sets    = query.sets    || []; //sets are Named Sets that are represented in WITH statement
@@ -381,11 +389,13 @@
 			}
 		}
 		this.text    = query.text    || '';
-		this.results = query.results || []; //allow rehydration of query without re-execution
+		this.results = query.results || null; //allow rehydration of query without re-execution
 	}
 	olap.Query.prototype.addAxis = function addAxis(axis){
-		if ((axis instanceof Object) && (axis instanceof olap.Axis == false)) { //do we have an object as param and it is not already an Axis
-			axis = new olap.Axis(axis, this);
+		if (axis instanceof Object){
+			if (axis instanceof olap.Axis == false) { //do we have an object as param and it is not already an Axis
+				axis = new olap.Axis(axis, this);
+			}
 		}
 		if (axis instanceof olap.Axis){
 			this.axes.push(axis);
@@ -520,8 +530,7 @@
 		return mdx;
 	}
 	olap.Query.prototype.execute = function execute(callback){
-		throw new Error('should not be here')
-		var results = this.results;
+		var results = this.results || new olap.CellSet({});;
 		if (typeof callback == 'function') {
 			callback.call(this, results);
 			delete results;
@@ -534,6 +543,7 @@
 	  *
 	*/
 	olap.Axis = function Axis(axis, $query){
+		axis = axis || {};
 		this.query       = $query           || {};
 		this.name        = axis.name        || 'Column';
 		this.location    = axis.location    || 0;
@@ -550,11 +560,22 @@
 	olap.Axis.prototype.getName = function getName(){
 		return this.name;
 	}
+	olap.Axis.prototype.addSet = function addSet(set){
+		if (set instanceof Array){
+			for (var i=0, j=set.length;i<j;i++){
+				this.addMember(set[i]);
+			}
+		}
+	}
 	olap.Axis.prototype.addMember = function addMember(member){
-		if ((member instanceof Object) && (member instanceof olap.Member == false)) {
-			member = new olap.Member(member)
+		if (member instanceof Object) {
+			if (member instanceof olap.Member == false) {
+				member = new olap.Member(member)
+			}
+			if (member instanceof olap.Member){
+				this.members.push(member);
+			}
 		} 
-		this.members.push(member);
 		
 	};
 	/* olap.MemberExpression

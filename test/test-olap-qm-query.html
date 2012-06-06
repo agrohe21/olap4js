@@ -86,6 +86,25 @@
 			
 		    });
 		    suite.add(testCase2);
+		    
+		    var testCase3 = new Y.Test.Case({
+			name: "Test API Query modification",
+			setUp : function () {
+			    this.qry = new olap.Query({name:"All Customers"});
+			},
+			tearDown: function() {
+			    delete this.qry;
+			},
+			testName: function () {
+			    Y.Assert.areEqual('All Customers', this.qry.getName());
+			},
+			testResult: function () {
+			    var result = this.qry.execute();
+			    Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			}
+		    });
+		    suite.add(testCase3);
+		    
 		      
 		    //add the test cases and suites
 		    Y.Test.Runner.add(suite);

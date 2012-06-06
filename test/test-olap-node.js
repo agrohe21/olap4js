@@ -1,7 +1,6 @@
 var olap = require('../olap'),
 assert = require('assert');
 
-
 var sources, idx, catalogs, catalog, cuubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
 var mysrc = {
     AUTHENTICATION_MODE:"Unauthenticated",
