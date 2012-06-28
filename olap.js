@@ -47,6 +47,7 @@
 		if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
 			source = new olap.Datasource(source);
 		}
+		console.log(source)
 		this.sources.push(source);
 		if (callback && typeof callback == 'function') {
 			callback(source);
@@ -85,7 +86,25 @@
 			}
 		}
 		
-		this.connection = $conn
+		this.connection = $conn;
+	}
+	olap.Datasource.prototype.getOlapConnection = function getOlapConnection() {
+		return this.connection;
+	}
+	olap.Datasource.prototype.getName = function getName() {
+		return this.DATA_SOURCE_NAME;
+	}
+	olap.Datasource.prototype.getDescription = function getDescription() {
+		return this.DATA_SOURCE_DESCRIPTION;
+	}
+	olap.Datasource.prototype.getProviderName = function getProviderName() {
+		return this.PROVIDER_NAME;
+	}
+	olap.Datasource.prototype.getURL = function getURL() {
+		return this.URL;
+	}
+	olap.Datasource.prototype.getDataSourceInfo = function getDataSourceInfo() {
+		return this.DATA_SOURCE_INFO;
 	}
 	olap.Datasource.prototype.getCatalogs = function getCatalogs() {
 		if (this.catalogs.length == 0) {
@@ -419,6 +438,11 @@
 	olap.Query.prototype.getName = function getName(){
 		return this.name;
 	}
+	olap.Query.prototype.createAxis = function createAxis(conf) {
+		var axis = new olap.Axis(conf, this);
+		this.axes.push(axis);
+		return axis;
+	}
 	olap.Query.prototype.beforeAdd2Axis = function(obj, axis){
 		if ((!obj instanceof olap.Level) && (!obj instanceof olap.Measure)) {
 			throw new Error('Axis members must be olap.Level or measure objects');
@@ -530,6 +554,7 @@
 		return mdx;
 	}
 	olap.Query.prototype.execute = function execute(callback){
+		//default implementation does not create results
 		var results = this.results || new olap.CellSet({});;
 		if (typeof callback == 'function') {
 			callback.call(this, results);
@@ -578,11 +603,89 @@
 		} 
 		
 	};
+	olap.Axis.prototype.addExpression = function addExpression(expression){
+		var exp = new olap.Expression(expression);
+		this.members.push(exp);
+	}
+	olap.Axis.prototype.getMembers = function getMembers(){
+		return this.members;
+	}
+
+	olap.Axis.prototype.getMember = function getMember(index){
+		return this.members[index] || null;
+	}
+	
 	/* olap.MemberExpression
 	  *
 	*/
-	olap.MemberExpression = function MemberExpression(expression){
-	}	
+	olap.Expression = function Expression(expression){
+		if (expression.expBase) {
+			if (expression.expFunction && this.validateFunction(expression)) {
+				this.expFunction = expression.expFunction;
+			} else {
+				throw new Error('Member Expressions must have a valid function')
+			}
+		} else {
+			throw new Error('Member Expressions must have a base metadata object');
+		}
+	}
+	olap.Expression.prototype.validateFunction = function validateFunction(expression){
+		if (expression.expBase instanceof olap.Member) {
+			if (expression.expFunction == 'Children' || expression.expFunction == 'PrevMember' || expression.expFunction == 'NextMember'){
+				return true;
+			}
+		}
+		return false;
+	}
+	/* Open
+	  Filter
+	  Order
+	  Item
+	*/
+	/* Dimension
+	  AllMembers
+	  Members
+	*/
+	/* Hierarchy
+	  DefaultMember
+	  AllMembers
+	  Members
+	*/
+	/* Level
+	  AllMembers
+	  ClosingPeriod
+	  Members
+	  OpeningPeriod
+	  ParallelPeriod
+	  PeriodsToDate
+	*/
+	/* Member
+	  Ascendants
+	  Ancestor
+	  Children
+	  Cousin
+	  Descendants
+	  FirstChild
+	  FirstSibling
+	  Lag
+	  LastChild
+	  LastSibling
+	  Lead
+	  Mtd
+	  NextMember
+	  Parent
+	  PrevMember
+	  Properties
+	  Qtd
+	  Rank
+	  Siblings
+	  Wtd
+	  Ytd
+	  <<Grandparent, Grandchild>>
+	*/
+	olap.Expression.prototype.getFunction = function getFunction(){
+		return this.expFunction;
+	}
 
 	/* olap.SetExpression
 	  *
