@@ -45,12 +45,11 @@
 	}
 	olap.Connection.prototype.addDataSource = function addDataSource(source, callback) {
 		if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
-			source = new olap.Datasource(source);
+			source = new olap.Datasource(source, this);
 		}
-		console.log(source)
 		this.sources.push(source);
 		if (callback && typeof callback == 'function') {
-			callback(source);
+			callback.call(this, source);
 		}
 		return source;
 	}
@@ -359,23 +358,56 @@
 		//this.properties   = [];
 		this.level = $level;
 	}
-	olap.Member.prototype.getName = function getName(){
-		return this.MEMBER_NAME;
+	olap.Member.validMethods = ['Children', 'Cousin', 'FirstChild', 'FirstSibling','LastChild', 'LastSibling', 'NextMember', 'Parent', 'PrevMember', 'Siblings'];
+	//hold on her 'Ascendants', 'Descendants', 'Lag', 'Lead', 'Mtd', 'Qtd', 'Rank', 'Siblings', 'Qtd', 'Wtd', 'Ytd'
+	olap.Member.sugarMethods = ['Self', 'GrandParent', 'GrandChild'];
+	olap.Member.isBasicMethod = function(method){
+		var idx;
+		for (idx in olap.Member.validMethods){
+			if (olap.Member.validMethods[idx] == method) {
+				return true;
+			}
+		}		
 	}
-	olap.Member.prototype.getUniqueName = function getUniqueName(){
-		return this.MEMBER_UNIQUE_NAME;
+	olap.Member.isMethodValid = function(method){
+		
+		if (olap.Member.isBasicMethod(method) == true){
+			return true;
+		}
+		var idx;
+		for (idx in olap.Member.sugarMethods){
+			if (olap.Member.sugarMethods[idx] == method) {
+				return true;
+			}
+		}
+		//if we get here the method is not valid
+		return false;
+		
 	}
-	
+	olap.Member.prototype = {
+		getName: function getName(){
+			return this.MEMBER_NAME;
+		},
+		getUniqueName: function getUniqueName(){
+			return this.MEMBER_UNIQUE_NAME;
+		},
+		toMDX: function toMDX(method, param){
+			if (olap.Member.isBasicMethod(method)) {
+				return this.getUniqueName() + '.' + method
+			}
+			else {
+				return "";
+			}
+		}
+	}
 	/* olap.CellSet
 	  *
 	*/
 	olap.CellSet = function CellSet($cellset){
-	    //console.debug('func Call: ' + arguments.callee.name);
+		//console.debug('func Call: ' + arguments.callee.name);
 		this.axes       = $cellset.axes || [];
 		this.filterAxis = $cellset.filterAxis || {};
 		this.cells      = $cellset.cells || [];
-		//console.log('ctor');
-		//console.log($cellset.cells)
 	}
 	olap.CellSet.prototype.getAxes = function getAxes(){
 		return this.axes;
@@ -393,12 +425,14 @@
 	olap.Query = function Query(query, $cube) {
 		var idx, axis;
 		query = query || {};
-		if (($cube instanceof Object) && ($cube instanceof olap.Cube == false)) {
-			this.cube = new olap.Cube($cube)
-		} else {
-			this.cube = $cube;
+		if ($cube instanceof Object){
+			if ($cube instanceof olap.Cube == false) {
+				this.cube = new olap.Cube($cube);
+			} else {
+				this.cube = $cube;
+			}
 		}
-		this.name    = query.name    || '';
+		this.name    = query.name    || ''; 
 		//this.sets    = query.sets    || []; //sets are Named Sets that are represented in WITH statement
 		//this.members = query.members || []; //members are calculated members that are represented in WITH statement
 		this.axes = [];
@@ -410,157 +444,64 @@
 		this.text    = query.text    || '';
 		this.results = query.results || null; //allow rehydration of query without re-execution
 	}
-	olap.Query.prototype.addAxis = function addAxis(axis){
-		if (axis instanceof Object){
-			if (axis instanceof olap.Axis == false) { //do we have an object as param and it is not already an Axis
-				axis = new olap.Axis(axis, this);
+	//class properties and functions....
+	olap.Query.id = 0;
+	olap.Query.prefix = "olap.query";
+	olap.Query.instances = {};
+	olap.Query.getInstance = function(id){
+	    return olap.Query.instances[id];
+	};	
+	olap.Query.prototype = {
+		addAxis: function addAxis(axis){
+			if (axis instanceof Object){
+				if (axis instanceof olap.Axis == false) { //do we have an object as param and it is not already an Axis
+					axis = new olap.Axis(axis, this);
+				}
 			}
-		}
-		if (axis instanceof olap.Axis){
+			if (axis instanceof olap.Axis){
+				this.axes.push(axis);
+			}
+		},
+		getAxes: function getAxes(){
+			if (this.axes.length == 0) {
+				this.fetchAxes();
+			}		
+			return this.axes;
+		},
+		fetchAxes: function fetchAxes(){
+			//empty function that does not fetch anything
+		},
+		getAxis: function getAxis(axis){
+			if (this.axes.length == 0) {
+				this.fetchAxes();
+			}		
+			return this.axes[axis];
+		},
+		getCube: function getCube(){
+			return this.cube;
+		},
+		getName: function getName(){
+			return this.name;
+		},
+		createAxis: function createAxis(conf) {
+			var axis = new olap.Axis(conf, this);
 			this.axes.push(axis);
-		}
-	}
-	olap.Query.prototype.getAxes = function getAxes(){
-		if (this.axes.length == 0) {
-			this.fetchAxes();
-		}		
-		return this.axes;
-	}
-	olap.Query.prototype.fetchAxes = function fetchAxes(){
-		//empty function that does not fetch anything
-	}
-	olap.Query.prototype.getAxis = function getAxis(axis){
-		return this.axes[axis];
-	}
-	olap.Query.prototype.getCube = function getCube(){
-		return this.cube;
-	}
-	olap.Query.prototype.getName = function getName(){
-		return this.name;
-	}
-	olap.Query.prototype.createAxis = function createAxis(conf) {
-		var axis = new olap.Axis(conf, this);
-		this.axes.push(axis);
-		return axis;
-	}
-	olap.Query.prototype.beforeAdd2Axis = function(obj, axis){
-		if ((!obj instanceof olap.Level) && (!obj instanceof olap.Measure)) {
-			throw new Error('Axis members must be olap.Level or measure objects');
-		}
-		if (axis != 'ROW' && axis != 'COLUMN' && axis != 'PAGE') {
-			throw new Error('Unknow axis specified: ' + axis);
-		}
-		if (axis == 'ROWS' && this.columns.length == 0){
-			throw new Error('Columns must be specified before Rows')
-		}
-		if (axis == 'PAGE' && this.rows.length == 0){
-			throw new Error('Rows must be specified before Pages')
-		}
-		/* check to see if dimension hierarchy exists on another axis
-		*/
-		var level = findHierarchy(obj);
-		if (level.hierarchy != obj.hierarchy) {
-			throw new Error('Cannot add level to more than one axis.')
-		}
-		return true;
-	}
-	olap.Query.prototype.findHierarchy = function(level){
-		var page, row, col, i=0,j=0;
-		for (i=0,j=this.pages.length;i<j;i++){
-			page = this.pages[i];
-			/* look in each page to see if the level's hierarchy already exist
-			*/
-			if (page.hierarchy == level.hierarchy) {
-				return page;
+			return axis;
+		},
+		reset: function() {
+		    for (var p in this.axes) {
+			this.axes[p].reset();
+		    }
+		},
+		execute: function execute(callback){
+			//default implementation does not create results
+			var results = this.results || new olap.CellSet({});;
+			if (typeof callback == 'function') {
+				callback.call(this, results);
+				delete results;
+			} else {
+				return results;
 			}
-		}
-		for (i=0,j=this.rows.length;i<j;i++){
-			row = this.rows[i];
-			/* look in each row to see if the level's hierarchy already exist
-			*/
-			if (row.hierarchy == level.hierarchy) {
-				return row;
-			}
-		}
-		for (i=0,j=this.columns.length;i<j;i++){
-			col = this.columns[i];
-			/* look in each row to see if the level's hierarchy already exist
-			*/
-			if (col.hierarchy == level.hierarchy) {
-				return col;
-			}
-		}
-		/* default is an empty object instead of null
-		*/
-		return false;
-	}
-	olap.Query.prototype.add2Axis = function(obj, axis, callback) {
-		if (this.beforeAdd2Axis()){
-			switch (axis) {
-				case 'COLUMN':
-					this.columns.push(obj);
-					break;
-				case 'ROW':
-					this.rows.push(obj);
-					break;
-				case 'SLICER':
-					this.slicer.push(obj);
-					break;
-				case 'PAGE':
-					this.pages.push(obj);
-					break;
-				default:
-					this.columns.push(obj);
-			}
-		}
-	}
-	olap.Query.prototype.getAxisMDX = function(axis){
-		//console.debug(axis)
-		var mdx = '', i=0,j=axis.length, amemb;
-		if (j>1) {
-			mdx += '{';
-		}
-		for (i=0;i<j;i++){
-			amemb = axis[i];
-			if (amemb instanceof olap.Member) {
-				mdx += amemb.MEMBER_UNIQUE_NAME;
-			} else { //must be a measure
-				mdx += amemb.MEASURE_UNIQUE_NAME;
-			}
-			if (i != j-1 && i < j-1) {
-				mdx += ', '
-			}
-		}
-		if (j>1) {
-			mdx += '}';
-		}
-		//console.debug(mdx);
-		return mdx;
-	}
-	olap.Query.prototype.getMDX = function() {
-		var mdx = 'SELECT ';
-		if (this.axes[0].members.length == 0){
-			throw new Error('MDX Query must have Column axis');
-		}
-		mdx += this.getAxisMDX(this.axes[0].members);
-		mdx += ' ON COLUMNS ';
-		if (this.axes[1] && this.axes[1].members.length != 0){
-			mdx += ', ' + this.getAxisMDX(this.rows)
-			mdx += ' ON ROWS ';
-		}
-		mdx += ' FROM [' + this.cube.getName() + ']';
-		//TODO Add Slicer
-		//TODO Add Pages and other axis
-		return mdx;
-	}
-	olap.Query.prototype.execute = function execute(callback){
-		//default implementation does not create results
-		var results = this.results || new olap.CellSet({});;
-		if (typeof callback == 'function') {
-			callback.call(this, results);
-			delete results;
-		} else {
-			return results;
 		}
 	}
 	
@@ -572,79 +513,88 @@
 		this.query       = $query           || {};
 		this.name        = axis.name        || 'Column';
 		this.location    = axis.location    || 0;
-		this.members     = [];
-		if (axis.members instanceof Array) {
-			for (var i=0,j=axis.members.length;i<j;i++){
-				this.addMember(axis.members[i])
+		this.hierarchies = [];
+	}
+	olap.Axis.prototype = {
+		getLocation: function getLocation(){
+			return this.location;
+		},	
+		getName: function getName(){
+			return this.name;
+		},
+		addExpression: function addExpression(expression){
+			if (!expression instanceof olap.Expression) {
+				var expression = new olap.Expression(expression);
 			}
+			this.members.push(exp);
+		},
+		reset: function(){
+			this.hierarchies = [];			
 		}
-	}
-	olap.Axis.prototype.getLocation = function getLocation(){
-		return this.location;
-	}	
-	olap.Axis.prototype.getName = function getName(){
-		return this.name;
-	}
-	olap.Axis.prototype.addSet = function addSet(set){
-		if (set instanceof Array){
-			for (var i=0, j=set.length;i<j;i++){
-				this.addMember(set[i]);
-			}
-		}
-	}
-	olap.Axis.prototype.addMember = function addMember(member){
-		if (member instanceof Object) {
-			if (member instanceof olap.Member == false) {
-				member = new olap.Member(member)
-			}
-			if (member instanceof olap.Member){
-				this.members.push(member);
-			}
-		} 
-		
-	};
-	olap.Axis.prototype.addExpression = function addExpression(expression){
-		var exp = new olap.Expression(expression);
-		this.members.push(exp);
-	}
-	olap.Axis.prototype.getMembers = function getMembers(){
-		return this.members;
-	}
-
-	olap.Axis.prototype.getMember = function getMember(index){
-		return this.members[index] || null;
 	}
 	
 	/* olap.MemberExpression
 	  *
 	*/
 	olap.Expression = function Expression(expression){
-		if (expression.expBase) {
-			if (expression.expFunction && this.validateFunction(expression)) {
-				this.expFunction = expression.expFunction;
-			} else {
-				throw new Error('Member Expressions must have a valid function')
-			}
-		} else {
-			throw new Error('Member Expressions must have a base metadata object');
-		}
+		var expr = expression || {base:{}, method:null, param:[]};
+		this.base = {};
+		this.method = {};
+		this.param  = [];
+		this.setBase(expr.base);
+		this.setMethod(expr.method);
+		this.setParameters(expr.param)
+		delete expr;
 	}
-	olap.Expression.prototype.validateFunction = function validateFunction(expression){
-		if (expression.expBase instanceof olap.Member) {
-			if (expression.expFunction == 'Children' || expression.expFunction == 'PrevMember' || expression.expFunction == 'NextMember'){
-				return true;
+	olap.Expression.prototype = {
+		setBase: function(base){
+			if (base) {
+				this.base = base;
+			} else {
+				throw new Error('Member Expressions must have a base metadata object');
 			}
+		},
+		getBase: function(){
+			return this.base;
+		},
+		setMethod: function(method){
+			if (method){
+				if (this.validateMethod(method)) {
+					this.method = method;
+				} else {
+					throw new Error('Method: ' + method + ' is not a valid method')
+				}
+			} else {
+				
+				throw new Error('Member Expressions must have a valid method')
+			}
+		},
+		getMethod: function(){
+			return this.method;
+		},
+		setParameters: function(params){
+			if (params instanceof Array) {
+				this.param = params;
+			}
+		},
+		getParameters: function(){
+			return this.param;
+		},
+		validateMethod: function validateMethod(method){
+			//TODO Add other classes in here Hierarchy, Level
+			if (this.base instanceof olap.Member) {
+				return olap.Member.isMethodValid(method);
+			}
+			return false;
+		},
+		toMDX: function(){
+			return this.base.toMDX(this.getMethod(), this.getParameters());
 		}
-		return false;
 	}
 	/* Open
 	  Filter
 	  Order
 	  Item
-	*/
-	/* Dimension
-	  AllMembers
-	  Members
 	*/
 	/* Hierarchy
 	  DefaultMember
@@ -660,6 +610,7 @@
 	  PeriodsToDate
 	*/
 	/* Member
+	  Add in Self as an option
 	  Ascendants
 	  Ancestor
 	  Children

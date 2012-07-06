@@ -12,7 +12,6 @@
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
 		var olapConn = new olapXmla.Connection({});
-		console.log(olapConn)
 		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
 		olapConn.getOlapDatabases(function(sources){
 		    for (idx in sources) {
@@ -46,6 +45,8 @@
 			    }
 			}
 		    }
+		    member =source.catalogs[1].cubes[0].dimensions[0].hierarchies[0].levels[0].members[0];
+		    sourceStr = JSON.stringify(member);
 		    document.body.appendChild(prettyPrint(sources, { maxDepth:10 } ));
 		})
         </script>

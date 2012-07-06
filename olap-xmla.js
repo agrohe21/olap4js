@@ -58,7 +58,7 @@
     
     olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(callback){
 	var that = this, raw_sources, source, ds;
-	//FIX ME
+	
 	this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
 	    while (source = raw_sources.fetchAsObject()) {
 		    ds = new olapXmla.Datasource({
@@ -69,18 +69,17 @@
 			PROVIDER_TYPE:source.ProviderType || "",
 			URL:source.URL            || "",
 			AUTHENTICATION_MODE:source.AuthenticationMode || ""
-		    }, this)
-		    that.addDataSource.call(this, ds);
+		    }, that)
+		    that.addDataSource.call(that, ds);
 	    }
 	    raw_sources.close();
 	    delete raw_sources;
-	    callback.call(this, this.sources)
+	    callback.call(that, that.sources)
 	}});
 	
     }
     
     olapXmla.Datasource = function XmlaDatasource($datasource, conn){
-	//this.catalogs = [];
 	olap.Datasource.call(this, $datasource, conn);
     }
     
@@ -275,7 +274,6 @@
 	    var that=this, properties = {}, mdx, results, dataset, cells, tmp_results, axis;
 	    
 	    mdx = this.getMDX();
-	    console.log(mdx);
 	    dataset = this.connection.executeOlapQuery({
 		    mdx: mdx,
 		    catalog: this.catalog,
