@@ -10,8 +10,6 @@
 		olapXmla = global.olapXmla = {};
 	}
 
-    //var olapXmla = function olapXmla(){new olap.call(this);};
-    
     olapXmla.Connection = function XmlaConnection($connection){
 	var conn = $connection || {};
 	olap.Connection.call(this, conn);
@@ -27,57 +25,55 @@
     inheritPrototype(olapXmla.Connection, olap.Connection);
     
     olapXmla.Connection.prototype.executeOlapQuery = function XmlaExecuteOlapQuery(options){
-	//console.debug('func Call: ' + arguments.callee.name);
-	var that=this, properties = {}, results, dataset, cells, tmp_results, axis;
-	properties[Xmla.PROP_FORMAT]         = Xmla.PROP_FORMAT_MULTIDIMENSIONAL;
-	if (options.catalog && options.catalog !== "") {
-	    properties[Xmla.PROP_CATALOG] = options.catalog;
-	} else {
-	    throw new Error('An MDX query must have a catalog specified in options')
+	    //console.debug('func Call: ' + arguments.callee.name);
+	    var that=this, properties = {}, results, dataset, cells, tmp_results, axis;
+	    properties[Xmla.PROP_FORMAT]         = Xmla.PROP_FORMAT_MULTIDIMENSIONAL;
+	    if (options.catalog && options.catalog !== "") {
+		properties[Xmla.PROP_CATALOG] = options.catalog;
+	    } else {
+		throw new Error('An MDX query must have a catalog specified in options')
+	    }
+	    dataset = that.xmla.execute({
+		statement: options.mdx,
+		properties: properties,
+		success: function xmlaExecuteSuccess($xmla, $options, xmla_dataset){
+		    //console.debug('func Call: ' + arguments.callee.name);
+		    var cellset = xmla_dataset.fetchAsObject();
+		    results = new olap.CellSet(cellset);
+		    if (typeof options.success ==  'function') {
+			options.success(results);
+		    }
+		    return results;
+		}			
+	    });
 	}
-	dataset = that.xmla.execute({
-	    statement: options.mdx,
-	    properties: properties,
-	    success: function xmlaExecuteSuccess($xmla, $options, xmla_dataset){
-		//console.debug('func Call: ' + arguments.callee.name);
-		var cellset = xmla_dataset.fetchAsObject();
-		results = new olap.CellSet(cellset);
-		if (typeof options.success ==  'function') {
-		    options.success(results);
-		}
-		return results;
-	    }			
-	});
-    };
-    
     olapXmla.Connection.prototype.addDataSource = function XmlaAddDataSource(source, callback) {
 	    var ds = new olapXmla.Datasource(source, this)
 	    olap.Connection.prototype.addDataSource.call(this, ds)
 	    return ds;
-    }
-    
+	}
     olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(callback){
-	var that = this, raw_sources, source, ds;
-	
-	this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
-	    while (source = raw_sources.fetchAsObject()) {
-		    ds = new olapXmla.Datasource({
-			DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
-			DATA_SOURCE_NAME:source.DataSourceName || "",
-			DATA_SOURCE_INFO:source.DataSourceInfo || "",
-			PROVIDER_NAME:source.ProviderName   || "",
-			PROVIDER_TYPE:source.ProviderType || "",
-			URL:source.URL            || "",
-			AUTHENTICATION_MODE:source.AuthenticationMode || ""
-		    }, that)
-		    that.addDataSource.call(that, ds);
-	    }
-	    raw_sources.close();
-	    delete raw_sources;
-	    callback.call(that, that.sources)
-	}});
-	
-    }
+	    var that = this, raw_sources, source, ds;
+	    //console.debug('in fetchXmla')
+	    this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
+		while (source = raw_sources.fetchAsObject()) {
+			ds = new olapXmla.Datasource({
+			    DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
+			    DATA_SOURCE_NAME:source.DataSourceName || "",
+			    DATA_SOURCE_INFO:source.DataSourceInfo || "",
+			    PROVIDER_NAME:source.ProviderName   || "",
+			    PROVIDER_TYPE:source.ProviderType || "",
+			    URL:source.URL            || "",
+			    AUTHENTICATION_MODE:source.AuthenticationMode || ""
+			}, that)
+			that.addDataSource.call(that, ds);
+		}
+		raw_sources.close();
+		delete raw_sources;
+		callback.call(that, that.sources)
+	    }});
+	    
+	}
     
     olapXmla.Datasource = function XmlaDatasource($datasource, conn){
 	olap.Datasource.call(this, $datasource, conn);
@@ -116,7 +112,7 @@
     
     inheritPrototype(olapXmla.Catalog, olap.Catalog);
     
-    olapXmla.Catalog.prototype.getCubes = function getCubes(filter, callback) {
+    olapXmla.Catalog.prototype.getCubes = function f(filter, callback) {
     
 	    var properties = {}, rowset, cube, that=this;
 	    properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
@@ -135,10 +131,27 @@
     olapXmla.Cube = function XmlaCube($Cube,$catalog){
 	olap.Cube.call(this, $Cube, $catalog);
     }
+
+    olapXmla.Cube.getCubes = function getCubes(source) {
+    
+	    var properties = {}, rowset, cube, cubes=[];
+	    rowset = source.connection.xmla.discoverMDCubes({
+		    properties: properties
+	    });
+	    if (rowset.hasMoreRows()) {
+		    while (cube = rowset.fetchAsObject()){
+			    cubes.push(new olapXmla.Cube(cube));
+		    }                        
+	    }
+	    rowset.close();
+	    return cubes;
+    
+    }
     
     inheritPrototype(olapXmla.Cube, olap.Cube);
     
-    olapXmla.Cube.prototype.getDimensions = function getDimensions(filter, callback) {
+    olapXmla.Cube.prototype = {
+	getDimensions: function getDimensions(filter, callback) {
     
 	    var properties = {}, rowset, dim, that=this;
 	    properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
@@ -154,30 +167,47 @@
 		}                        
 	    }
 	    return this.dimensions;
-    }
+	},
+	getMeasures: function getMeasures(filter, callback) {
     
-    olapXmla.Cube.prototype.getMeasures = function getMeasures(filter, callback) {
-    
-	var properties = {}, rowset, obj, that=this;
-	//properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
-	var restrictions = {};
-	restrictions["CATALOG_NAME"] = this.catalog.CATALOG_NAME;
-	restrictions["CUBE_NAME"]    = this.CUBE_NAME;	
-	rowset = this.catalog.datasource.connection.xmla.discoverMDMeasures({
-		restrictions: restrictions
-	});
-	if (rowset.hasMoreRows()) {
-		while (obj= rowset.fetchAsObject()){
-		    this.addMeasure(new olapXmla.Measure(obj, this), callback);
-		}                        
+	    var properties = {}, rowset, obj, that=this;
+	    //properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
+	    var restrictions = {};
+	    restrictions["CATALOG_NAME"] = this.catalog.CATALOG_NAME;
+	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;	
+	    rowset = this.catalog.datasource.connection.xmla.discoverMDMeasures({
+		    restrictions: restrictions
+	    });
+	    if (rowset.hasMoreRows()) {
+		    while (obj= rowset.fetchAsObject()){
+			this.addMeasure(new olapXmla.Measure(obj, this), callback);
+		    }                        
+	    }
+	    return this.measures;
 	}
-	return this.measures;
     }
     
     olapXmla.Dimension = function XmlaDimension($dim,$cube){
 	olap.Dimension.call(this, $dim, $cube);
     }
+    //add in fetch for each get
+    //start on dimension expression tesing from here....
+    olapXmla.Dimension.getDimensions = function getDimensions(source) {
     
+	var properties = {}, rowset, dim, dims=[];
+	var restrictions = {};
+	rowset = source.connection.xmla.discoverMDDimensions({
+		restrictions: restrictions
+	});
+	if (rowset.hasMoreRows()) {
+	    while (dim= rowset.fetchAsObject()){
+		//console.log(dim);
+		dims.push(new olapXmla.Dimension(dim));
+	    }                        
+	}
+	return dims;
+    }
+
     inheritPrototype(olapXmla.Dimension, olap.Dimension);
     
     olapXmla.Dimension.prototype.getHierarchies = function getHierarchies(filter, callback) {

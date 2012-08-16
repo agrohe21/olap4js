@@ -15,6 +15,8 @@
 	olap.Connection = function Connection($connection){
 		//console.debug('func Call: ' + arguments.callee.name);
 		
+		this.id = olap.Connection.id++;
+		
 		var src = {}, that=this;
 		this.sources = [];
 		if ($connection instanceof Object) { //have we been passed a valid JS object?
@@ -26,33 +28,41 @@
 				}
 			}
 		}
-		
+		olap.Connection.instances[this.id] = this;		
 	}
+	
 	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(callback){
-		if (this.sources.length ==0) {
-			this.fetchOlapDatasources(function(sources){
-				callback.call(this, sources);
-			});
-		} else {
-			if (callback && typeof callback == 'function') {
-				callback.call(this, this.sources);
+			if (this.sources.length ==0) {
+				console.debug('none');
+				this.fetchOlapDatasources(function(sources){
+					callback.call(this, sources);
+				});
+			} else {
+				console.debug('some')
+				if (callback && typeof callback == 'function') {
+					callback.call(this, this.sources);
+				}
+				return this.sources;
 			}
-			return this.sources;
 		}
-	}
 	olap.Connection.prototype.fetchOlapDatasources = function fetchOlapDatasources(callback){
-		//empty function that does not fetch anything
-	}
+			//empty function that does not fetch anything
+		}
 	olap.Connection.prototype.addDataSource = function addDataSource(source, callback) {
-		if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
-			source = new olap.Datasource(source, this);
-		}
-		this.sources.push(source);
-		if (callback && typeof callback == 'function') {
-			callback.call(this, source);
-		}
-		return source;
+			if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
+				source = new olap.Datasource(source, this);
+			}
+			this.sources.push(source);
+			if (callback && typeof callback == 'function') {
+				callback.call(this, source);
+			}
+			return source;
 	}
+	olap.Connection.id = 0;
+	olap.Connection.instances = {};
+	olap.Connection.getInstance = function(id){
+	    return olap.Connection.instances[id];
+	};
 	
 	/* olap.Datasource
 	*   <p>
@@ -144,12 +154,14 @@
 		this.cubes         = catalog.cubes         || [];
 		this.datasource    = $s;
 	}
-	olap.Catalog.prototype.addCube = function addCube(cube, callback) {
-		this.cubes.push(cube);
-		if (typeof callback == 'function') {
-			callback(cube);
+	olap.Catalog.prototype = {
+		addCube: function addCube(cube, callback) {
+			this.cubes.push(cube);
+			if (typeof callback == 'function') {
+				callback(cube);
+			}
+			return cube;
 		}
-		return cube;
 	}
 	
 	/* olap.Cube
@@ -174,24 +186,27 @@
 		this.measures   = [];
 		this.dimensions = [];
 		this.catalog    = $cat || {};
+		//console.log(this)
 	}
 	
-	olap.Cube.prototype.getName = function getName() {
-		return this.CUBE_NAME;
-	}
-	olap.Cube.prototype.addDimension = function addDimension(dimension, callback) {
-		this.dimensions.push(dimension);
-		if (typeof callback == 'function') {
-			callback(dimension);
-		} 
-		return dimension;
-	}
-	olap.Cube.prototype.addMeasure = function addMeasure(measure, callback) {
-		this.measures.push(measure);
-		if (typeof callback == 'function') {
-			callback(measure);
-		} 
-		return measure;
+	olap.Cube.prototype = {
+		getName: function getName() {
+			return this.CUBE_NAME;
+		},
+		addDimension: function addDimension(dimension, callback) {
+			this.dimensions.push(dimension);
+			if (typeof callback == 'function') {
+				callback(dimension);
+			} 
+			return dimension;
+		},
+		addMeasure: function addMeasure(measure, callback) {
+			this.measures.push(measure);
+			if (typeof callback == 'function') {
+				callback(measure);
+			} 
+			return measure;
+		}
 	}
 	
 	/* olap.Measure
@@ -327,17 +342,64 @@
 				if (level.hierarchy instanceof Object) {
 					this.hierarchy = new olap.Hierarchy(level.hierarchy);
 				} else {
-					throw new Error('hierarchy of level is not a valid object' + $hier.toString());
+					if (!level.hierarchy &&  !$hier) {
+						//console.log('nothing')
+						//we don't have a hierarchy here.
+					} else {
+						throw new Error('hierarchy of level is not a valid object' + $hier.toString());
+					}
 				}
 			}
 		}
 	}
-	olap.Level.prototype.addMember = function addLevel(mem, callback) {
-		this.members.push(mem);
-		if (typeof callback == 'function') {
-			callback(mem);
+	olap.Level.validMethods = ['Members', 'Allmembers'];
+	olap.Level.sugarMethods = [];
+	olap.Level.isBasicMethod = function(method){
+		var idx;
+		for (idx in olap.Level.validMethods){
+			if (olap.Level.validMethods[idx] == method) {
+				return true;
+			}
+		}		
+	}
+	olap.Level.isMethodValid = function(method){
+		
+		if (olap.Level.isBasicMethod(method) == true){
+			return true;
 		}
-		return mem;
+		var idx;
+		for (idx in olap.Level.sugarMethods){
+			if (olap.Level.sugarMethods[idx] == method) {
+				return true;
+			}
+		}
+		//if we get here the method is not valid
+		return false;
+		
+	}	
+	olap.Level.prototype = {
+		addMember: function addLevel(mem, callback) {
+			this.members.push(mem);
+			if (typeof callback == 'function') {
+				callback(mem);
+			}
+			return mem;
+		},
+		getName:  function getName(){
+			return this.LEVEL_NAME;
+		},
+		getUniqueName:  function getUniqueName(){
+			return this.LEVEL_UNIQUE_NAME;
+		},
+		toMDX: function toMDX(method, param){
+			if (olap.Level.isBasicMethod(method)) {
+				return this.getUniqueName() + '.' + method
+			}
+			else {
+				return "";
+			}
+		}
+
 	}
 	
 	/* olap.Member
@@ -396,7 +458,13 @@
 				return this.getUniqueName() + '.' + method
 			}
 			else {
-				return "";
+				//TODO add more in for sugar methods
+				switch(method){
+					case 'Self':
+					  return this.getUniqueName();
+					default:
+					  return this.getUniqueName();
+				}
 			}
 		}
 	}
@@ -505,6 +573,7 @@
 		}
 	}
 	
+	
 	/* olap.Axis
 	  *
 	*/
@@ -513,7 +582,7 @@
 		this.query       = $query           || {};
 		this.name        = axis.name        || 'Column';
 		this.location    = axis.location    || 0;
-		this.hierarchies = [];
+		this.collections = [];
 	}
 	olap.Axis.prototype = {
 		getLocation: function getLocation(){
@@ -524,12 +593,12 @@
 		},
 		addExpression: function addExpression(expression){
 			if (!expression instanceof olap.Expression) {
-				var expression = new olap.Expression(expression);
+				var exp = new olap.Expression(expression);
 			}
 			this.members.push(exp);
 		},
 		reset: function(){
-			this.hierarchies = [];			
+			this.collections = [];			
 		}
 	}
 	
@@ -585,10 +654,34 @@
 			if (this.base instanceof olap.Member) {
 				return olap.Member.isMethodValid(method);
 			}
+			if (this.base instanceof olap.Level){
+				return olap.Level.isMethodValid(method);
+			}
 			return false;
 		},
 		toMDX: function(){
 			return this.base.toMDX(this.getMethod(), this.getParameters());
+		}
+	}
+	
+	/* olap.ExpressionCollection
+	  *
+	*/
+	olap.ExpressionCollection = function ExpressionCollection(collection){
+		var col = collection || {hierarchy:null, expressions:[]}
+		this.setHierarchy(col.hierarchy);
+	}
+	olap.ExpressionCollection.prototype = {
+		setHierarchy: function setHierarchy(hierarchy){
+			if (hierarchy && this.hierarchy) {
+				throw new Error("Cannot set Hierarchy after being set");
+			} else {
+				this.hierarchy = hierarchy;
+			}
+		},
+		reset: function reset(){
+			this.hierarchy = null;
+			this.collection = [];
 		}
 	}
 	/* Open

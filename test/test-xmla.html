@@ -11,7 +11,7 @@
         <script type="text/javascript" src="../olap-xmla.js"></script>
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
-		var olapConn = new olapXmla.Connection({});
+		olapConn = new olapXmla.Connection({});
 		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
 		olapConn.getOlapDatabases(function(sources){
 		    for (idx in sources) {

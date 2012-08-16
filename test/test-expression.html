@@ -21,7 +21,7 @@
 		    suite.add(testCase1);
 
 		    var testCase2 = new Y.Test.Case({
-			name: "new Expression object",
+			name: "new Expression object-Member",
 			setUp : function () {
 			    var memb = new olap.Member({MEMBER_NAME: "May", MEMBER_ORDINAL:38, MEMBER_TYPE:1, MEMBER_UNIQUE_NAME:"[Time].[2005].[QTR2].[May]"});
 			    this.meth = 'Parent';
@@ -87,6 +87,117 @@
 			
 		    });
 		    suite.add(testCase4);
+
+		    var testCase5 = new Y.Test.Case({
+			name: "new Expression object-Level",
+			setUp : function () {
+			    var lvl = new olap.Level({LEVEL_NAME: "(All)", LEVEL_UNIQUE_NAME:"[Customers].[(All)]"});
+			    //console.log(lvl);
+			    this.meth = 'Members';
+			    this.expr = new olap.Expression({
+				base:lvl,
+				method:this.meth});
+			},
+			tearDown: function() {
+			    delete this.expr;
+			},
+			"Is the new variable an olap.Expression": function () {
+			    Y.Assert.areEqual(true, this.expr instanceof olap.Expression);
+			},
+			"match function": function () {
+			    var func = this.expr.getMethod();
+			    Y.Assert.areEqual('Members', func);
+			},
+			"match base LEVEL_NAME": function () {
+			    var base = this.expr.getBase();
+			    Y.Assert.areEqual('(All)', base.getName());
+			},
+			"match MDX": function () {
+			    var mdx = this.expr.toMDX();
+			    Y.Assert.areEqual('[Customers].[(All)].Members', mdx);
+			}
+		    });
+		    suite.add(testCase5);
+
+		    var testCase6 = new Y.Test.Case({
+			name: "new Expression object-Level",
+			setUp : function () {
+			    var lvl = new olap.Level({LEVEL_NAME: "(All)", LEVEL_UNIQUE_NAME:"[Customers].[(All)]"});
+			    //console.log(lvl);
+			    this.meth = 'Allmembers';
+			    this.expr = new olap.Expression({
+				base:lvl,
+				method:this.meth});
+			},
+			tearDown: function() {
+			    delete this.expr;
+			},
+			"Is the new variable an olap.Expression": function () {
+			    Y.Assert.areEqual(true, this.expr instanceof olap.Expression);
+			},
+			"match function": function () {
+			    var func = this.expr.getMethod();
+			    Y.Assert.areEqual('Allmembers', func);
+			},
+			"match base LEVEL_NAME": function () {
+			    var base = this.expr.getBase();
+			    Y.Assert.areEqual('(All)', base.getName());
+			},
+			"match MDX": function () {
+			    var mdx = this.expr.toMDX();
+			    Y.Assert.areEqual('[Customers].[(All)].Allmembers', mdx);
+			}
+		    });
+		    suite.add(testCase6);
+
+		    var testCase7 = new Y.Test.Case({
+			name: "new Expression object-Member",
+			setUp : function () {
+			    var memb = new olap.Member({MEMBER_NAME: "May", MEMBER_ORDINAL:38, MEMBER_TYPE:1, MEMBER_UNIQUE_NAME:"[Time].[2005].[QTR2].[May]"});
+			    this.meth = 'Self';
+			    this.expr = new olap.Expression({
+				base:memb,
+				method:this.meth});
+			},
+			tearDown: function() {
+			    delete this.expr;
+			},
+			"Is the new variable an olap.Expression": function () {
+			    Y.Assert.areEqual(true, this.expr instanceof olap.Expression);
+			},
+			"match function": function () {
+			    var func = this.expr.getMethod();
+			    Y.Assert.areEqual('Self', func);
+			},
+			"match base MEMBER_NAME": function () {
+			    var base = this.expr.getBase();
+			    Y.Assert.areEqual('May', base.getName());
+			},
+			"match MDX": function () {
+			    var mdx = this.expr.toMDX();
+			    Y.Assert.areEqual('[Time].[2005].[QTR2].[May]', mdx);
+			}
+		    });
+		    suite.add(testCase7);
+
+		    var testCase8 = new Y.Test.Case({
+			name: "Create expressionCollection",
+			setUp : function () {
+			    var memb = new olap.Member({MEMBER_NAME: "May", MEMBER_ORDINAL:38, MEMBER_TYPE:1, MEMBER_UNIQUE_NAME:"[Time].[2005].[QTR2].[May]"});
+			    this.meth = 'Self';
+			    this.expr = new olap.Expression({
+				base:memb,
+				method:this.meth});
+			    this.exprCol = new olap.ExpressionCollection();
+			},
+			tearDown: function() {
+			    delete this.expr;
+			},
+			"Is the new variable an olap.ExpressionCollection": function () {
+			    Y.Assert.areEqual(true, this.exprCol instanceof olap.ExpressionCollection);
+			}
+		    });
+		    suite.add(testCase8);
 		      
 		    //add the test cases and suites
 		    Y.Test.Runner.add(suite);
