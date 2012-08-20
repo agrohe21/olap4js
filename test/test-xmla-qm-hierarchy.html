@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Query Model Test</title>
+    </head>
+    <body>
+        <h1>OLAP Xmla Query Model Testing</h1>
+        <script src="../olap.js"></script>
+        <script src="../../xmla4js/src/Xmla.js"></script>
+        <script src="../olap-xmla.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Xmla Driver");
+		    var testCase5 = new Y.Test.Case({
+			name: "Basic query with metadata members and expressions",
+			setUp : function () {
+			    var olapConn = new olapXmla.Connection({});
+			    this.hiers = olapXmla.Hierarchy.getHierarchies(olapConn);
+			    var cube = new olap.Cube({CUBE_NAME:'SteelWheelsSales'});
+			    this.qry = new olapXmla.Query({name:"All Customers"}, cube, olapConn,'SteelWheels');
+			},
+			tearDown: function() {
+			    delete this.qry;
+			},
+			"members of hierarchy is valid": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'Members', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"1st cell is value": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'Members', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				var cell = result.getCell(0);
+				Y.Assert.areEqual(105331, cell.Value);
+			    });
+			},
+			"2nd cell is value": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'AllMembers', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				var cell = result.getCell(1);
+				Y.Assert.areEqual(1778, cell.Value);
+			    });
+			},
+			"AllMembers of hierarchy is valid": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'AllMembers', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"AllMember of hierarchy is valid": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'AllMember', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"AllMember cell is value": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'AllMember', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				var cell = result.getCell(0);
+				Y.Assert.areEqual(105331, cell.Value);
+			    });
+			},
+			"DefaultMember of hierarchy is valid": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'DefaultMember', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"DefaultMember cell is value": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr = new olap.Expression({method:'DefaultMember', base:hier});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				var cell = result.getCell(0);
+				Y.Assert.areEqual(105331, cell.Value);
+			    });
+			},
+			"Multiple  expressions per axis": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier = this.hiers[0];
+			    var expr1 = new olap.Expression({method:'DefaultMember', base:hier}),
+			    expr2 = new olap.Expression({method:'AllMember', base:hier});
+			    axis.addExpression(expr1);
+			    axis.addExpression(expr2);
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"Multiple Hierarchies per axis": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier1 = this.hiers[0], hier2 = this.hiers[1];
+			    var expr1 = new olap.Expression({method:'DefaultMember', base:hier1}),
+			    expr2 = new olap.Expression({method:'AllMember', base:hier2});
+			    axis.addExpression(expr1);
+			    axis.addExpression(expr2);
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"Multiple Hierarchies and dimensions per axis": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier1 = this.hiers[0],
+				hier2 = this.hiers[1],
+				hier3 = this.hiers[2],
+				hier4 = this.hiers[3];
+			    var expr1 = new olap.Expression({method:'DefaultMember', base:hier1}),
+				expr2 = new olap.Expression({method:'AllMember', base:hier2}),
+				expr3 = new olap.Expression({method:'DefaultMember', base:hier3}),
+				expr4 = new olap.Expression({method:'AllMember', base:hier4});
+			    axis.addExpression(expr1);
+			    axis.addExpression(expr2);
+			    axis.addExpression(expr3);
+			    axis.addExpression(expr4);
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			}
+		    });
+		    suite.add(testCase5);
+		      
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+        </script>
+    </body>
+</html>

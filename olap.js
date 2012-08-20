@@ -33,12 +33,10 @@
 	
 	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(callback){
 			if (this.sources.length ==0) {
-				console.debug('none');
 				this.fetchOlapDatasources(function(sources){
 					callback.call(this, sources);
 				});
 			} else {
-				console.debug('some')
 				if (callback && typeof callback == 'function') {
 					callback.call(this, this.sources);
 				}
@@ -305,12 +303,65 @@
 		this.levels                = [];
 		this.dimension = $dim;
 	}
-	olap.Hierarchy.prototype.addLevel = function addLevel(level, callback) {
-		this.levels.push(level);
-		if (typeof callback == 'function') {
-			callback(level);
+
+	olap.Hierarchy.validMethods = ['Members', 'AllMembers'];
+	olap.Hierarchy.sugarMethods = ['DefaultMember', 'AllMember'];
+	olap.Hierarchy.isBasicMethod = function(method){
+		
+		var idx;
+		for (idx in this.validMethods){
+			if (this.validMethods[idx] == method) {
+				return true;
+			}
+		}		
+	}
+	olap.Hierarchy.isMethodValid = function(method){
+		//console.debug('func Call: ' + arguments.callee.name + method);	
+		if (this.isBasicMethod(method) == true){
+			return true;
 		}
-		return level;
+		var idx;
+		for (idx in this.sugarMethods){
+			if (this.sugarMethods[idx] == method) {
+				return true;
+			}
+		}
+		//if we get here the method is not valid
+		return false;
+		
+	}	
+
+	olap.Hierarchy.prototype = {
+		addLevel: function addLevel(level, callback) {
+			this.levels.push(level);
+			if (typeof callback == 'function') {
+				callback(level);
+			}
+			return level;
+		},
+		toMDX: function toMDX(method, param){
+			if (olap.Hierarchy.isBasicMethod(method)) {
+				return this.getUniqueName() + '.' + method
+			}
+			else {
+				if (method == 'DefaultMember'){
+					return this.getUniqueName(); //MDX will just use default member if nothing else is after hierarch
+				}
+				if (method == 'AllMember') {
+					return this.getUniqueName() + '.' + this.ALL_MEMBER;
+				}
+				return "";
+			}
+		},
+		getHierarchy: function () {
+			return this;
+		},
+		getName: function () {
+			return this.HIERARCHY_NAME;
+		},
+		getUniqueName: function () {
+			return this.HIERARCHY_UNIQUE_NAME;
+		}
 	}
 	
 	/* olap.Level
@@ -330,7 +381,7 @@
 		this.CUSTOM_ROLLUP_SETTINGS = level.CUSTOM_ROLLUP_SETTINGS;
 		this.LEVEL_CARDINALITY = level.LEVEL_CARDINALITY;
 		this.LEVEL_NUMBER      = level.LEVEL_NUMBER;
-		this.LEVEL_TYPE        = level.LEVEL_TYPE || 0;
+		this.LEVEL_TYPE        = level.LEVEL_TYPE || 0
 		this.members   = [];
 		// this is done because a plain $hier is just an object literal
 		if ($hier instanceof olap.Hierarchy) {
@@ -352,6 +403,7 @@
 			}
 		}
 	}
+	
 	olap.Level.validMethods = ['Members', 'Allmembers'];
 	olap.Level.sugarMethods = [];
 	olap.Level.isBasicMethod = function(method){
@@ -561,6 +613,21 @@
 			this.axes[p].reset();
 		    }
 		},
+		getMDX: function getMDX(){
+			//return 'SELECT Measures.members on columns from ' + this.getCube().getName();
+			var mdx = "", axes = this.getAxes(), axis, axisMdx;
+			
+			for (var i=0, j=axes.length;i<j;i++){
+				axisMdx = this.getAxis(i).getMdx();
+				mdx += " " + axisMdx;
+			}
+			if (mdx.length) {
+			    mdx = "SELECT" + mdx +
+				"\nFROM   [" + this.getCube().getName() + "]";
+			}
+			//console.debug(mdx);
+			return mdx;
+		},
 		execute: function execute(callback){
 			//default implementation does not create results
 			var results = this.results || new olap.CellSet({});;
@@ -591,15 +658,69 @@
 		getName: function getName(){
 			return this.name;
 		},
+		findCollection: function(expression){
+			var col;
+			for (var i=0,j=this.collections.length; i<j;i++){
+				col = this.collections[i];
+				if (col.getHierarchy() == expression.getBase().getHierarchy()){
+					return col;
+				}
+			}
+			return null;
+		},
+		collectionCount: function(){
+		},
+		addCollection: function(collection){
+			this.collections.push(collection);
+		},
 		addExpression: function addExpression(expression){
 			if (!expression instanceof olap.Expression) {
-				var exp = new olap.Expression(expression);
+				expression = new olap.Expression(expression);
 			}
-			this.members.push(exp);
+			var col = this.findCollection(expression);
+			if (col instanceof olap.ExpressionCollection) {
+				//console.debug('Adding expresssion to existing collection')
+				col.addExpression(expression);
+			} else {
+				//console.debug('Adding expresssion to new collection')
+				col = new olap.ExpressionCollection();
+				col.setHierarchy(expression.getBase().getHierarchy());
+				col.addExpression(expression);
+				this.addCollection(col);
+			}
 		},
 		reset: function(){
 			this.collections = [];			
-		}
+		},
+		getMdx: function() {
+		    var colls = this.collections, i, n = colls.length,
+			coll, hierarchy, hierarchyName, minLevel, maxLevel,
+			member, members, mdx = "", setDef;
+		    for (i = 0; i < n; i++) {
+			minLevel = null, maxLevel = null;
+			coll = colls[i];
+			hierarchyName = coll.getHierarchy().getName();
+			exprs = coll.expressions;
+			for (var j = 0, m = exprs.length, members = ""; j < m; j++) {
+			    if (members.length) members += ", ";
+			    members += exprs[j].toMDX();
+			}
+			setDef = "{" + members + "}";
+			if (hierarchyName !== "Measures") {
+				//get distinct collections. if only one, then don't need hierarchize or crossjoin.
+				//if more than one expression inside same collection, then hierarchize
+				if (n > 1) {
+				    setDef = "Hierarchize(" + setDef + ")";
+				} else {
+					//do nothing as hierarchize is not needed on only one collection
+				}
+			}
+			mdx = mdx ? "CrossJoin(" + mdx + ", " + setDef + ")" : setDef;
+		    }
+		    if (mdx.length) mdx = mdx + " ON Axis(" + this.getLocation() + ")";
+		    //console.debug(mdx);
+		    return mdx;
+		}		
 	}
 	
 	/* olap.MemberExpression
@@ -657,6 +778,9 @@
 			if (this.base instanceof olap.Level){
 				return olap.Level.isMethodValid(method);
 			}
+			if (this.base instanceof olap.Hierarchy){
+				return olap.Hierarchy.isMethodValid(method);
+			}
 			return false;
 		},
 		toMDX: function(){
@@ -667,21 +791,42 @@
 	/* olap.ExpressionCollection
 	  *
 	*/
-	olap.ExpressionCollection = function ExpressionCollection(collection){
-		var col = collection || {hierarchy:null, expressions:[]}
-		this.setHierarchy(col.hierarchy);
+	olap.ExpressionCollection = function ExpressionCollection() {
+		//var col = collection || {hierarchy:null, expressions:[]}
+		//this.hierarchy = null;
+		this.expressions = [];
+		//this.setHierarchy(col.hierarchy);
 	}
+	
 	olap.ExpressionCollection.prototype = {
 		setHierarchy: function setHierarchy(hierarchy){
 			if (hierarchy && this.hierarchy) {
 				throw new Error("Cannot set Hierarchy after being set");
 			} else {
-				this.hierarchy = hierarchy;
+				if (hierarchy instanceof olap.Hierarchy) {
+					this.hierarchy = hierarchy;
+				} else {
+					throw new Error("Object: " + hierarchy + " is not an olap.Hierarchy");
+				}
+			}
+		},
+		getHierarchy: function() {
+			return this.hierarchy || {};
+		},
+		addExpression: function(expression){
+			var baseHier = expression.getBase().getHierarchy();
+			if (baseHier.HIERARCHY_UNIQUE_NAME == this.getHierarchy().HIERARCHY_UNIQUE_NAME) {
+				this.expressions.push(expression);
+			} else {
+				throw new Error("Cannot add two expressions from differing hierarchies in same ExpressionCollection:" + this.getHierarchy().HIERARCHY_UNIQUE_NAME + ":" + baseHier.HIERARCHY_UNIQUE_NAME);
 			}
 		},
 		reset: function reset(){
-			this.hierarchy = null;
-			this.collection = [];
+			delete this.hierarchy;
+			this.expressions = [];
+		},
+		getFunction: function getFunction(){
+			return this.expFunction;
 		}
 	}
 	/* Open
@@ -727,17 +872,6 @@
 	  Ytd
 	  <<Grandparent, Grandchild>>
 	*/
-	olap.Expression.prototype.getFunction = function getFunction(){
-		return this.expFunction;
-	}
-
-	/* olap.SetExpression
-	  *
-	*/
-	olap.SetExpression = function SetExpression(expression){
-	}	
-
-	inheritPrototype(olap.SetExpression, Array)
 })(this);
 
 /*

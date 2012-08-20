@@ -37,7 +37,6 @@
 		statement: options.mdx,
 		properties: properties,
 		success: function xmlaExecuteSuccess($xmla, $options, xmla_dataset){
-		    //console.debug('func Call: ' + arguments.callee.name);
 		    var cellset = xmla_dataset.fetchAsObject();
 		    results = new olap.CellSet(cellset);
 		    if (typeof options.success ==  'function') {
@@ -54,7 +53,6 @@
 	}
     olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(callback){
 	    var that = this, raw_sources, source, ds;
-	    //console.debug('in fetchXmla')
 	    this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
 		while (source = raw_sources.fetchAsObject()) {
 			ds = new olapXmla.Datasource({
@@ -201,7 +199,6 @@
 	});
 	if (rowset.hasMoreRows()) {
 	    while (dim= rowset.fetchAsObject()){
-		//console.log(dim);
 		dims.push(new olapXmla.Dimension(dim));
 	    }                        
 	}
@@ -230,6 +227,20 @@
     
     olapXmla.Hierarchy = function XmlaHierarchy($hier,$dim){
 	olap.Hierarchy.call(this, $hier, $dim);
+    }
+
+    olapXmla.Hierarchy.getHierarchies = function getHierarchies(connection) {
+	//console.debug('func Call: ' + arguments.callee.name);
+	var properties = {}, rowset, hierarchy, that=this, hiers=[], restrictions = {};
+	rowset = connection.xmla.discoverMDHierarchies({
+		restrictions: restrictions
+	});
+	if (rowset.hasMoreRows()) {
+		while (hierarchy = rowset.fetchAsObject()){
+		    hiers.push(new olapXmla.Hierarchy(hierarchy));
+		}                        
+	}
+	return hiers;
     }
     
     inheritPrototype(olapXmla.Hierarchy, olap.Hierarchy);
