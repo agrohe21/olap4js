@@ -56,7 +56,7 @@
 			}
 			return source;
 	}
-	olap.Connection.id = 0;
+	olap.Connection.id = 1;
 	olap.Connection.instances = {};
 	olap.Connection.getInstance = function(id){
 	    return olap.Connection.instances[id];
@@ -95,45 +95,47 @@
 		
 		this.connection = $conn;
 	}
-	olap.Datasource.prototype.getOlapConnection = function getOlapConnection() {
-		return this.connection;
-	}
-	olap.Datasource.prototype.getName = function getName() {
-		return this.DATA_SOURCE_NAME;
-	}
-	olap.Datasource.prototype.getDescription = function getDescription() {
-		return this.DATA_SOURCE_DESCRIPTION;
-	}
-	olap.Datasource.prototype.getProviderName = function getProviderName() {
-		return this.PROVIDER_NAME;
-	}
-	olap.Datasource.prototype.getURL = function getURL() {
-		return this.URL;
-	}
-	olap.Datasource.prototype.getDataSourceInfo = function getDataSourceInfo() {
-		return this.DATA_SOURCE_INFO;
-	}
-	olap.Datasource.prototype.getCatalogs = function getCatalogs() {
-		if (this.catalogs.length == 0) {
-			this.fetchCatalogs();
+	olap.Datasource.prototype = {
+		getOlapConnection: function getOlapConnection() {
+			return this.connection;
+		},
+		getName: function getName() {
+			return this.DATA_SOURCE_NAME;
+		},
+		getDescription: function getDescription() {
+			return this.DATA_SOURCE_DESCRIPTION;
+		},
+		getProviderName: function getProviderName() {
+			return this.PROVIDER_NAME;
+		},
+		getURL: function getURL() {
+			return this.URL;
+		},
+		getDataSourceInfo: function getDataSourceInfo() {
+			return this.DATA_SOURCE_INFO;
+		},
+		getCatalogs: function getCatalogs() {
+			if (this.catalogs.length == 0) {
+				this.fetchCatalogs();
+			}
+			return this.catalogs;
+		},
+		fetchCatalogs: function fetchCatalogs() {	
+			//empty function that does not fetch anything
+		},
+		addCatalog: function addCatalog(catalog, callback) {
+			if ((catalog instanceof Object) && (catalog instanceof olap.Catalog == false)) { //do we have an object as param and it is not already a Catalog
+				catalog = new olap.Catalog(catalog, this);
+			}
+	
+			this.catalogs.push(catalog);
+			if (typeof callback == 'function') {
+				callback(catalog);
+			}
+			return catalog;
+			
 		}
-		return this.catalogs;
-	}
-	olap.Datasource.prototype.fetchCatalogs = function fetchCatalogs() {	
-		//empty function that does not fetch anything
-	}
-	olap.Datasource.prototype.addCatalog = function addCatalog(catalog, callback) {
-		if ((catalog instanceof Object) && (catalog instanceof olap.Catalog == false)) { //do we have an object as param and it is not already a Catalog
-			catalog = new olap.Catalog(catalog, this);
-		}
-
-		this.catalogs.push(catalog);
-		if (typeof callback == 'function') {
-			callback(catalog);
-		}
-		return catalog;
-		
-	}
+	} // olap.Datasource.prototype
 	
 	/* olap.Catalog
 	*   <p>
@@ -150,15 +152,29 @@
 		this.DESCRIPTION   = catalog.DESCRIPTION   || "";
 		this.ROLES         = catalog.ROLES         || [];
 		this.cubes         = catalog.cubes         || [];
+		//this.SCHEMA_NAME = catalog.SCHEMA_NAME;
 		this.datasource    = $s;
 	}
 	olap.Catalog.prototype = {
 		addCube: function addCube(cube, callback) {
+			if ((cube instanceof Object) && (cube instanceof olap.Cube == false)) { //do we have an object as param and it is not already a Catalog
+				cube = new olap.Cube(cube, this);
+			}
+	
 			this.cubes.push(cube);
 			if (typeof callback == 'function') {
 				callback(cube);
 			}
-			return cube;
+			return cube;		
+		},
+		getCubes: function getCubes() {
+			if (this.cubes.length == 0) {
+				this.fetchCubes();
+			}
+			return this.cubes;
+		},
+		fetchCubes: function fetchCubes() {	
+			//empty function that does not fetch anything
 		}
 	}
 	
@@ -183,9 +199,18 @@
 		this.sets       = [];
 		this.measures   = [];
 		this.dimensions = [];
+		this.SCHEMA_NAME = cube.SCHEMA_NAME;
+		this.CATALOG_NAME = cube.CATALOG_NAME;
 		this.catalog    = $cat || {};
-		//console.log(this)
+		this.id = olap.Cube.id++;
+		olap.Cube.instances[this.id] = this;		
+
 	}
+	olap.Cube.id = 1;
+	olap.Cube.instances = {};
+	olap.Cube.getInstance = function(id){
+	    return olap.Cube.instances[id];
+	};
 	
 	olap.Cube.prototype = {
 		getName: function getName() {
@@ -224,7 +249,60 @@
 		this.MEASURE_IS_VISIBLE = measure.MEASURE_IS_VISIBLE || false;
 		this.MEASURE_NAME       = measure.MEASURE_NAME || "";
 		this.MEASURE_UNIQUE_NAME= measure.MEASURE_UNIQUE_NAME || "";
+		this.CUBE_NAME          = measure.CUBE_NAME;
+		this.SCHEMA_NAME        = measure.SCHEMA_NAME;
+		this.CATALOG_NAME       = measure.CATALOG_NAME;
 		this.cube = $cube
+	}
+
+	olap.Measure.validMethods = ['Value'];
+	olap.Measure.sugarMethods = ['Self'];
+	olap.Measure.isBasicMethod = function(method){
+		
+		var idx;
+		for (idx in this.validMethods){
+			if (this.validMethods[idx] == method) {
+				return true;
+			}
+		}		
+	}
+	olap.Measure.isMethodValid = function(method){
+		//console.debug('func Call: ' + arguments.callee.name + method);	
+		if (this.isBasicMethod(method) == true){
+			return true;
+		}
+		var idx;
+		for (idx in this.sugarMethods){
+			if (this.sugarMethods[idx] == method) {
+				return true;
+			}
+		}
+		//if we get here the method is not valid
+		return false;
+		
+	}
+	
+	olap.Measure.prototype = {
+		toMDX: function toMDX(method, param){
+			if (olap.Measure.isBasicMethod(method)) {
+				return this.getUniqueName() + '.' + method
+			}
+			else {
+				if (method == 'Self'){
+					return this.getUniqueName();
+				}
+				return "";
+			}
+		},
+		getHierarchy: function () {
+			return new olap.Hierarchy({HIERARCHY_NAME:'Measures', HIERARCHY_UNIQUE_NAME:'[Measures]'});
+		},
+		getName: function () {
+			return this.MEASURE_NAME;
+		},
+		getUniqueName: function () {
+			return this.MEASURE_UNIQUE_NAME;
+		}
 	}
 	
 	/* olap.Dimension
@@ -270,14 +348,25 @@
 		this.IS_VIRTUAL = dim.IS_VIRTUAL == 'true' ? true : false;
 		this.IS_READWRITE = dim.IS_READWRITE == 'true' ? true : false;
 		this.hierarchies = [];
-		this.cube = $cube
+		this.CUBE_NAME = dim.CUBE_NAME;
+		this.SCHEMA_NAME = dim.SCHEMA_NAME;
+		this.CATALOG_NAME = dim.CATALOG_NAME;
+		this.cube = $cube;
 	}
-	olap.Dimension.prototype.addHierarchy = function addHierarchy(hierarchy, callback) {
-		this.hierarchies.push(hierarchy);
-		if (typeof callback == 'function') {
-			callback(hierarchy);
+	olap.Dimension.prototype = {
+		addHierarchy: function addHierarchy(hierarchy, callback) {
+			this.hierarchies.push(hierarchy);
+			if (typeof callback == 'function') {
+				callback(hierarchy);
+			}
+			return hierarchy;
+		},
+		getUniqueName: function getUniqueName(){
+			return this.DIMENSION_UNIQUE_NAME;
+		},
+		getName: function getUniqueName(){
+			return this.DIMENSION_NAME;
 		}
-		return hierarchy;
 	}
 	
 	/* olap.Hierarchy
@@ -300,6 +389,10 @@
 		this.HIERARCHY_UNIQUE_NAME = hierarchy.HIERARCHY_UNIQUE_NAME || "";
 		this.PARENT_CHILD          = hierarchy.PARENT_CHILD == 'true' ? true : false;
 		this.STRUCTURE             = hierarchy.STRUCTURE || 0;
+		this.DIMENSION_UNIQUE_NAME = hierarchy.DIMENSION_UNIQUE_NAME;
+		this.CUBE_NAME             = hierarchy.CUBE_NAME;
+		this.SCHEMA_NAME           = hierarchy.SCHEMA_NAME;
+		this.CATALOG_NAME          = hierarchy.CATALOG_NAME;
 		this.levels                = [];
 		this.dimension = $dim;
 	}
@@ -382,6 +475,11 @@
 		this.LEVEL_CARDINALITY = level.LEVEL_CARDINALITY;
 		this.LEVEL_NUMBER      = level.LEVEL_NUMBER;
 		this.LEVEL_TYPE        = level.LEVEL_TYPE || 0
+		this.HIERARCHY_UNIQUE_NAME = level.HIERARCHY_UNIQUE_NAME;
+		this.DIMENSION_UNIQUE_NAME = level.DIMENSION_UNIQUE_NAME;
+		this.CUBE_NAME = level.CUBE_NAME;
+		this.SCHEMA_NAME = level.SCHEMA_NAME;
+		this.CATALOG_NAME = level.CATALOG_NAME;
 		this.members   = [];
 		// this is done because a plain $hier is just an object literal
 		if ($hier instanceof olap.Hierarchy) {
@@ -404,7 +502,7 @@
 		}
 	}
 	
-	olap.Level.validMethods = ['Members', 'Allmembers'];
+	olap.Level.validMethods = ['Members', 'AllMembers'];
 	olap.Level.sugarMethods = [];
 	olap.Level.isBasicMethod = function(method){
 		var idx;
@@ -443,6 +541,9 @@
 		getUniqueName:  function getUniqueName(){
 			return this.LEVEL_UNIQUE_NAME;
 		},
+		getHierarchy: function () {
+			return this.hierarchy;
+		},
 		toMDX: function toMDX(method, param){
 			if (olap.Level.isBasicMethod(method)) {
 				return this.getUniqueName() + '.' + method
@@ -467,7 +568,16 @@
 		this.MEMBER_UNIQUE_NAME = member.MEMBER_UNIQUE_NAME;
 		this.MEMBER_NAME        = member.MEMBER_NAME;
 		this.MEMBER_TYPE        = member.MEMBER_TYPE;
-		this.MEMBER_ORDINAL     = member.MEMBER_ORDINAL
+		this.CHILDREN_CARDINALITY = member.CHILDREN_CARDINALITY;
+		this.MEMBER_ORDINAL     = member.MEMBER_ORDINAL;
+		this.MEMBER_CAPTION     = member.MEMBER_CAPTION;
+		this.LEVEL_NUMBER       = member.LEVEL_NUMBER;
+		this.LEVEL_UNIQUE_NAME  = member.LEVEL_UNIQUE_NAME;
+		this.HIERARCHY_UNIQUE_NAME = member.HIERARCHY_UNIQUE_NAME;
+		this.DIMENSION_UNIQUE_NAME = member.DIMENSION_UNIQUE_NAME;
+		this.CUBE_NAME             = member.CUBE_NAME;
+		this.SCHEMA_NAME           = member.SCHEMA_NAME;
+		this.CATALOG_NAME          = member.CATALOG_NAME;
 		//TODO put member properties here
 		//this.properties   = [];
 		this.level = $level;
@@ -529,16 +639,17 @@
 		this.filterAxis = $cellset.filterAxis || {};
 		this.cells      = $cellset.cells || [];
 	}
-	olap.CellSet.prototype.getAxes = function getAxes(){
-		return this.axes;
+	olap.CellSet.prototype = {
+		getAxes: function getAxes(){
+			return this.axes;
+		},
+		getFilterAxis: function getFilterAxis(){
+			return this.filterAxis;
+		},
+		getCell: function getCell(index){
+			return this.cells[index];
+		}
 	}
-	olap.CellSet.prototype.getFilterAxis = function getFilterAxis(){
-		return this.filterAxis;
-	}
-	olap.CellSet.prototype.getCell = function getCell(index){
-		return this.cells[index];
-	}
-
 	/* olap.Query
 	  *
 	*/
@@ -625,7 +736,7 @@
 			    mdx = "SELECT" + mdx +
 				"\nFROM   [" + this.getCube().getName() + "]";
 			}
-			//console.debug(mdx);
+			console.debug(mdx);
 			return mdx;
 		},
 		execute: function execute(callback){
@@ -727,6 +838,7 @@
 	  *
 	*/
 	olap.Expression = function Expression(expression){
+		//console.debug(expression);
 		var expr = expression || {base:{}, method:null, param:[]};
 		this.base = {};
 		this.method = {};
@@ -771,7 +883,7 @@
 			return this.param;
 		},
 		validateMethod: function validateMethod(method){
-			//TODO Add other classes in here Hierarchy, Level
+			//TODO Add other classes in here 
 			if (this.base instanceof olap.Member) {
 				return olap.Member.isMethodValid(method);
 			}
@@ -780,6 +892,9 @@
 			}
 			if (this.base instanceof olap.Hierarchy){
 				return olap.Hierarchy.isMethodValid(method);
+			}
+			if (this.base instanceof olap.Measure) {
+				return olap.Measure.isMethodValid(method);
 			}
 			return false;
 		},
@@ -887,4 +1002,103 @@ function inheritPrototype(subType, superType){
 	var prototype = object(superType.prototype);   //create object
 	prototype.constructor = subType;               //augment object
 	subType.prototype = prototype;                 //assign object
+}
+
+/* filter
+	//TODO could use underscore.js
+	filter will filter an object or array of objects base on
+	filter.property, filter.value and filter.type
+	where filter.type is in ('equal', 'gt', 'lt')
+	this function can be called for any object with properties using this as scope
+	sample usage:
+		var a = [], obj;
+		a.push({id:1, val:"One", descr:"Hey"});
+		a.push({id:2, val:"Two", descr:"Hey"});
+		a.push({id:3, val:"Three", descr:"Nope"});
+		var display = function(val) {
+			console.log("Matched");
+			console.log(val);
+		};
+		filter.apply(a, [
+				{property:"id", value:"2", type:"equal"}, 
+				display
+		]);
+*/
+filterProperty = function(filter, callback) {
+	//console.log("this");console.log(this);
+	//console.log("filter");console.log(filter);
+	var _sources = [], _source;
+	//if we are processing an array, then loop through each for filtering
+	if (this instanceof Array) {
+		//console.log('filter an array');console.log(this);
+		for (var i=0,j=this.length;i<j;i++) {
+			_source = filterProperty.apply(this[i], [filter, callback]);
+			if (_source) {
+				_sources.push(_source);
+			}
+		}
+		//after processing each piece of the array, stop processing the array itself.
+		if (_sources.length == 1){
+			return _sources[0];
+		} else {
+			return _sources;
+		}
+	} else {
+		//this is not an array, so continue with filter
+	}
+
+	//if filter not supplied then use filter arg as callback arg
+	if (arguments.length == 1 && typeof filter == 'function' ) {
+		callback = filter;
+		filter = null;
+	}
+	//make an empty function so that future calls just go through
+	if (typeof callback !== 'function') {
+		callback = function(){};
+	}
+
+	//if no filter then return this
+	if (filter == null ) {
+		callback(this);
+		return this;
+	} else {
+		//some filter was supplied, try to see if there is a match for equality
+		//TODO add other conditions: contains, starts, ends
+		try {
+			switch (filter.type) {
+				case 'gt':
+					if (this[filter.property] > filter.value) {
+						callback(this);
+						return this;
+					} else {
+						//console.log('no match for:' + this[filter.property] + ':' + filter.value);
+						return null;
+					}
+					break;
+				case 'lt':
+					if (this[filter.property] < filter.value) {
+						callback(this);
+						return this;
+					} else {
+						//console.log('no match for:' + this[filter.property] + ':' + filter.value);
+						return null;
+					}
+					break;
+				case 'equal':
+					//letting equal fall through to default
+				default:
+					if (this[filter.property] == filter.value) {
+						//console.log('found match');console.log(this);
+						callback(this);
+						return this;
+					} else {
+						//console.log('no match for:' + this[filter.property] + ':' + filter.value);
+						return null;
+					}
+			}
+		} catch(e) {
+			//just move on to next
+			return null;
+		}
+	}
 }

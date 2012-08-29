@@ -45,9 +45,7 @@
 			    }
 			}
 		    }
-		    member =source.catalogs[1].cubes[0].dimensions[0].hierarchies[0].levels[0].members[0];
-		    sourceStr = JSON.stringify(member);
-		    document.body.appendChild(prettyPrint(sources, { maxDepth:10 } ));
+		    document.body.appendChild(prettyPrint(measures, { maxDepth:1 } ));
 		})
         </script>
     </body>

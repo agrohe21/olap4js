@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Query Model Test Level</title>
+    </head>
+    <body>
+        <h1>OLAP Xmla Query Model Testing</h1>
+        <script src="../olap.js"></script>
+        <script src="../../xmla4js/src/Xmla.js"></script>
+        <script src="../olap-xmla.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Xmla Driver");
+		    var testCase5 = new Y.Test.Case({
+			name: "Basic query with metadata members and expressions",
+			setUp : function () {
+			    this.olapConn = new olapXmla.Connection({});
+			},
+			tearDown: function() {
+			    delete this.qry;
+			},
+			"is result Cellset": function () {
+			    var cube = new olapXmla.Cube({CUBE_NAME:'SteelWheelsSales', CATALOG_NAME:'SteelWheels'});
+			    this.qry = new olapXmla.Query({name:"SW Sales"}, cube, this.olapConn,cube.CATALOG_NAME);
+			    var axis = this.qry.createAxis({name:'COLUMN',location:0});
+			    msrs = olapXmla.Measure.getMeasures(this.olapConn);
+			    console.debug(msrs)
+			    msrs = filterProperty.apply(msrs, [{type:'equal', property:'CUBE_NAME', value:'SteelWheelsSales'}]);
+			    this.msr = filterProperty.apply(msrs, [{type:'equal', property:'MEASURE_NAME', value:'Sales'}]);
+			    var expr = new olap.Expression({method:'Self', base:this.msr});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			}/*,
+			"1st cell is value": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var expr = new olap.Expression({method:'Members', base:this.lvl});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				var cell = result.getCell(0);
+				Y.Assert.areEqual(35552, cell.Value);
+			    });
+			},
+			"AllMembers of Level is valid": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var expr = new olap.Expression({method:'AllMembers', base:this.lvl});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"Multiple Hierarchies per axis": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var this.lvl1 = this.lvls[0],
+			    var expr1 = new olap.Expression({method:'Members', base:lvl1}),
+			    expr2 = new olap.Expression({method:'Members', base:lvl2});
+			    axis.addExpression(expr1);
+			    axis.addExpression(expr2);
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			},
+			"Multiple Hierarchies and dimensions per axis": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var hier1 = this.hiers[0],
+				hier2 = this.hiers[1],
+				hier3 = this.hiers[2],
+				hier4 = this.hiers[3];
+			    var expr1 = new olap.Expression({method:'DefaultMember', base:hier1}),
+				expr2 = new olap.Expression({method:'AllMember', base:hier2}),
+				expr3 = new olap.Expression({method:'DefaultMember', base:hier3}),
+				expr4 = new olap.Expression({method:'AllMember', base:hier4});
+			    axis.addExpression(expr1);
+			    axis.addExpression(expr2);
+			    axis.addExpression(expr3);
+			    axis.addExpression(expr4);
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			}*/
+		    });
+		    suite.add(testCase5);
+
+		    var testCase1 = new Y.Test.Case({
+			name: "Basic query with metadata members and expressions",
+			setUp : function () {
+			    var olapConn = new olapXmla.Connection({});
+			    this.lvls = olapXmla.Level.getLevels(olapConn);
+			    //console.debug(this.lvls);
+			    var cube = new olap.Cube({CUBE_NAME:'SteelWheelsSales'});
+			    this.qry = new olapXmla.Query({name:"All Customers"}, cube, olapConn,'SteelWheels');
+			},
+			tearDown: function() {
+			    delete this.qry;
+			},
+			"members of level is valid": function () {
+			    this.qry.createAxis({name:'COLUMN',location:0});
+			    var axis = this.qry.getAxes()[0];
+			    var lvl = this.lvls[0];
+			    var expr = new olap.Expression({method:'Members', base:lvl});
+			    axis.addExpression(expr)
+			    this.qry.execute(function(result){
+				Y.Assert.areEqual(true, result instanceof olap.CellSet);
+			    });
+			}
+		    });
+		    //suite.add(testCase1);
+		      
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+        </script>
+    </body>
+</html>

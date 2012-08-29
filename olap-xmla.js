@@ -110,7 +110,7 @@
     
     inheritPrototype(olapXmla.Catalog, olap.Catalog);
     
-    olapXmla.Catalog.prototype.getCubes = function f(filter, callback) {
+    olapXmla.Catalog.prototype.fetchCubes = function XmlaFetchCubes() {
     
 	    var properties = {}, rowset, cube, that=this;
 	    properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
@@ -119,7 +119,7 @@
 	    });
 	    if (rowset.hasMoreRows()) {
 		    while (cube = rowset.fetchAsObject()){
-			    this.addCube(new olapXmla.Cube(cube, this), callback);
+			    this.addCube(new olapXmla.Cube(cube, this));
 		    }                        
 	    }
 	    return this.cubes;
@@ -133,8 +133,12 @@
     olapXmla.Cube.getCubes = function getCubes(source) {
     
 	    var properties = {}, rowset, cube, cubes=[];
+            properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
+	    var restrictions = {};
+	    restrictions["CATALOG_NAME"] = this.CATALOG_NAME;
 	    rowset = source.connection.xmla.discoverMDCubes({
-		    properties: properties
+		    properties: properties,
+		    restrictions: restrictions
 	    });
 	    if (rowset.hasMoreRows()) {
 		    while (cube = rowset.fetchAsObject()){
@@ -148,15 +152,15 @@
     
     inheritPrototype(olapXmla.Cube, olap.Cube);
     
-    olapXmla.Cube.prototype = {
-	getDimensions: function getDimensions(filter, callback) {
+    olapXmla.Cube.prototype.getDimensions = function getDimensions(filter, callback) {
     
 	    var properties = {}, rowset, dim, that=this;
-	    properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
+            properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
 	    var restrictions = {};
-	    restrictions["CATALOG_NAME"] = this.catalog.CATALOG_NAME;
-	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;	
+	    restrictions["CATALOG_NAME"] = this.CATALOG_NAME;
+	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;
 	    rowset = this.catalog.datasource.connection.xmla.discoverMDDimensions({
+		    properties: properties,
 		    restrictions: restrictions
 	    });
 	    if (rowset.hasMoreRows()) {
@@ -164,16 +168,18 @@
 		    this.addDimension(new olapXmla.Dimension(dim, this), callback);
 		}                        
 	    }
+	    rowset.close();
 	    return this.dimensions;
-	},
-	getMeasures: function getMeasures(filter, callback) {
+    }
+    olapXmla.Cube.prototype.getMeasures = function getMeasures(filter, callback) {
     
 	    var properties = {}, rowset, obj, that=this;
-	    //properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
+            properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
 	    var restrictions = {};
-	    restrictions["CATALOG_NAME"] = this.catalog.CATALOG_NAME;
-	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;	
+	    restrictions["CATALOG_NAME"] = this.CATALOG_NAME;
+	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;
 	    rowset = this.catalog.datasource.connection.xmla.discoverMDMeasures({
+		    properties: properties,
 		    restrictions: restrictions
 	    });
 	    if (rowset.hasMoreRows()) {
@@ -181,9 +187,10 @@
 			this.addMeasure(new olapXmla.Measure(obj, this), callback);
 		    }                        
 	    }
+	    rowset.close();
 	    return this.measures;
-	}
     }
+    
     
     olapXmla.Dimension = function XmlaDimension($dim,$cube){
 	olap.Dimension.call(this, $dim, $cube);
@@ -209,19 +216,21 @@
     
     olapXmla.Dimension.prototype.getHierarchies = function getHierarchies(filter, callback) {
 	var properties = {}, rowset, hierarchy, that=this;
-	properties[olap.PROP_CATALOG] = this.cube.catalog.CATALOG_NAME;
+	properties[Xmla.PROP_CATALOG] = this.cube.catalog.CATALOG_NAME;
 	var restrictions = {};
 	restrictions["CATALOG_NAME"] = this.cube.catalog.CATALOG_NAME;
 	restrictions["CUBE_NAME"]    = this.cube.CUBE_NAME;	
 	restrictions["DIMENSION_UNIQUE_NAME"] = this.DIMENSION_UNIQUE_NAME;	
 	rowset = this.cube.catalog.datasource.connection.xmla.discoverMDHierarchies({
-		restrictions: restrictions
+	    properties: properties,
+	    restrictions: restrictions
 	});
 	if (rowset.hasMoreRows()) {
 		while (hierarchy = rowset.fetchAsObject()){
 		    this.addHierarchy(new olapXmla.Hierarchy(hierarchy, this), callback);
 		}                        
 	}
+	rowset.close();
 	return this.hierarchies;
     }
     
@@ -247,13 +256,14 @@
     
     olapXmla.Hierarchy.prototype.getLevels = function getLevels(filter, callback) {
 	var properties = {}, rowset, obj, that=this;
-	properties[olap.PROP_CATALOG] = this.dimension.cube.catalog.CATALOG_NAME;
+	properties[Xmla.PROP_CATALOG] = this.dimension.cube.catalog.CATALOG_NAME;
 	var restrictions = {};
 	restrictions["CATALOG_NAME"] = this.dimension.cube.catalog.CATALOG_NAME;
 	restrictions["CUBE_NAME"]    = this.dimension.cube.CUBE_NAME;	
 	restrictions["DIMENSION_UNIQUE_NAME"] = this.dimension.DIMENSION_UNIQUE_NAME;	
 	restrictions["HIERARCHY_UNIQUE_NAME"] = this.HIERARCHY_UNIQUE_NAME;
 	rowset = this.dimension.cube.catalog.datasource.connection.xmla.discoverMDLevels({
+		properties: properties,
 		restrictions: restrictions
 	});
 	if (rowset.hasMoreRows()) {
@@ -261,19 +271,40 @@
 		    this.addLevel(new olapXmla.Level(obj, this), callback);
 		}                        
 	}
+	rowset.close();
 	return this.levels;
     }
     
     olapXmla.Level = function XmlaLevel($level,$hier){
 	olap.Level.call(this, $level, $hier);
     }
+
+    olapXmla.Level.getLevels = function getLevels(connection) {
+	var properties = {}, rowset, obj, that=this, lvls=[];
+	//properties[Xmla.PROP_CATALOG] = this.dimension.cube.catalog.CATALOG_NAME;
+	var restrictions = {};
+	/*
+	 *restrictions["CATALOG_NAME"] = this.dimension.cube.catalog.CATALOG_NAME;
+	restrictions["CUBE_NAME"]    = this.dimension.cube.CUBE_NAME;	
+	restrictions["DIMENSION_UNIQUE_NAME"] = this.dimension.DIMENSION_UNIQUE_NAME;	
+	restrictions["HIERARCHY_UNIQUE_NAME"] = this.HIERARCHY_UNIQUE_NAME;
+	*/
+	rowset = connection.xmla.discoverMDLevels({
+		restrictions: restrictions
+	});
+	if (rowset.hasMoreRows()) {
+		while (obj = rowset.fetchAsObject()){
+		    lvls.push(new olapXmla.Level(obj, this));
+		}                        
+	}
+	return lvls;
+    }
     
     inheritPrototype(olapXmla.Level, olap.Level);
     
     olap.Level.prototype.getMembers = function getMembers(filter, callback) {
 	var properties = {}, rowset, obj, that=this;
-	properties[olap.PROP_DATASOURCEINFO] = this.hierarchy.dimension.cube.catalog.datasource[olap.PROP_DATASOURCEINFO];
-	properties[olap.PROP_CATALOG] = this.hierarchy.dimension.cube.catalog.CATALOG_NAME;
+	properties[Xmla.PROP_CATALOG] = this.hierarchy.dimension.cube.catalog.CATALOG_NAME;
 	var restrictions = {};
 	restrictions["CATALOG_NAME"] = this.hierarchy.dimension.cube.catalog.CATALOG_NAME;
 	restrictions["CUBE_NAME"]    = this.hierarchy.dimension.cube.CUBE_NAME;	
@@ -281,13 +312,15 @@
 	restrictions["HIERARCHY_UNIQUE_NAME"] = this.hierarchy.HIERARCHY_UNIQUE_NAME;
 	restrictions["LEVEL_UNIQUE_NAME"]          = this.LEVEL_UNIQUE_NAME;
 	rowset = this.hierarchy.dimension.cube.catalog.datasource.connection.xmla.discoverMDMembers({
+		properties: properties,
 		restrictions: restrictions
 	});
 	if (rowset.hasMoreRows()) {
 		while (obj = rowset.fetchAsObject()){
 		    this.addMember(new olapXmla.Member(obj, this), callback);
 		}                        
-	} 
+	}
+	rowset.close();
 	return this.members
     }
     
@@ -299,6 +332,25 @@
     
     olapXmla.Measure = function XmlaMeasure($Measure,$cube){
 	olap.Measure.call(this, $Measure, $cube);
+    }
+    olapXmla.Measure.getMeasures = function getMeasures(connection){
+	var idx, source, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure, _measures = [];
+	connection.getOlapDatabases(function(sources){
+	    for (idx in sources) {
+		source = sources[idx];
+		catalogs = source.getCatalogs();
+		for (idx in catalogs){
+		    catalog = catalogs[idx];
+		    cubes = catalog.getCubes();
+		    for (idx in cubes){
+			cube = cubes[idx];
+			measures = cube.getMeasures();
+			_measures = _measures.concat(measures);
+		    }
+		}
+	    }
+	})
+	return _measures;
     }
     
     inheritPrototype(olapXmla.Measure, olap.Measure);
