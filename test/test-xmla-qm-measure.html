@@ -17,7 +17,7 @@
 		    var testCase5 = new Y.Test.Case({
 			name: "Basic query with metadata members and expressions",
 			setUp : function () {
-			    this.olapConn = new olapXmla.Connection({});
+			    this.olapConn = new olapXmla.Connection({url:"http://centp45:8080/pentaho/Xmla"});
 			},
 			tearDown: function() {
 			    delete this.qry;

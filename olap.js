@@ -211,6 +211,16 @@
 	olap.Cube.getInstance = function(id){
 	    return olap.Cube.instances[id];
 	};
+	olap.Cube.getInstanceByName = function(CUBE_NAME, CATALOG_NAME){
+		var cubes = olap.Cube.instances, cube;
+		for (cube in cubes){
+			if (cubes[cube].getName() == CUBE_NAME && cubes[cube].CATALOG_NAME == CATALOG_NAME){
+				return cubes[cube];
+			}
+		}
+		//Should only get here if no cubes match string
+		return null;
+	}
 	
 	olap.Cube.prototype = {
 		getName: function getName() {
@@ -229,6 +239,26 @@
 				callback(measure);
 			} 
 			return measure;
+		},
+		getLevelByUniqueName: function(LEVEL_UNIQUE_NAME, HIERARCHY_NAME){
+	
+			for (var i=0, j=this.dimensions.length;i<j;i++){
+				var dim = this.dimensions[i];
+				for (var h=0, k=dim.hierarchies.length;h<k;h++){
+					var hier = dim.hierarchies[h];
+					if (hier.HIERARCHY_NAME == HIERARCHY_NAME) {
+						for (var z=0, y=hier.levels.length;z<y;z++){
+							var lvl = hier.levels[z];
+							if (lvl.LEVEL_UNIQUE_NAME == LEVEL_UNIQUE_NAME){
+								return lvl;
+							}
+						}
+					}
+				}
+			}
+			// Maybe throw error here
+			console.debug('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
+			return null;			
 		}
 	}
 	
@@ -383,7 +413,7 @@
 		this.DEFAULT_MEMBER = hierarchy.DEFAULT_MEMBER || "";
 		this.DESCRIPTION    = hierarchy.DESCRIPTION || "";
 		this.HIERARCHY_CAPTION = hierarchy.HIERARCHY_CAPTION || "";
-		this.HIERARCHY_CARDINALITY = hierarchy.HIERARCHY_CARDINALITY || "";
+		this.HIERARCHY_CARDINALITY = hierarchy.HIERARCHaY_CARDINALITY || "";
 		this.HIERARCHY_NAME        = hierarchy.HIERARCHY_NAME || "";
 		this.HIERARCHY_ORDINAL     = hierarchy.HIERARCHY_ORDINAL || 0;
 		this.HIERARCHY_UNIQUE_NAME = hierarchy.HIERARCHY_UNIQUE_NAME || "";
@@ -598,7 +628,7 @@
 		if (olap.Member.isBasicMethod(method) == true){
 			return true;
 		}
-		var idx;
+		var idx
 		for (idx in olap.Member.sugarMethods){
 			if (olap.Member.sugarMethods[idx] == method) {
 				return true;
@@ -635,9 +665,11 @@
 	*/
 	olap.CellSet = function CellSet($cellset){
 		//console.debug('func Call: ' + arguments.callee.name);
+		//console.debug($cellset);
 		this.axes       = $cellset.axes || [];
 		this.filterAxis = $cellset.filterAxis || {};
 		this.cells      = $cellset.cells || [];
+		this.CUBE_NAME  = $cellset.cubeName || '';
 	}
 	olap.CellSet.prototype = {
 		getAxes: function getAxes(){
@@ -648,6 +680,9 @@
 		},
 		getCell: function getCell(index){
 			return this.cells[index];
+		},
+		getCubeName: function getCubeName(){
+			return this.CUBE_NAME;
 		}
 	}
 	/* olap.Query

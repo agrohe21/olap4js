@@ -130,23 +130,21 @@
 	olap.Cube.call(this, $Cube, $catalog);
     }
 
-    olapXmla.Cube.getCubes = function getCubes(source) {
+    olapXmla.Cube.getCubes = function getCubes(connection) {
     
-	    var properties = {}, rowset, cube, cubes=[];
-            properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
-	    var restrictions = {};
-	    restrictions["CATALOG_NAME"] = this.CATALOG_NAME;
-	    rowset = source.connection.xmla.discoverMDCubes({
-		    properties: properties,
-		    restrictions: restrictions
-	    });
-	    if (rowset.hasMoreRows()) {
-		    while (cube = rowset.fetchAsObject()){
-			    cubes.push(new olapXmla.Cube(cube));
-		    }                        
-	    }
-	    rowset.close();
-	    return cubes;
+		var idx, source, catalogs, catalog, cubes, cube, _cubes = [];
+		connection.getOlapDatabases(function(sources){
+			for (idx in sources) {
+			source = sources[idx];
+			catalogs = source.getCatalogs();
+				for (idx in catalogs){
+					catalog = catalogs[idx];
+					cubes = catalog.getCubes();
+					_cubes = _cubes.concat(cubes);
+				}
+			}
+		})
+		return _cubes;
     
     }
     
@@ -334,23 +332,23 @@
 	olap.Measure.call(this, $Measure, $cube);
     }
     olapXmla.Measure.getMeasures = function getMeasures(connection){
-	var idx, source, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure, _measures = [];
-	connection.getOlapDatabases(function(sources){
-	    for (idx in sources) {
-		source = sources[idx];
-		catalogs = source.getCatalogs();
-		for (idx in catalogs){
-		    catalog = catalogs[idx];
-		    cubes = catalog.getCubes();
-		    for (idx in cubes){
-			cube = cubes[idx];
-			measures = cube.getMeasures();
-			_measures = _measures.concat(measures);
-		    }
-		}
-	    }
-	})
-	return _measures;
+		var idx, source, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure, _measures = [];
+		connection.getOlapDatabases(function(sources){
+			for (idx in sources) {
+			source = sources[idx];
+			catalogs = source.getCatalogs();
+			for (idx in catalogs){
+				catalog = catalogs[idx];
+				cubes = catalog.getCubes();
+				for (idx in cubes){
+				cube = cubes[idx];
+				measures = cube.getMeasures();
+				_measures = _measures.concat(measures);
+				}
+			}
+			}
+		})
+		return _measures;
     }
     
     inheritPrototype(olapXmla.Measure, olap.Measure);
