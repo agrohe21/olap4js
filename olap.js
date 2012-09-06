@@ -665,7 +665,6 @@
 	*/
 	olap.CellSet = function CellSet($cellset){
 		//console.debug('func Call: ' + arguments.callee.name);
-		//console.debug($cellset);
 		this.axes       = $cellset.axes || [];
 		this.filterAxis = $cellset.filterAxis || {};
 		this.cells      = $cellset.cells || [];

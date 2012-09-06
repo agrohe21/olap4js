@@ -37,10 +37,10 @@
 		statement: options.mdx,
 		properties: properties,
 		success: function xmlaExecuteSuccess($xmla, $options, xmla_dataset){
-		    var cellset = xmla_dataset.fetchAsObject();
+		    var cellset = xmla_dataset.fetchAsObject();			
 		    results = new olap.CellSet(cellset);
 		    if (typeof options.success ==  'function') {
-			options.success(results);
+				options.success(results);
 		    }
 		    return results;
 		}			
