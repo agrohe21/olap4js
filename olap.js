@@ -1,21 +1,14 @@
 (function olap(global){
 
 	/* olap module boiler plate
-	  *
 	*/
-	var olap;
-	if (typeof exports !== 'undefined') {
-		olap = exports;
-	} else {
-		olap = global.olap = {};
-	}
+	var olap; if (typeof exports !== 'undefined') {olap = exports;} else {olap = global.olap = {};}
 
 	/* olap.Connection
 	*/
 	olap.Connection = function Connection($connection){
 		//console.debug('func Call: ' + arguments.callee.name);
 		
-		this.id = olap.Connection.id++;
 		
 		var src = {}, that=this;
 		this.sources = [];
@@ -28,10 +21,12 @@
 				}
 			}
 		}
+		this.id = olap.Connection.id++;
 		olap.Connection.instances[this.id] = this;		
 	}
 	
-	olap.Connection.prototype.getOlapDatabases = function getOlapDatabases(callback){
+	olap.Connection.prototype = {
+		getOlapDatabases: function getOlapDatabases(callback){
 			if (this.sources.length ==0) {
 				this.fetchOlapDatasources(function(sources){
 					callback.call(this, sources);
@@ -42,11 +37,11 @@
 				}
 				return this.sources;
 			}
-		}
-	olap.Connection.prototype.fetchOlapDatasources = function fetchOlapDatasources(callback){
+		},
+		fetchOlapDatasources: function fetchOlapDatasources(callback){
 			//empty function that does not fetch anything
-		}
-	olap.Connection.prototype.addDataSource = function addDataSource(source, callback) {
+		},
+		addDataSource: function addDataSource(source, callback) {
 			if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
 				source = new olap.Datasource(source, this);
 			}
@@ -55,6 +50,7 @@
 				callback.call(this, source);
 			}
 			return source;
+		}
 	}
 	olap.Connection.id = 1;
 	olap.Connection.instances = {};
@@ -94,7 +90,14 @@
 		}
 		
 		this.connection = $conn;
+		this.id = olap.Datasource.id++;
+		olap.Datasource.instances[this.id] = this;		
 	}
+	olap.Datasource.id = 1;
+	olap.Datasource.instances = {};
+	olap.Datasource.getInstance = function(id){
+	    return olap.Datasource.instances[id];
+	};	
 	olap.Datasource.prototype = {
 		getOlapConnection: function getOlapConnection() {
 			return this.connection;
@@ -151,10 +154,24 @@
 		this.DATE_MODIFIED = catalog.DATE_MODIFIED || "";
 		this.DESCRIPTION   = catalog.DESCRIPTION   || "";
 		this.ROLES         = catalog.ROLES         || [];
-		this.cubes         = catalog.cubes         || [];
+		this.cubes         =  [];
+		if (catalog.cubes instanceof Array) {
+			for (var idx in catalog.cubes){
+				var cube = catalog.cubes[idx];	
+				this.addCube(cube);
+			}
+		}
+		
 		//this.SCHEMA_NAME = catalog.SCHEMA_NAME;
 		this.datasource    = $s;
+		this.id = olap.Catalog.id++;
+		olap.Catalog.instances[this.id] = this;				
 	}
+	olap.Catalog.id = 1;
+	olap.Catalog.instances = {};
+	olap.Catalog.getInstance = function(id){
+	    return olap.Catalog.instances[id];
+	};		
 	olap.Catalog.prototype = {
 		addCube: function addCube(cube, callback) {
 			if ((cube instanceof Object) && (cube instanceof olap.Cube == false)) { //do we have an object as param and it is not already a Catalog
@@ -221,7 +238,6 @@
 		//Should only get here if no cubes match string
 		return null;
 	}
-	
 	olap.Cube.prototype = {
 		getName: function getName() {
 			return this.CUBE_NAME;
@@ -259,6 +275,33 @@
 			// Maybe throw error here
 			console.debug('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
 			return null;			
+		},
+		getMeasures: function getMeasures() {
+			if (this.measures.length == 0) {
+				var processMeasures = function processMeasures(measures){
+					return this.measures;
+				};
+				this.fetchMeasures(processMeasures);
+			} else {
+				return this.measures;
+			}
+		},
+		fetchMeasures: function fetchMeasures() {	
+			//empty function that does not fetch anything
+		},
+		getDimensions: function getDimensions() {
+			console.debug(this.dimensions.length);
+			if (this.dimensions.length == 0) {
+				var processDimensions = function processDimensions(dimensions){
+					return this.dimensions;
+				};
+				this.fetchDimensions(processDimensions);
+			} else {
+				return this.dimensions;
+			}
+		},
+		fetchDimensions: function fetchDimensions() {	
+			//empty function that does not fetch anything
 		}
 	}
 	
@@ -272,9 +315,9 @@
 	*   @param {olap.Cube} cube The olap.Cube that this Measure belongs to
 	*/ 
 	olap.Measure = function Measure(measure, $cube) {
-		this.DATA_TYPE = measure.DATA_TYPE || 0;
+		this.DATA_TYPE             = measure.DATA_TYPE || 0;
 		this.DEFAULT_FORMAT_STRING = measure.DEFAULT_FORMAT_STRING || ""
-		this.DESCRIPTION = measure.DESCRIPTION || "";
+		this.DESCRIPTION        = measure.DESCRIPTION || "";
 		this.MEASURE_AGGREGATOR = measure.MEASURE_AGGREGATOR || 0;
 		this.MEASURE_IS_VISIBLE = measure.MEASURE_IS_VISIBLE || false;
 		this.MEASURE_NAME       = measure.MEASURE_NAME || "";
@@ -283,8 +326,15 @@
 		this.SCHEMA_NAME        = measure.SCHEMA_NAME;
 		this.CATALOG_NAME       = measure.CATALOG_NAME;
 		this.cube = $cube
+		this.id = olap.Measure.id++;
+		olap.Measure.instances[this.id] = this;		
+		
 	}
-
+	olap.Measure.id = 1;
+	olap.Measure.instances = {};
+	olap.Measure.getInstance = function(id){
+	    return olap.Measure.instances[id];
+	};
 	olap.Measure.validMethods = ['Value'];
 	olap.Measure.sugarMethods = ['Self'];
 	olap.Measure.isBasicMethod = function(method){
@@ -311,7 +361,6 @@
 		return false;
 		
 	}
-	
 	olap.Measure.prototype = {
 		toMDX: function toMDX(method, param){
 			if (olap.Measure.isBasicMethod(method)) {
@@ -382,7 +431,14 @@
 		this.SCHEMA_NAME = dim.SCHEMA_NAME;
 		this.CATALOG_NAME = dim.CATALOG_NAME;
 		this.cube = $cube;
+		this.id = olap.Dimension.id++;
+		olap.Dimension.instances[this.id] = this;				
 	}
+	olap.Dimension.id = 1;
+	olap.Dimension.instances = {};
+	olap.Dimension.getInstance = function(id){
+	    return olap.Dimension.instances[id];
+	};
 	olap.Dimension.prototype = {
 		addHierarchy: function addHierarchy(hierarchy, callback) {
 			this.hierarchies.push(hierarchy);
@@ -408,7 +464,7 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Dimension} dimension The olap.Dimension that this Hierarchy belongs to
 	*/
-	olap.Hierarchy =function Hierarchy(hierarchy, $dim){
+	olap.Hierarchy = function Hierarchy(hierarchy, $dim){
 		this.ALL_MEMBER = hierarchy.ALL_MEMBER || "";
 		this.DEFAULT_MEMBER = hierarchy.DEFAULT_MEMBER || "";
 		this.DESCRIPTION    = hierarchy.DESCRIPTION || "";
@@ -425,8 +481,14 @@
 		this.CATALOG_NAME          = hierarchy.CATALOG_NAME;
 		this.levels                = [];
 		this.dimension = $dim;
+		this.id = olap.Hierarchy.id++;
+		olap.Hierarchy.instances[this.id] = this;		
 	}
-
+	olap.Hierarchy.id = 1;
+	olap.Hierarchy.instances = {};
+	olap.Hierarchy.getInstance = function(id){
+	    return olap.Hierarchy.instances[id];
+	};
 	olap.Hierarchy.validMethods = ['Members', 'AllMembers'];
 	olap.Hierarchy.sugarMethods = ['DefaultMember', 'AllMember'];
 	olap.Hierarchy.isBasicMethod = function(method){
@@ -452,8 +514,7 @@
 		//if we get here the method is not valid
 		return false;
 		
-	}	
-
+	}
 	olap.Hierarchy.prototype = {
 		addLevel: function addLevel(level, callback) {
 			this.levels.push(level);
@@ -530,8 +591,14 @@
 				}
 			}
 		}
+		this.id = olap.Level.id++;
+		olap.Level.instances[this.id] = this;				
 	}
-	
+	olap.Level.id = 1;
+	olap.Level.instances = {};
+	olap.Level.getInstance = function(id){
+	    return olap.Level.instances[id];
+	};	
 	olap.Level.validMethods = ['Members', 'AllMembers'];
 	olap.Level.sugarMethods = [];
 	olap.Level.isBasicMethod = function(method){
@@ -611,10 +678,17 @@
 		//TODO put member properties here
 		//this.properties   = [];
 		this.level = $level;
+		this.id = olap.Member.id++;
+		olap.Member.instances[this.id] = this;						
 	}
+	olap.Member.id = 1;
+	olap.Member.instances = {};
+	olap.Member.getInstance = function(id){
+	    return olap.Level.instances[id];
+	};		
 	olap.Member.validMethods = ['Children', 'Cousin', 'FirstChild', 'FirstSibling','LastChild', 'LastSibling', 'NextMember', 'Parent', 'PrevMember', 'Siblings'];
-	//hold on her 'Ascendants', 'Descendants', 'Lag', 'Lead', 'Mtd', 'Qtd', 'Rank', 'Siblings', 'Qtd', 'Wtd', 'Ytd'
-	olap.Member.sugarMethods = ['Self', 'GrandParent', 'GrandChild'];
+	//TODO 'Ascendants', 'Descendants', 'Lag', 'Lead', 'Mtd', 'Qtd', 'Rank', 'Siblings', 'Qtd', 'Wtd', 'Ytd',  'GrandParent', 'GrandChild'
+	olap.Member.sugarMethods = ['Self'];
 	olap.Member.isBasicMethod = function(method){
 		var idx;
 		for (idx in olap.Member.validMethods){
@@ -660,6 +734,7 @@
 			}
 		}
 	}
+	
 	/* olap.CellSet
 	  *
 	*/
@@ -684,6 +759,7 @@
 			return this.CUBE_NAME;
 		}
 	}
+	
 	/* olap.Query
 	  *
 	*/
@@ -708,9 +784,10 @@
 		}
 		this.text    = query.text    || '';
 		this.results = query.results || null; //allow rehydration of query without re-execution
+		this.id = olap.Query.id++;
+		olap.Query.instances[this.id] = this;				
 	}
-	//class properties and functions....
-	olap.Query.id = 0;
+	olap.Query.id = 1;
 	olap.Query.prefix = "olap.query";
 	olap.Query.instances = {};
 	olap.Query.getInstance = function(id){

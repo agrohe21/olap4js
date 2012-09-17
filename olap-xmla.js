@@ -125,6 +125,12 @@
 	    return this.cubes;
     
     }
+	
+    olapXmla.Catalog.prototype.addCube = function XmlaAddCube(cube, callback) {
+	    var cube = new olapXmla.Cube(cube, this)
+	    olap.Catalog.prototype.addCube.call(this, cube)
+	    return cube;
+    }	
     
     olapXmla.Cube = function XmlaCube($Cube,$catalog){
 	olap.Cube.call(this, $Cube, $catalog);
@@ -169,7 +175,7 @@
 	    rowset.close();
 	    return this.dimensions;
     }
-    olapXmla.Cube.prototype.getMeasures = function getMeasures(filter, callback) {
+    olapXmla.Cube.prototype.fetchMeasures = function fetchMeasures() {
     
 	    var properties = {}, rowset, obj, that=this;
             properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;

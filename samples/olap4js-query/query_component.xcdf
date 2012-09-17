@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdf>
+	<title>XMLAQuery</title>
+	<author>Andy Grohe</author>
+	<description>XMLAQueryComponent</description>
+	<icon></icon>
+	<template>template.html</template>
+</cdf>

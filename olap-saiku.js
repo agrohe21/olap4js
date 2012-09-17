@@ -11,36 +11,94 @@
 	}
 
     olapSaiku.Connection = function SaikuConnection($connection){
-	var conn = $connection || {};
-	olap.Connection.call(this, conn);
+		var conn = $connection || {}, that = this;
+		olap.Connection.call(this, conn);
+		this.url = conn.url;
+		$.ajax({
+		  url: conn.url +'/session',
+		  data:{}
+		}).done(function(data) { 
+		  that.sessionid = data;
+		});		
     }
     
     inheritPrototype(olapSaiku.Connection, olap.Connection);
     
-    olapSaiku.Connection.prototype = {
-	executeOlapQuery: function SaikuExecuteOlapQuery(options){
-	},
-	addDataSource: function XmlaAddDataSource(source, callback) {
+    olapSaiku.Connection.prototype.executeOlapQuery = function SaikuExecuteOlapQuery(options){
+		var that = this;
+		var uuid = 'xxxxxxxx-xxxx-xxxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
+            function (c) {
+                var r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }).toUpperCase();
+		$.ajax({
+		  url: that.url +'/joe/query/'+ uuid +'/result/flattened',
+		  data:{mdx:'SELECT NON EMPTY {Hierarchize({[Measures].[Quantity]})} ON COLUMNS, NON EMPTY {Hierarchize({[Markets].[Territory].Members})} ON ROWS FROM [SteelWheelsSales]'}
+		}).done(function(data) { 
+			that.response = data;
+			if (typeof options.success ==  'function') {
+				options.success(data);
+			}
+			return data;
+		});				
+	}
+	
+	olapSaiku.Connection.prototype.addDataSource = function SaikuAddDataSource(source, callback) {
 	    var ds = new olapSaiku.Datasource(source, this)
 	    olap.Connection.prototype.addDataSource.call(this, ds)
 	    return ds;
-	},
-	fetchOlapDatasources: function XmlaFetchOlapDatasources(callback){
 	}
-    }
+	olapSaiku.Connection.prototype.fetchOlapDatasources = function SaikuFetchOlapDatasources(callback){
+		var that = this;
+		
+		var processSaikuDiscover = function processSaikuDiscover(sources){
+			var catalogs, catalog, source, idx, cubeIdx, cube, _cubes=[];
+			for (var i=0,j=sources.length;i<j;i++){
+				source=sources[i];
+				catalogs = source.catalogs[0].schemas;
+				for (idx in catalogs){
+					catalog = catalogs[idx];
+					_cubes=[];
+					catalog.CATALOG_NAME = catalog.uniqueName;
+					catalog.DESCRIPTION  = catalog.name;
+					delete catalog.name;
+					delete catalog.uniqueName;
+					for (cubeIdx in catalog.cubes){
+						cube = catalog.cubes[cubeIdx];
+						//console.debug(cube);
+						_cubes.push({CUBE_NAME:cube.uniqueName, DESCRIPTION: cube.name, SCHEMA_NAME: cube.schemaName, CATALOG_NAME: cube.catalogName});
+					}
+					catalog.cubes = _cubes;
+				}
+				source.catalogs = catalogs;
+				ds = new olapSaiku.Datasource({
+					DATA_SOURCE_DESCRIPTION:source.name|| "",
+					DATA_SOURCE_NAME:source.uniqueName || "",
+					catalogs:source.catalogs
+				}, that)
+				that.addDataSource.call(that, ds);		 
+			}
+			callback.call(that, that.sources)
+		}
+		
+		$.ajax({
+		  url: that.url +'/joe/discover/',
+		  data:{'_':that.sessionid}
+		}).done(processSaikuDiscover);
+	}
     
-    olapSaiku.Datasource = function XmlaDatasource($datasource, conn){
-	olap.Datasource.call(this, $datasource, conn);
+    olapSaiku.Datasource = function SaikuDatasource($datasource, conn){
+		olap.Datasource.call(this, $datasource, conn);
     }
     
     inheritPrototype(olapSaiku.Datasource, olap.Datasource);
     
-    olapSaiku.Datasource.prototype.fetchCatalogs = function XmlaFetchCatalogs() {
-    
-	return this.catalogs;
+    olapSaiku.Datasource.prototype.fetchCatalogs = function SaikuFetchCatalogs() {
+		return this.catalogs;
     }
     
-    olapSaiku.Datasource.prototype.addCatalog = function XmlaAddCatalog(catalog, callback) {
+    olapSaiku.Datasource.prototype.addCatalog = function SaikuAddCatalog(catalog, callback) {
 	    var cat = new olapSaiku.Catalog(catalog, this)
 	    olap.Datasource.prototype.addCatalog.call(this, cat)
 	    return cat;
@@ -51,95 +109,90 @@
      *
     */
       
-    olapSaiku.Catalog = function XmlaCatalog($catalog,$datasource){
-	olap.Catalog.call(this, $catalog, $datasource);
+    olapSaiku.Catalog = function SaikuCatalog($catalog,$datasource){
+		olap.Catalog.call(this, $catalog, $datasource);
     }
     
     inheritPrototype(olapSaiku.Catalog, olap.Catalog);
     
-    olapSaiku.Catalog.prototype.getCubes = function f(filter, callback) {    
+	olapSaiku.Catalog.prototype.addCube = function SaikuAddCube(cube, callback) {
+	    var cube = new olapSaiku.Cube(cube, this)
+	    olap.Catalog.prototype.addCube.call(this, cube)
+	    return cube;
     }
+
     
     olapSaiku.Cube = function SaikuCube($Cube,$catalog){
-	olap.Cube.call(this, $Cube, $catalog);
+		olap.Cube.call(this, $Cube, $catalog);
     }
 
     olapSaiku.Cube.getCubes = function getCubes(source) {
-    
-	    var properties = {}, rowset, cube, cubes=[];
-	    rowset = source.connection.xmla.discoverMDCubes({
-		    properties: properties
-	    });
-	    if (rowset.hasMoreRows()) {
-		    while (cube = rowset.fetchAsObject()){
-			    cubes.push(new olapSaiku.Cube(cube));
-		    }                        
-	    }
-	    rowset.close();
-	    return cubes;
-    
+       
     }
     
     inheritPrototype(olapSaiku.Cube, olap.Cube);
     
-    olapSaiku.Cube.prototype = {
-	getDimensions: function getDimensions(filter, callback) {
+    olapSaiku.Cube.prototype.fetchDimensions = function getDimensions(filter, callback) {
     
-	    var properties = {}, rowset, dim, that=this;
-	    properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
-	    var restrictions = {};
-	    restrictions["CATALOG_NAME"] = this.catalog.CATALOG_NAME;
-	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;	
-	    rowset = this.catalog.datasource.connection.xmla.discoverMDDimensions({
-		    restrictions: restrictions
-	    });
-	    if (rowset.hasMoreRows()) {
-		while (dim= rowset.fetchAsObject()){
-		    this.addDimension(new olapSaiku.Dimension(dim, this), callback);
-		}                        
-	    }
-	    return this.dimensions;
-	},
-	getMeasures: function getMeasures(filter, callback) {
-    
-	    var properties = {}, rowset, obj, that=this;
-	    //properties[olap.PROP_CATALOG] = this.catalog.CATALOG_NAME;
-	    var restrictions = {};
-	    restrictions["CATALOG_NAME"] = this.catalog.CATALOG_NAME;
-	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;	
-	    rowset = this.catalog.datasource.connection.xmla.discoverMDMeasures({
-		    restrictions: restrictions
-	    });
-	    if (rowset.hasMoreRows()) {
-		    while (obj= rowset.fetchAsObject()){
-			this.addMeasure(new olapSaiku.Measure(obj, this), callback);
-		    }                        
-	    }
-	    return this.measures;
+		var that = this;
+		var processSaikuDimensions = function processSaikuDimensions(dimensions){
+		
+			for (var i=0, j=dimensions.length, obj=null;i<j;i++){
+				obj = {
+					DIMENSION_NAME: dimensions[i].name,
+					DIMENSION_UNIQUE_NAME: dimensions[i].uniqueName,
+					DESCRIPTION: dimensions[i].description,
+					CAPTION: dimensions[i].caption,
+					CUBE_NAME: that.CUBE_NAME,
+					SCHEMA_NAME: that.SCHEMA_NAME,
+					CATALOG_NAME: that.CATALOG_NAME
+				};
+				that.addDimension(new olapSaiku.Dimension(obj, that), callback);
+			}
+			console.debug(that.dimensions);
+		};
+	
+
+		$.ajax({
+		url: that.catalog.datasource.connection.url +'/joe/discover/'+ that.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME + '/' + that.SCHEMA_NAME +'/'+that.DESCRIPTION +'/dimensions',
+		  data:{'_':that.sessionid},
+		  async:false,
+		  success:processSaikuDimensions
+		})//.done(processSaikuMeasures);
+			
 	}
-    }
+	olapSaiku.Cube.prototype.fetchMeasures = function getMeasures(callback) {
+		var that = this;
+		var processSaikuMeasures = function processSaikuMeasures(measures){
+		
+			for (var i=0, j=measures.length, obj=null;i<j;i++){
+				obj = {
+					MEASURE_NAME: measures[i].name,
+					MEASURE_UNIQUE_NAME: measures[i].uniqueName,
+					DESCRIPTION: measures[i].description,
+					CAPTION: measures[i].caption,
+					CUBE_NAME: that.CUBE_NAME,
+					SCHEMA_NAME: that.SCHEMA_NAME,
+					CATALOG_NAME: that.CATALOG_NAME
+				};
+				that.addMeasure(new olapSaiku.Measure(obj, that), callback);
+			}
+			//console.debug(that.measures);
+		};
+	
+
+		$.ajax({
+		url: that.catalog.datasource.connection.url +'/joe/discover/'+ that.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME + '/' + that.SCHEMA_NAME +'/'+that.DESCRIPTION +'/measures',
+		  data:{'_':that.sessionid},
+		  async:false,
+		  success:processSaikuMeasures
+		})//.done(processSaikuMeasures);
+			
+	}
     
     olapSaiku.Dimension = function SaikuDimension($dim,$cube){
-	olap.Dimension.call(this, $dim, $cube);
+		olap.Dimension.call(this, $dim, $cube);
     }
-    //add in fetch for each get
-    //start on dimension expression tesing from here....
-    olapSaiku.Dimension.getDimensions = function getDimensions(source) {
-    
-	var properties = {}, rowset, dim, dims=[];
-	var restrictions = {};
-	rowset = source.connection.xmla.discoverMDDimensions({
-		restrictions: restrictions
-	});
-	if (rowset.hasMoreRows()) {
-	    while (dim= rowset.fetchAsObject()){
-		//console.log(dim);
-		dims.push(new olapSaiku.Dimension(dim));
-	    }                        
-	}
-	return dims;
-    }
-
     inheritPrototype(olapSaiku.Dimension, olap.Dimension);
     
     olapSaiku.Dimension.prototype.getHierarchies = function getHierarchies(filter, callback) {
