@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Hierarchy</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Hierarchy</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) 
+{
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Hierarchy");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Hierarchy Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Hierarchy a valid Object": function () {
+					Y.Assert.isFunction(olap.Hierarchy);
+				},
+				"Test olap.Hierarchy class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Hierarchy.getInstance);
+				},
+				"Test olap.Hierarchy class methods id": function () {
+					Y.Assert.isNumber(olap.Hierarchy.id);
+				},
+				"Test olap.Hierarchy class methods prefix": function () {
+					Y.Assert.isString(olap.Hierarchy.prefix);
+				},
+				"Test olap.Hierarchy class methods instances": function () {
+					Y.Assert.isObject(olap.Hierarchy.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Hierarchy Prototype Methods",
+				setUp : function () {
+					this.Hierarchy = new olap.Hierarchy();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Hierarchy object": function () {
+					Y.Assert.isInstanceOf(olap.Hierarchy, this.Hierarchy);
+				},
+				"Test olap.Hierarchy prototype method-getName": function () {
+					Y.Assert.isFunction(this.Hierarchy.getName);
+				},
+				"Test olap.Hierarchy prototype method-getLevels": function () {
+					Y.Assert.isFunction(this.Hierarchy.getLevels);
+				},
+				"Test olap.Hierarchy prototype method-getDimension": function () {
+					Y.Assert.isFunction(this.Hierarchy.getDimension);
+				},
+				"Test olap.Hierarchy prototype method-hasAll": function () {
+					Y.Assert.isFunction(this.Hierarchy.hasAll);
+				},
+				"Test olap.Hierarchy prototype method-getDefaultMember": function () {
+					Y.Assert.isFunction(this.Hierarchy.getDefaultMember);
+				},
+				"Test olap.Hierarchy prototype method-getRootMembers": function () {
+					Y.Assert.isFunction(this.Hierarchy.getRootMembers);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		})
+
+        </script>
+    </body>
+</html>

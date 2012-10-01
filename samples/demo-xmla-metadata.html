@@ -12,7 +12,7 @@
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
 		olapConn = new olapXmla.Connection({url:"http://centp45:8080/pentaho/Xmla"});
-		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, _hierarchies=[], hierarchy, levels, level, members, member, measures, measure;
 		olapConn.getOlapDatabases(function(sources){
 		    for (idx in sources) {
 			source = sources[idx];
@@ -30,22 +30,22 @@
 				for (idx in dimensions){
 				    dimension = dimensions[idx];
 				    hierarchies = dimension.getHierarchies();
+					_hierarchies = _hierarchies.concat(hierarchies);
 				    for (idx in hierarchies){
 					hierarchy = hierarchies[idx];
 					levels = hierarchy.getLevels();
 					for (idx in levels){
 					    level = levels[idx];
-					    members = level.getMembers();
-					    for (idx in members){
-						member = members[idx];
+					    //members = level.getMembers();
+					    //for (idx in members){
+						//member = members[idx];
 					    }	    
 					}	    
 				    }	    
 				}	    
 			    }
 			}
-		    }
-		    document.body.appendChild(prettyPrint(hierarchies, { maxDepth:1 } ));
+		document.body.appendChild(prettyPrint(_hierarchies, { maxDepth:2 } ));			
 		})
         </script>
     </body>

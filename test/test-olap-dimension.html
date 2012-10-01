@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Dimension</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Dimension</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) 
+{
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Dimension");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Dimension Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Dimension a valid Object": function () {
+					Y.Assert.isFunction(olap.Dimension);
+				},
+				"Test olap.Dimension class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Dimension.getInstance);
+				},
+				"Test olap.Dimension class methods id": function () {
+					Y.Assert.isNumber(olap.Dimension.id);
+				},
+				"Test olap.Dimension class methods prefix": function () {
+					Y.Assert.isString(olap.Dimension.prefix);
+				},
+				"Test olap.Dimension class methods instances": function () {
+					Y.Assert.isObject(olap.Dimension.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Dimension Prototype Methods",
+				setUp : function () {
+					this.Dimension = new olap.Dimension();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Dimension object": function () {
+					Y.Assert.isInstanceOf(olap.Dimension, this.Dimension);
+				},
+				"Test olap.Dimension prototype method-getName": function () {
+					Y.Assert.isFunction(this.Dimension.getName);
+				},
+				"Test olap.Dimension prototype method-getHierarchies": function () {
+					Y.Assert.isFunction(this.Dimension.getHierarchies);
+				},
+				"Test olap.Dimension prototype method-getDimensionType": function () {
+					Y.Assert.isFunction(this.Dimension.getDimensionType);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		})
+
+        </script>
+    </body>
+</html>

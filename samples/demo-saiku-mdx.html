@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: MDX Test Saiku</title>
+    </head>
+    <body>
+        <h1>OLAP Saiku MDX Testing</h1>
+        <script src="/pentaho/content/pentaho-cdf/js/jquery.js"></script>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script type="text/javascript" src="../olap-saiku.js"></script>
+        <script type="text/javascript" src="prettyprint.js"></script>
+        <script type="text/javascript">
+		var olapConn = new olapSaiku.Connection({url:"http://localhost:8080/pentaho/content/saiku"});
+		var cubeList = olap.Cube.getCubes(olapConn,
+			function(cubes){
+				var cube = filterProperty.apply(cubes, [{type:'equal', property:'DESCRIPTION', value:'SteelWheelsSales'}])				
+				olapConn.executeOlapQuery({
+					catalog:"SteelWheels",
+					cube: cube,
+					mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members})on rows, non empty [Product].[Line].members on columns, non empty {[Order Status].[Type].members} on pages from SteelWheelsSales where [Measures].[Quantity]",
+					//mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members})on rows, non empty [Product].[Line].members on columns from SteelWheelsSales where [Measures].[Quantity]",
+					success: function ExecuteOlapQuerySuccess(results){
+						document.body.appendChild(prettyPrint(results, { maxDepth:10 } ));
+					}
+				});
+			}
+		);
+
+		
+        </script>
+    </body>
+</html>

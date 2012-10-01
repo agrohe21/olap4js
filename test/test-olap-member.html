@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Member</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Member</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) 
+{
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Member");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Member Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Member a valid Object": function () {
+					Y.Assert.isFunction(olap.Member);
+				},
+				"Test olap.Member class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Member.getInstance);
+				},
+				"Test olap.Member class methods id": function () {
+					Y.Assert.isNumber(olap.Member.id);
+				},
+				"Test olap.Member class methods prefix": function () {
+					Y.Assert.isString(olap.Member.prefix);
+				},
+				"Test olap.Member class methods instances": function () {
+					Y.Assert.isObject(olap.Member.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Member Prototype Methods",
+				setUp : function () {
+					this.Member = new olap.Member();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Member object": function () {
+					Y.Assert.isInstanceOf(olap.Member, this.Member);
+				},
+				"Test olap.Member prototype method-getName": function () {
+					Y.Assert.isFunction(this.Member.getName);
+				},				"Test olap.Member prototype method-getChildMembers": function () {					Y.Assert.isFunction(this.Member.getChildMembers);				},				"Test olap.Member prototype method-getParentMember": function () {					Y.Assert.isFunction(this.Member.getParentMember);				},				"Test olap.Member prototype method-getLevel": function () {					Y.Assert.isFunction(this.Member.getLevel);				},				"Test olap.Member prototype method-getHierarchy": function () {					Y.Assert.isFunction(this.Member.getHierarchy);				},				"Test olap.Member prototype method-isAll": function () {					Y.Assert.isFunction(this.Member.isAll);				},				"Test olap.Member prototype method-isChildOrEqualTo": function () {					Y.Assert.isFunction(this.Member.isChildOrEqualTo);				},				"Test olap.Member prototype method-isCalculated": function () {					Y.Assert.isFunction(this.Member.isCalculated);				},				"Test olap.Member prototype method-isCalculatedInQuery": function () {					Y.Assert.isFunction(this.Member.isCalculatedInQuery);				},				"Test olap.Member prototype method-solveOrder": function () {					Y.Assert.isFunction(this.Member.solveOrder);				},				"Test olap.Member prototype method-getAncestorMembers": function () {					Y.Assert.isFunction(this.Member.getAncestorMembers);				},				"Test olap.Member prototype method-getPropertyValue": function () {					Y.Assert.isFunction(this.Member.getPropertyValue);				},				"Test olap.Member prototype method-getPropertyFormattedValue": function () {					Y.Assert.isFunction(this.Member.getPropertyFormattedValue);				},				"Test olap.Member prototype method-getProperties": function () {					Y.Assert.isFunction(this.Member.getProperties);				},				"Test olap.Member prototype method-getOrdinal": function () {					Y.Assert.isFunction(this.Member.getOrdinal);				},				"Test olap.Member prototype method-isHidden": function () {					Y.Assert.isFunction(this.Member.isHidden);				},				"Test olap.Member prototype method-getDataMember": function () {					Y.Assert.isFunction(this.Member.getDataMember);				},				"Test olap.Member prototype method-getChildMemberCount": function () {					Y.Assert.isFunction(this.Member.getChildMemberCount);				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		})
+
+        </script>
+    </body>
+</html>

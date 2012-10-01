@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Connection</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Connection</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Connection");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Connection Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Connection a valid Object": function () {
+					Y.Assert.isFunction(olap.Connection);
+				},
+				"Test olap.Connection class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Connection.getInstance);
+				},
+				"Test olap.Connection class methods id": function () {
+					Y.Assert.isNumber(olap.Connection.id);
+				},
+				"Test olap.Connection class methods prefix": function () {
+					Y.Assert.isString(olap.Connection.prefix);
+				},
+				"Test olap.Connection class methods instances": function () {
+					Y.Assert.isObject(olap.Connection.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Connection Prototype Methods",
+				setUp : function () {
+					this.Connection = new olap.Connection();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Connection object": function () {
+					Y.Assert.isInstanceOf(olap.Connection, this.Connection);
+				},
+				"Test olap.Cell prototype method-getOlapDatabases": function () {
+					Y.Assert.isFunction(this.Connection.getOlapDatabases);
+				},
+				"Test olap.Cell prototype method-getOlapCatalogs": function () {
+					Y.Assert.isFunction(this.Connection.getOlapCatalogs);
+				},
+				"Test olap.Cell prototype method-getOlapSchemas": function () {
+					Y.Assert.isFunction(this.Connection.getOlapSchemas);
+				},
+				"Test olap.Cell prototype method-getOlapSchemas": function () {
+					Y.Assert.isFunction(this.Connection.getOlapSchemas);
+				},
+				"Test olap.Cell prototype method-executeOlapQuery": function () {
+					Y.Assert.isFunction(this.Connection.executeOlapQuery);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

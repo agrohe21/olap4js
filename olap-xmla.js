@@ -25,7 +25,7 @@
     inheritPrototype(olapXmla.Connection, olap.Connection);
     
     olapXmla.Connection.prototype.executeOlapQuery = function XmlaExecuteOlapQuery(options){
-	    //console.debug('func Call: ' + arguments.callee.name);
+		//console.debug('func Call: ' + arguments.callee.name);
 	    var that=this, properties = {}, results, dataset, cells, tmp_results, axis;
 	    properties[Xmla.PROP_FORMAT]         = Xmla.PROP_FORMAT_MULTIDIMENSIONAL;
 	    if (options.catalog && options.catalog !== "") {
@@ -37,8 +37,40 @@
 		statement: options.mdx,
 		properties: properties,
 		success: function xmlaExecuteSuccess($xmla, $options, xmla_dataset){
-		    var cellset = xmla_dataset.fetchAsObject();			
-		    results = new olap.CellSet(cellset);
+			var getAxisAsObject = function getAxisAsObject($axis){
+				var i,j, idx, hier, tuple, pos, member, axis={hierarchies:[], positions:[]}, _hier;
+				for (i=0, j=$axis.hierarchies.length;i<j;i++){
+					hier = $axis.hierarchies[i];
+					axis.hierarchies.push({HIERARCHY_UNIQUE_NAME:hier.name});
+				}
+				for (i=0, j=$axis.positions.length;i<j;i++){
+					tuple = $axis.positions[i];
+					pos = {};
+					for (idx in tuple){
+						member = tuple[idx];
+						pos[idx] ={
+							MEMBER_UNIQUE_NAME: member.UName,
+							MEMBER_CAPTION: member.Caption,
+							LEVEL_UNIQUE_NAME: member.LName,
+							LEVEL_NUMBER: member.LNum
+						};
+					}
+					axis.positions.push(pos);
+				}
+				return axis;
+			}
+		    var xmla_cellset = xmla_dataset.fetchAsObject();
+			var cellset = {
+				CUBE_NAME:xmla_cellset.cubeName,
+				axes: [],
+				SLICER: {}
+			}, axis = {};
+			for (var i=0, j=xmla_cellset.axes.length;i<j;i++) {
+				axis = xmla_cellset.axes[i];
+				cellset.axes.push(getAxisAsObject(axis));
+			}
+			cellset.SLICER = getAxisAsObject(xmla_cellset.filterAxis);
+		    results = new olap.CellSet(cellset, options.catalog);
 		    if (typeof options.success ==  'function') {
 				options.success(results);
 		    }
@@ -133,27 +165,8 @@
     }	
     
     olapXmla.Cube = function XmlaCube($Cube,$catalog){
-	olap.Cube.call(this, $Cube, $catalog);
-    }
-
-    olapXmla.Cube.getCubes = function getCubes(connection) {
-    
-		var idx, source, catalogs, catalog, cubes, cube, _cubes = [];
-		connection.getOlapDatabases(function(sources){
-			for (idx in sources) {
-			source = sources[idx];
-			catalogs = source.getCatalogs();
-				for (idx in catalogs){
-					catalog = catalogs[idx];
-					cubes = catalog.getCubes();
-					_cubes = _cubes.concat(cubes);
-				}
-			}
-		})
-		return _cubes;
-    
-    }
-    
+		olap.Cube.call(this, $Cube, $catalog);
+    }    
     inheritPrototype(olapXmla.Cube, olap.Cube);
     
     olapXmla.Cube.prototype.getDimensions = function getDimensions(filter, callback) {
@@ -188,7 +201,7 @@
 	    });
 	    if (rowset.hasMoreRows()) {
 		    while (obj= rowset.fetchAsObject()){
-			this.addMeasure(new olapXmla.Measure(obj, this), callback);
+			this.addMeasure(new olapXmla.Measure(obj, this));
 		    }                        
 	    }
 	    rowset.close();

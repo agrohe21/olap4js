@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-CellSet</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-CellSet</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-CellSet");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic CellSet Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.CellSet a valid Object": function () {
+					Y.Assert.isFunction(olap.CellSet);
+				},
+				"Test olap.CellSet class methods getInstance": function () {
+					Y.Assert.isFunction(olap.CellSet.getInstance);
+				},
+				"Test olap.CellSet class methods id": function () {
+					Y.Assert.isNumber(olap.CellSet.id);
+				},
+				"Test olap.CellSet class methods prefix": function () {
+					Y.Assert.isString(olap.CellSet.prefix);
+				},
+				"Test olap.CellSet class methods instances": function () {
+					Y.Assert.isObject(olap.CellSet.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic CellSet Prototype Methods",
+				setUp : function () {
+					this.CellSet = new olap.CellSet();
+				},
+				tearDown: function() {
+				},
+				"Test olap.CellSet object": function () {
+					Y.Assert.isInstanceOf(olap.CellSet, this.CellSet);
+				},
+				"Test olap.CellSet prototype method-getAxes": function () {
+					Y.Assert.isFunction(this.CellSet.getAxes);
+				},
+				"Test olap.CellSet prototype method-getFilterAxis": function () {
+					Y.Assert.isFunction(this.CellSet.getFilterAxis);
+				},
+				"Test olap.CellSet prototype method-getCell": function () {
+					Y.Assert.isFunction(this.CellSet.getCell);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

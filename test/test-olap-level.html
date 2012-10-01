@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Level</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Level</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) 
+{
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Level");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Level Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Level a valid Object": function () {
+					Y.Assert.isFunction(olap.Level);
+				},
+				"Test olap.Level class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Level.getInstance);
+				},
+				"Test olap.Level class methods id": function () {
+					Y.Assert.isNumber(olap.Level.id);
+				},
+				"Test olap.Level class methods prefix": function () {
+					Y.Assert.isString(olap.Level.prefix);
+				},
+				"Test olap.Level class methods instances": function () {
+					Y.Assert.isObject(olap.Level.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Level Prototype Methods",
+				setUp : function () {
+					this.Level = new olap.Level();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Level object": function () {
+					Y.Assert.isInstanceOf(olap.Level, this.Level);
+				},
+				"Test olap.Level prototype method-getDepth": function () {
+					Y.Assert.isFunction(this.Level.getDepth);
+				},
+				"Test olap.Level prototype method-getHierarchy": function () {
+					Y.Assert.isFunction(this.Level.getHierarchy);
+				},
+				"Test olap.Level prototype method-getLevelType": function () {
+					Y.Assert.isFunction(this.Level.getLevelType);
+				},
+				"Test olap.Level prototype method-getMembers": function () {
+					Y.Assert.isFunction(this.Level.getMembers);
+				},
+				"Test olap.Level prototype method-getCardinality": function () {
+					Y.Assert.isFunction(this.Level.getCardinality);
+				},
+				"Test olap.Level prototype method-getProperties": function () {
+					Y.Assert.isFunction(this.Level.getProperties);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		})
+
+        </script>
+    </body>
+</html>

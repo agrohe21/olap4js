@@ -1,0 +1,852 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS API Test Page</title>
+    </head>
+    <body>
+        <h1>OLAP4JS API Test Page</h1>
+		<br/>
+		<div id="log"></div>
+		Output is in browser console.  use Firebug or Chrome developer tools.
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript" src="../samples/prettyprint.js"></script>
+        <script type="text/javascript">
+		YUI({ logInclude: { TestRunner: true } }).use('test-console', 'test', 'JSON', 'json', function (Y) {
+		//YUI({ useBrowserConsole: true }).use('test', 'JSON', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects ");
+		    var connection1 = new Y.Test.Case({
+				name: "Basic Connection Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Connection a valid Object": function () {
+					Y.Assert.isFunction(olap.Connection);
+				},
+				"Test olap.Connection class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Connection.getInstance);
+				},
+				"Test olap.Connection class methods id": function () {
+					Y.Assert.isNumber(olap.Connection.id);
+				},
+				"Test olap.Connection class methods prefix": function () {
+					Y.Assert.isString(olap.Connection.prefix);
+				},
+				"Test olap.Connection class methods instances": function () {
+					Y.Assert.isObject(olap.Connection.instances);
+				}
+		    });
+		    suite.add(connection1); 
+
+			var connection2 = new Y.Test.Case({
+				name: "Basic Connection Prototype Methods",
+				setUp : function () {
+					this.Connection = new olap.Connection();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Connection object": function () {
+					Y.Assert.isInstanceOf(olap.Connection, this.Connection);
+				},
+				"Test olap.Cell prototype method-getOlapDatabases": function () {
+					Y.Assert.isFunction(this.Connection.getOlapDatabases);
+				},
+				"Test olap.Cell prototype method-getOlapCatalogs": function () {
+					Y.Assert.isFunction(this.Connection.getOlapCatalogs);
+				},
+				/*
+				"Test olap.Cell prototype method-getOlapSchemas": function () {
+					Y.Assert.isFunction(this.Connection.getOlapSchemas);
+				},*/
+				"Test olap.Cell prototype method-getOlapSchemas": function () {
+					Y.Assert.isFunction(this.Connection.getOlapSchemas);
+				},
+				"Test olap.Cell prototype method-executeOlapQuery": function () {
+					Y.Assert.isFunction(this.Connection.executeOlapQuery);
+				}
+		    });
+		    suite.add(connection2);
+			
+		    var datasource1 = new Y.Test.Case({
+				name: "Basic Datasource Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Datasource a valid Object": function () {
+					Y.Assert.isFunction(olap.Datasource);
+				},
+				"Test olap.Datasource class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Datasource.getInstance);
+				},
+				"Test olap.Datasource class methods id": function () {
+					Y.Assert.isNumber(olap.Datasource.id);
+				},
+				"Test olap.Datasource class methods prefix": function () {
+					Y.Assert.isString(olap.Datasource.prefix);
+				},
+				"Test olap.Datasource class methods instances": function () {
+					Y.Assert.isObject(olap.Datasource.instances);
+				}
+		    });
+		    suite.add(datasource1);
+
+			var datasource2 = new Y.Test.Case({
+				name: "Basic Datasource Prototype Methods",
+				setUp : function () {
+					this.Datasource = new olap.Datasource();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Datasource object": function () {
+					Y.Assert.isInstanceOf(olap.Datasource, this.Datasource);
+				},
+				"Test olap.Cell prototype method-getOlapConnection": function () {
+					Y.Assert.isFunction(this.Datasource.getOlapConnection);
+				},
+				"Test olap.Cell prototype method-getName": function () {
+					Y.Assert.isFunction(this.Datasource.getName);
+				},
+				"Test olap.Cell prototype method-getDescription": function () {
+					Y.Assert.isFunction(this.Datasource.getDescription);
+				},
+				"Test olap.Cell prototype method-getURL": function () {
+					Y.Assert.isFunction(this.Datasource.getURL);
+				},
+				"Test olap.Cell prototype method-getDataSourceInfo": function () {
+					Y.Assert.isFunction(this.Datasource.getDataSourceInfo);
+				},
+				"Test olap.Cell prototype method-getProviderName": function () {
+					Y.Assert.isFunction(this.Datasource.getProviderName);
+				},
+				"Test olap.Cell prototype method-getProviderTypes": function () {
+					Y.Assert.isFunction(this.Datasource.getProviderTypes);
+				},
+				"Test olap.Cell prototype method-getAuthenticationModes": function () {
+					Y.Assert.isFunction(this.Datasource.getAuthenticationModes);
+				},
+				"Test olap.Cell prototype method-getCatalogs": function () {
+					Y.Assert.isFunction(this.Datasource.getCatalogs);
+				}
+		    });
+		    suite.add(datasource2);
+			
+		    var catalog1 = new Y.Test.Case({
+				name: "Basic Catalog Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Catalog a valid Object": function () {
+					Y.Assert.isFunction(olap.Catalog);
+				},
+				"Test olap.Catalog class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Catalog.getInstance);
+				},
+				"Test olap.Catalog class methods id": function () {
+					Y.Assert.isNumber(olap.Catalog.id);
+				},
+				"Test olap.Catalog class methods prefix": function () {
+					Y.Assert.isString(olap.Catalog.prefix);
+				},
+				"Test olap.Catalog class methods instances": function () {
+					Y.Assert.isObject(olap.Catalog.instances);
+				}
+		    });
+		    suite.add(catalog1);
+
+			var catalog2 = new Y.Test.Case({
+				name: "Basic Catalog Prototype Methods",
+				setUp : function () {
+					this.Catalog = new olap.Catalog();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Catalog object": function () {
+					Y.Assert.isInstanceOf(olap.Catalog, this.Catalog);
+				},
+				"Test olap.Cell prototype method-getName": function () {
+					Y.Assert.isFunction(this.Catalog.getName);
+				},
+				"Test olap.Cell prototype method-getSchemas": function () {
+					Y.Assert.isFunction(this.Catalog.getSchemas);
+				},
+				"Test olap.Cell prototype method-getDatabase": function () {
+					Y.Assert.isFunction(this.Catalog.getDatabase);
+				}
+		    });
+		    suite.add(catalog2);			
+			/*
+		    var schema1 = new Y.Test.Case({
+				name: "Basic Schema Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Schema a valid Object": function () {
+					Y.Assert.isFunction(olap.Schema);
+				},
+				"Test olap.Schema class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Schema.getInstance);
+				},
+				"Test olap.Schema class methods id": function () {
+					Y.Assert.isNumber(olap.Schema.id);
+				},
+				"Test olap.Schema class methods prefix": function () {
+					Y.Assert.isString(olap.Schema.prefix);
+				},
+				"Test olap.Schema class methods instances": function () {
+					Y.Assert.isObject(olap.Schema.instances);
+				}
+		    });
+		    suite.add(schema1);
+
+			var schema2 = new Y.Test.Case({
+				name: "Basic Schema Prototype Methods",
+				setUp : function () {
+					this.Schema = new olap.Schema();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Schema object": function () {
+					Y.Assert.isInstanceOf(olap.Schema, this.Schema);
+				},
+				"Test olap.Schema prototype method-getCatalog": function () {
+					Y.Assert.isFunction(this.Schema.getCatalog);
+				},
+				"Test olap.Schema prototype method-getName": function () {
+					Y.Assert.isFunction(this.Schema.getName);
+				},
+				"Test olap.Schema prototype method-getSharedDimensions": function () {
+					Y.Assert.isFunction(this.Schema.getSharedDimensions);
+				},
+				"Test olap.Schema prototype method-getCubes": function () {
+					Y.Assert.isFunction(this.Schema.getCubes);
+				}
+		    });
+		    suite.add(schema2);
+			*/
+		    var cube1 = new Y.Test.Case({
+				name: "Basic Cube Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Cube a valid Object": function () {
+					Y.Assert.isFunction(olap.Cube);
+				},
+				"Test olap.Cube class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Cube.getInstance);
+				},
+				"Test olap.Cube class methods id": function () {
+					Y.Assert.isNumber(olap.Cube.id);
+				},
+				"Test olap.Cube class methods prefix": function () {
+					Y.Assert.isString(olap.Cube.prefix);
+				},
+				"Test olap.Cube class methods instances": function () {
+					Y.Assert.isObject(olap.Cube.instances);
+				}
+		    });
+		    suite.add(cube1);
+
+			var cube2 = new Y.Test.Case({
+				name: "Basic Cube Prototype Methods",
+				setUp : function () {
+					this.Cube = new olap.Cube();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Cube object": function () {
+					Y.Assert.isInstanceOf(olap.Cube, this.Cube);
+				},
+				"Test olap.Cube prototype method-getSchema": function () {
+					Y.Assert.isFunction(this.Cube.getSchema);
+				},
+				"Test olap.Cube prototype method-getDimensions": function () {
+					Y.Assert.isFunction(this.Cube.getDimensions);
+				},
+				"Test olap.Cube prototype method-getHierarchies": function () {
+					Y.Assert.isFunction(this.Cube.getHierarchies);
+				},
+				"Test olap.Cube prototype method-getMeasures": function () {
+					Y.Assert.isFunction(this.Cube.getMeasures);
+				},
+				"Test olap.Cube prototype method-getSets": function () {
+					Y.Assert.isFunction(this.Cube.getSets);
+				},
+				"Test olap.Cube prototype method-getName": function () {
+					Y.Assert.isFunction(this.Cube.getName);
+				},
+				"Test olap.Cube prototype method-lookupMember": function () {
+					Y.Assert.isFunction(this.Cube.lookupMember);
+				},
+				"Test olap.Cube prototype method-lookupMembers": function () {
+					Y.Assert.isFunction(this.Cube.lookupMembers);
+				}
+		    });
+		    suite.add(cube2);
+
+		    var dimension1 = new Y.Test.Case({
+				name: "Basic Dimension Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Dimension a valid Object": function () {
+					Y.Assert.isFunction(olap.Dimension);
+				},
+				"Test olap.Dimension class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Dimension.getInstance);
+				},
+				"Test olap.Dimension class methods id": function () {
+					Y.Assert.isNumber(olap.Dimension.id);
+				},
+				"Test olap.Dimension class methods prefix": function () {
+					Y.Assert.isString(olap.Dimension.prefix);
+				},
+				"Test olap.Dimension class methods instances": function () {
+					Y.Assert.isObject(olap.Dimension.instances);
+				}
+		    });
+		    suite.add(dimension1);
+
+			var dimension2 = new Y.Test.Case({
+				name: "Basic Dimension Prototype Methods",
+				setUp : function () {
+					this.Dimension = new olap.Dimension();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Dimension object": function () {
+					Y.Assert.isInstanceOf(olap.Dimension, this.Dimension);
+				},
+				"Test olap.Dimension prototype method-getName": function () {
+					Y.Assert.isFunction(this.Dimension.getName);
+				},
+				"Test olap.Dimension prototype method-getHierarchies": function () {
+					Y.Assert.isFunction(this.Dimension.getHierarchies);
+				},
+				"Test olap.Dimension prototype method-getDimensionType": function () {
+					Y.Assert.isFunction(this.Dimension.getDimensionType);
+				}
+		    });
+		    suite.add(dimension2);
+			
+		    var hierarchy1 = new Y.Test.Case({
+				name: "Basic Hierarchy Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Hierarchy a valid Object": function () {
+					Y.Assert.isFunction(olap.Hierarchy);
+				},
+				"Test olap.Hierarchy class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Hierarchy.getInstance);
+				},
+				"Test olap.Hierarchy class methods id": function () {
+					Y.Assert.isNumber(olap.Hierarchy.id);
+				},
+				"Test olap.Hierarchy class methods prefix": function () {
+					Y.Assert.isString(olap.Hierarchy.prefix);
+				},
+				"Test olap.Hierarchy class methods instances": function () {
+					Y.Assert.isObject(olap.Hierarchy.instances);
+				}
+		    });
+		    suite.add(hierarchy1);
+
+			var hierarchy2 = new Y.Test.Case({
+				name: "Basic Hierarchy Prototype Methods",
+				setUp : function () {
+					this.Hierarchy = new olap.Hierarchy();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Hierarchy object": function () {
+					Y.Assert.isInstanceOf(olap.Hierarchy, this.Hierarchy);
+				},
+				"Test olap.Hierarchy prototype method-getName": function () {
+					Y.Assert.isFunction(this.Hierarchy.getName);
+				},
+				"Test olap.Hierarchy prototype method-getLevels": function () {
+					Y.Assert.isFunction(this.Hierarchy.getLevels);
+				},
+				"Test olap.Hierarchy prototype method-getDimension": function () {
+					Y.Assert.isFunction(this.Hierarchy.getDimension);
+				},
+				"Test olap.Hierarchy prototype method-hasAll": function () {
+					Y.Assert.isFunction(this.Hierarchy.hasAll);
+				},
+				"Test olap.Hierarchy prototype method-getDefaultMember": function () {
+					Y.Assert.isFunction(this.Hierarchy.getDefaultMember);
+				},
+				"Test olap.Hierarchy prototype method-getRootMembers": function () {
+					Y.Assert.isFunction(this.Hierarchy.getRootMembers);
+				}
+		    });
+		    suite.add(hierarchy2);
+
+		    var level1 = new Y.Test.Case({
+				name: "Basic Level Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Level a valid Object": function () {
+					Y.Assert.isFunction(olap.Level);
+				},
+				"Test olap.Level class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Level.getInstance);
+				},
+				"Test olap.Level class methods id": function () {
+					Y.Assert.isNumber(olap.Level.id);
+				},
+				"Test olap.Level class methods prefix": function () {
+					Y.Assert.isString(olap.Level.prefix);
+				},
+				"Test olap.Level class methods instances": function () {
+					Y.Assert.isObject(olap.Level.instances);
+				}
+		    });
+		    suite.add(level1);
+
+			var level2 = new Y.Test.Case({
+				name: "Basic Level Prototype Methods",
+				setUp : function () {
+					this.Level = new olap.Level();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Level object": function () {
+					Y.Assert.isInstanceOf(olap.Level, this.Level);
+				},
+				"Test olap.Level prototype method-getDepth": function () {
+					Y.Assert.isFunction(this.Level.getDepth);
+				},
+				"Test olap.Level prototype method-getHierarchy": function () {
+					Y.Assert.isFunction(this.Level.getHierarchy);
+				},
+				"Test olap.Level prototype method-getLevelType": function () {
+					Y.Assert.isFunction(this.Level.getLevelType);
+				},
+				"Test olap.Level prototype method-getMembers": function () {
+					Y.Assert.isFunction(this.Level.getMembers);
+				},
+				"Test olap.Level prototype method-getCardinality": function () {
+					Y.Assert.isFunction(this.Level.getCardinality);
+				},
+				"Test olap.Level prototype method-getProperties": function () {
+					Y.Assert.isFunction(this.Level.getProperties);
+				}
+		    });
+		    suite.add(level2);
+
+		    var member1 = new Y.Test.Case({
+				name: "Basic Member Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Member a valid Object": function () {
+					Y.Assert.isFunction(olap.Member);
+				},
+				"Test olap.Member class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Member.getInstance);
+				},
+				"Test olap.Member class methods id": function () {
+					Y.Assert.isNumber(olap.Member.id);
+				},
+				"Test olap.Member class methods prefix": function () {
+					Y.Assert.isString(olap.Member.prefix);
+				},
+				"Test olap.Member class methods instances": function () {
+					Y.Assert.isObject(olap.Member.instances);
+				}
+		    });
+		    suite.add(member1);
+
+			var member2 = new Y.Test.Case({
+				name: "Basic Member Prototype Methods",
+				setUp : function () {
+					this.Member = new olap.Member();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Member object": function () {
+					Y.Assert.isInstanceOf(olap.Member, this.Member);
+				},
+				"Test olap.Member prototype method-getName": function () {
+					Y.Assert.isFunction(this.Member.getName);
+				},
+				"Test olap.Member prototype method-getChildMembers": function () {
+					Y.Assert.isFunction(this.Member.getChildMembers);
+				},
+				"Test olap.Member prototype method-getParentMember": function () {
+					Y.Assert.isFunction(this.Member.getParentMember);
+				},
+				"Test olap.Member prototype method-getLevel": function () {
+					Y.Assert.isFunction(this.Member.getLevel);
+				},
+				"Test olap.Member prototype method-getHierarchy": function () {
+					Y.Assert.isFunction(this.Member.getHierarchy);
+				},
+				"Test olap.Member prototype method-isAll": function () {
+					Y.Assert.isFunction(this.Member.isAll);
+				},
+				"Test olap.Member prototype method-isChildOrEqualTo": function () {
+					Y.Assert.isFunction(this.Member.isChildOrEqualTo);
+				},
+				"Test olap.Member prototype method-isCalculated": function () {
+					Y.Assert.isFunction(this.Member.isCalculated);
+				},
+				"Test olap.Member prototype method-isCalculatedInQuery": function () {
+					Y.Assert.isFunction(this.Member.isCalculatedInQuery);
+				},
+				"Test olap.Member prototype method-solveOrder": function () {
+					Y.Assert.isFunction(this.Member.solveOrder);
+				},
+				"Test olap.Member prototype method-getAncestorMembers": function () {
+					Y.Assert.isFunction(this.Member.getAncestorMembers);
+				},
+				"Test olap.Member prototype method-getPropertyValue": function () {
+					Y.Assert.isFunction(this.Member.getPropertyValue);
+				},
+				"Test olap.Member prototype method-getPropertyFormattedValue": function () {
+					Y.Assert.isFunction(this.Member.getPropertyFormattedValue);
+				},
+				"Test olap.Member prototype method-getProperties": function () {
+					Y.Assert.isFunction(this.Member.getProperties);
+				},
+				"Test olap.Member prototype method-getOrdinal": function () {
+					Y.Assert.isFunction(this.Member.getOrdinal);
+				},
+				"Test olap.Member prototype method-isHidden": function () {
+					Y.Assert.isFunction(this.Member.isHidden);
+				},
+				"Test olap.Member prototype method-getDataMember": function () {
+					Y.Assert.isFunction(this.Member.getDataMember);
+				},
+				"Test olap.Member prototype method-getChildMemberCount": function () {
+					Y.Assert.isFunction(this.Member.getChildMemberCount);
+				}
+		    });
+		    suite.add(member2);
+			
+		    var measure1 = new Y.Test.Case({
+				name: "Basic Measure Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Measure a valid Object": function () {
+					Y.Assert.isFunction(olap.Measure);
+				},
+				"Test olap.Measure class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Measure.getInstance);
+				},
+				"Test olap.Measure class methods id": function () {
+					Y.Assert.isNumber(olap.Measure.id);
+				},
+				"Test olap.Measure class methods prefix": function () {
+					Y.Assert.isString(olap.Measure.prefix);
+				},
+				"Test olap.Measure class methods instances": function () {
+					Y.Assert.isObject(olap.Measure.instances);
+				}
+		    });
+		    suite.add(measure1);
+
+			var measure2 = new Y.Test.Case({
+				name: "Basic Measure Prototype Methods",
+				setUp : function () {
+					this.Measure = new olap.Measure();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Measure object": function () {
+					Y.Assert.isInstanceOf(olap.Measure, this.Measure);
+				},
+				"Test olap.Measure prototype method-isVisible": function () {
+					Y.Assert.isFunction(this.Measure.isVisible);
+				},
+				"Test olap.Measure prototype method-getAggregator": function () {
+					Y.Assert.isFunction(this.Measure.getAggregator);
+				},
+				"Test olap.Measure prototype method-getDataType": function () {
+					Y.Assert.isFunction(this.Measure.getDataType);
+				}
+		    });
+		    suite.add(measure2);
+			
+		    var property1 = new Y.Test.Case({
+				name: "Basic Property Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Property a valid Object": function () {
+					Y.Assert.isFunction(olap.Property);
+				},
+				"Test olap.Property class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Property.getInstance);
+				},
+				"Test olap.Property class methods id": function () {
+					Y.Assert.isNumber(olap.Property.id);
+				},
+				"Test olap.Property class methods prefix": function () {
+					Y.Assert.isString(olap.Property.prefix);
+				},
+				"Test olap.Property class methods instances": function () {
+					Y.Assert.isObject(olap.Property.instances);
+				}
+		    });
+		    suite.add(property1);
+
+			var property2 = new Y.Test.Case({
+				name: "Basic Property Prototype Methods",
+				setUp : function () {
+					this.Property = new olap.Property();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Property object": function () {
+					Y.Assert.isInstanceOf(olap.Property, this.Property);
+				},
+				"Test olap.Property prototype method-getDatatype": function () {
+					Y.Assert.isFunction(this.Property.getDatatype);
+				},
+				"Test olap.Property prototype method-getType": function () {
+					Y.Assert.isFunction(this.Property.getType);
+				}
+		    });
+		    suite.add(property2);
+
+			var namedset1 = new Y.Test.Case({
+				name: "Basic NamedSet Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.NamedSet a valid Object": function () {
+					Y.Assert.isFunction(olap.NamedSet);
+				},
+				"Test olap.NamedSet class methods getInstance": function () {
+					Y.Assert.isFunction(olap.NamedSet.getInstance);
+				},
+				"Test olap.NamedSet class methods id": function () {
+					Y.Assert.isNumber(olap.NamedSet.id);
+				},
+				"Test olap.NamedSet class methods prefix": function () {
+					Y.Assert.isString(olap.NamedSet.prefix);
+				},
+				"Test olap.NamedSet class methods instances": function () {
+					Y.Assert.isObject(olap.NamedSet.instances);
+				}
+		    });
+		    suite.add(namedset1);
+
+			var namedset2 = new Y.Test.Case({
+				name: "Basic NamedSet Prototype Methods",
+				setUp : function () {
+					this.NamedSet = new olap.NamedSet();
+				},
+				tearDown: function() {
+				},
+				"Test olap.NamedSet object": function () {
+					Y.Assert.isInstanceOf(olap.NamedSet, this.NamedSet);
+				},
+				"Test olap.NamedSet prototype method-getCube": function () {
+					Y.Assert.isFunction(this.NamedSet.getCube);
+				},
+				"Test olap.NamedSet prototype method-getExpression": function () {
+					Y.Assert.isFunction(this.NamedSet.getExpression);
+				}
+		    });
+		    suite.add(namedset2);
+
+		    var cellset1 = new Y.Test.Case({
+				name: "Basic CellSet Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.CellSet a valid Object": function () {
+					Y.Assert.isFunction(olap.CellSet);
+				},
+				"Test olap.CellSet class methods getInstance": function () {
+					Y.Assert.isFunction(olap.CellSet.getInstance);
+				},
+				"Test olap.CellSet class methods id": function () {
+					Y.Assert.isNumber(olap.CellSet.id);
+				},
+				"Test olap.CellSet class methods prefix": function () {
+					Y.Assert.isString(olap.CellSet.prefix);
+				},
+				"Test olap.CellSet class methods instances": function () {
+					Y.Assert.isObject(olap.CellSet.instances);
+				}
+		    });
+		    suite.add(cellset1);
+
+			var cellset2 = new Y.Test.Case({
+				name: "Basic CellSet Prototype Methods",
+				setUp : function () {
+					this.CellSet = new olap.CellSet();
+				},
+				tearDown: function() {
+				},
+				"Test olap.CellSet object": function () {
+					Y.Assert.isInstanceOf(olap.CellSet, this.CellSet);
+				},
+				"Test olap.CellSet prototype method-getAxes": function () {
+					Y.Assert.isFunction(this.CellSet.getAxes);
+				},
+				"Test olap.CellSet prototype method-getFilterAxis": function () {
+					Y.Assert.isFunction(this.CellSet.getFilterAxis);
+				},
+				"Test olap.CellSet prototype method-getCell": function () {
+					Y.Assert.isFunction(this.CellSet.getCell);
+				}
+		    });
+		    suite.add(cellset2);
+
+		    var cellsetaxis1 = new Y.Test.Case({
+				name: "Basic CellSetAxis Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.CellSetAxis a valid Object": function () {
+					Y.Assert.isFunction(olap.CellSetAxis);
+				},
+				"Test olap.CellSetAxis class methods getInstance": function () {
+					Y.Assert.isFunction(olap.CellSetAxis.getInstance);
+				},
+				"Test olap.CellSetAxis class methods id": function () {
+					Y.Assert.isNumber(olap.CellSetAxis.id);
+				},
+				"Test olap.CellSetAxis class methods prefix": function () {
+					Y.Assert.isString(olap.CellSetAxis.prefix);
+				},
+				"Test olap.CellSetAxis class methods instances": function () {
+					Y.Assert.isObject(olap.CellSetAxis.instances);
+				}
+		    });
+		    suite.add(cellsetaxis1);
+
+			var cellsetaxis2 = new Y.Test.Case({
+				name: "Basic CellSetAxis Prototype Methods",
+				setUp : function () {
+					this.CellSetAxis = new olap.CellSetAxis();
+				},
+				tearDown: function() {
+				},
+				"Test olap.CellSetAxis object": function () {
+					Y.Assert.isInstanceOf(olap.CellSetAxis, this.CellSetAxis);
+				},
+				"Test olap.CellSetAxis prototype method-getOrdinal": function () {
+					Y.Assert.isFunction(this.CellSetAxis.getOrdinal);
+				},
+				"Test olap.CellSetAxis prototype method-getCellSet": function () {
+					Y.Assert.isFunction(this.CellSetAxis.getCellSet);
+				},
+				"Test olap.CellSetAxis prototype method-getPositions": function () {
+					Y.Assert.isFunction(this.CellSetAxis.getPositions);
+				},
+				"Test olap.CellSetAxis prototype method-getPositionCount": function () {
+					Y.Assert.isFunction(this.CellSetAxis.getPositionCount);
+				},
+				"Test olap.CellSetAxis prototype method-getHierarchies": function () {
+					Y.Assert.isFunction(this.CellSetAxis.getHierarchies);
+				},
+				"Test olap.CellSetAxis prototype method-getProperties": function () {
+					Y.Assert.isFunction(this.CellSetAxis.getProperties);
+				}
+		    });
+		    suite.add(cellsetaxis2);
+
+		    var cell1 = new Y.Test.Case({
+				name: "Basic Cell Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Cell a valid Object": function () {
+					Y.Assert.isFunction(olap.Cell);
+				},
+				"Test olap.Cell class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Cell.getInstance);
+				},
+				"Test olap.Cell class methods id": function () {
+					Y.Assert.isNumber(olap.Cell.id);
+				},
+				"Test olap.Cell class methods prefix": function () {
+					Y.Assert.isString(olap.Cell.prefix);
+				},
+				"Test olap.Cell class methods instances": function () {
+					Y.Assert.isObject(olap.Cell.instances);
+				}
+		    });
+		    suite.add(cell1);
+
+			var cell2 = new Y.Test.Case({
+				name: "Basic Cell Prototype Methods",
+				setUp : function () {
+					this.Cell = new olap.Cell();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Cell object": function () {
+					Y.Assert.isInstanceOf(olap.Cell, this.Cell);
+				},
+				"Test olap.Cell prototype method-getCellSet": function () {
+					Y.Assert.isFunction(this.Cell.getCellSet);
+				},
+				"Test olap.Cell prototype method-getOrdinal": function () {
+					Y.Assert.isFunction(this.Cell.getOrdinal);
+				},
+				"Test olap.Cell prototype method-getCoordinateList": function () {
+					Y.Assert.isFunction(this.Cell.getCoordinateList);
+				},
+				"Test olap.Cell prototype method-getPropertyValue": function () {
+					Y.Assert.isFunction(this.Cell.getPropertyValue);
+				},
+				"Test olap.Cell prototype method-getValue": function () {
+					Y.Assert.isFunction(this.Cell.getValue);
+				},
+				"Test olap.Cell prototype method-getFormattedValue": function () {
+					Y.Assert.isFunction(this.Cell.getFormattedValue);
+				}
+		    });
+		    suite.add(cell2);
+			
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+
+			var getResults = function(){
+				//get object of results
+				resultsObject = Y.Test.Runner.getResults();
+				//console.debug(resultsObject);
+				document.body.appendChild(prettyPrint(resultsObject, { maxDepth:10 } ));
+			}
+			Y.Test.TestRunner.subscribe(Y.Test.TestRunner.COMPLETE_EVENT, getResults);			
+		//initialize the console
+			/*
+			(new Y.Test.Console({
+				newestOnTop: false
+			})).render('#log');			
+			*/
+		    //run all tests
+		    Y.Test.Runner.run();
+
+			
+		});
+
+        </script>
+    </body>
+</html>

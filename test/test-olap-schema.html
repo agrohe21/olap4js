@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Schema</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Schema</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Schema");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Schema Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Schema a valid Object": function () {
+					Y.Assert.isFunction(olap.Schema);
+				},
+				"Test olap.Schema class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Schema.getInstance);
+				},
+				"Test olap.Schema class methods id": function () {
+					Y.Assert.isNumber(olap.Schema.id);
+				},
+				"Test olap.Schema class methods prefix": function () {
+					Y.Assert.isString(olap.Schema.prefix);
+				},
+				"Test olap.Schema class methods instances": function () {
+					Y.Assert.isObject(olap.Schema.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Schema Prototype Methods",
+				setUp : function () {
+					this.Schema = new olap.Schema();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Schema object": function () {
+					Y.Assert.isInstanceOf(olap.Schema, this.Schema);
+				},
+				"Test olap.Schema prototype method-getCatalog": function () {
+					Y.Assert.isFunction(this.Schema.getCatalog);
+				},
+				"Test olap.Schema prototype method-getName": function () {
+					Y.Assert.isFunction(this.Schema.getName);
+				},
+				"Test olap.Schema prototype method-getSharedDimensions": function () {
+					Y.Assert.isFunction(this.Schema.getSharedDimensions);
+				},
+				"Test olap.Schema prototype method-getCubes": function () {
+					Y.Assert.isFunction(this.Schema.getCubes);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

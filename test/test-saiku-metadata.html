@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Discover Test</title>
+    </head>
+    <body>
+        <h1>Discover Testing</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+        <script>typeof(window.jQuery) !== "undefined" || document.write('<script src="js/jquery/jquery.min.js"><\/script>')</script>
+        <script type="text/javascript" src="../olap-saiku.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects");
+		    testCase1 = new Y.Test.Case({
+				name: "olap.Connection",
+				setUp : function () {
+					var that = this;
+					this.olapConn = new olapSaiku.Connection({url:"http://centp45:8080/pentaho/content/saiku"});
+				},
+				tearDown: function() {
+					this.olapConn.close();
+				},
+				"id 1": function () {
+					Y.Assert.areEqual(1, olap.Connection.id);
+				}
+		    });
+		    suite.add(testCase1);
+
+		    testCase2 = new Y.Test.Case({
+			name: "Get Cubes",
+			setUp : function () {
+			    var that = this;
+			    this.olapConn = new olapSaiku.Connection({url:"http://centp45:8080/pentaho/content/saiku"});
+			    this.olapConn.getOlapDatabases(function(sources){
+				console.debug(sources);
+				that.source = sources[0];
+			    });
+			},
+			tearDown: function() {
+			    olapConn.close();
+			},
+			"Get Cubes Array": function () {
+			    var idx, cubes, cube;
+			    cubes = olapXmla.Cube.getCubes(this.source);
+			    Y.Assert.areEqual(4, cubes.length);
+			},
+			"Cube is olapXmla Cube": function () {
+			    var idx, cubes, cube;
+			    cubes = olapXmla.Cube.getCubes(this.source);
+			    Y.Assert.areEqual(true, cubes[0] instanceof olapXmla.Cube);
+			}
+		    });
+		    //suite.add(testCase2);
+			
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+        </script>
+    </body>
+</html>

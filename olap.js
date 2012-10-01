@@ -7,9 +7,7 @@
 	/* olap.Connection
 	*/
 	olap.Connection = function Connection($connection){
-		//console.debug('func Call: ' + arguments.callee.name);
-		
-		
+		//console.debug('func Call: ' + arguments.callee.name);		
 		var src = {}, that=this;
 		this.sources = [];
 		if ($connection instanceof Object) { //have we been passed a valid JS object?
@@ -24,22 +22,30 @@
 		this.id = olap.Connection.id++;
 		olap.Connection.instances[this.id] = this;		
 	}
-	
+	olap.Connection.id = 1;
+	olap.Connection.prefix = "olap.Connection";
+	olap.Connection.instances = {};
+	olap.Connection.getInstance = function(id){
+	    return olap.Connection.instances[id];
+	};
 	olap.Connection.prototype = {
 		getOlapDatabases: function getOlapDatabases(callback){
 			if (this.sources.length ==0) {
 				this.fetchOlapDatasources(function(sources){
-					callback.call(this, sources);
+					if (callback && typeof callback == 'function') {
+						callback.call(this, sources);
+					}
 				});
 			} else {
 				if (callback && typeof callback == 'function') {
 					callback.call(this, this.sources);
 				}
-				return this.sources;
 			}
+			return this.sources;
 		},
 		fetchOlapDatasources: function fetchOlapDatasources(callback){
 			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		},
 		addDataSource: function addDataSource(source, callback) {
 			if ((source instanceof Object) && (source instanceof olap.Datasource == false)) { //do we have an object as param and it is not already a Datasource
@@ -50,13 +56,84 @@
 				callback.call(this, source);
 			}
 			return source;
-		}
+		},
+		executeOlapQuery: function executeOlapQuery(options){
+			//just do the default for now
+			console.warn('Default execute being used');
+			return new olap.CellSet({});
+		},
+		getCubes: function getCubes(callback) {
+		
+			var getCubesInDatasource = function getCubesInDatasource(sources){
+				var idx, source, catalogs, catalog, cubes, cube, _cubes = [];
+				for (idx in sources) {
+				source = sources[idx];
+				catalogs = source.getCatalogs();
+					for (idx in catalogs){
+						catalog = catalogs[idx];
+						cubes = catalog.getCubes();
+						_cubes = _cubes.concat(cubes);
+					}
+				}
+				return _cubes;
+			}
+			this.getOlapDatabases(function(sources){
+				var cubes = getCubesInDatasource(sources);
+				if (typeof callback == 'function') {
+					callback.call(this, cubes);
+				} else {
+					return cubes;
+				}
+			})    
+		},
+		getLevels: function getLevels(callback) {
+		
+			var getLevelsInDatasource = function getLevelsInDatasource(sources){
+				var idx, source, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchy, hierarchies, levels, level, _levels = [];
+				for (idx in sources) {
+				source = sources[idx];
+				catalogs = source.getCatalogs();
+					for (idx in catalogs){
+						catalog = catalogs[idx];
+						cubes = catalog.getCubes();
+						for (idx in cubes){
+							cube = cubes[idx];
+							measures = cube.getMeasures();
+							for (idx in measures){
+								measure = measures[idx];
+							}
+							dimensions = cube.getDimensions();
+							for (idx in dimensions){
+								dimension = dimensions[idx];
+								hierarchies = dimension.getHierarchies();
+								for (idx in hierarchies){
+									hierarchy = hierarchies[idx];
+									levels = hierarchy.getLevels();
+									/*
+									for (idx in levels){
+										level = levels[idx];
+										//members = level.getMembers();
+										//for (idx in members){
+										//member = members[idx];
+									}*/	    
+									_levels = _levels.concat(levels);
+								}	    
+							}	    
+						}
+					}
+				}
+				return _levels;
+			}
+			this.getOlapDatabases(function(sources){
+				var lvls = getLevelsInDatasource(sources);
+				if (typeof callback == 'function') {
+					callback.call(this, lvls);
+				} else {
+					return lvls;
+				}
+			})    
+		}	
 	}
-	olap.Connection.id = 1;
-	olap.Connection.instances = {};
-	olap.Connection.getInstance = function(id){
-	    return olap.Connection.instances[id];
-	};
 	
 	/* olap.Datasource
 	*   <p>
@@ -71,7 +148,7 @@
 	*   @param {Xmla} xmla The Xmla instance to be used to communicate with the server
 	*/
 	olap.Datasource = function Datasource(source, $conn) {
-		var idx, cat;
+		//var idx cat;
 		this.catalogs = [];
 		if (source instanceof Object) { //have we been passed a valid JS object?
 			this.DATA_SOURCE_DESCRIPTION = source.DATA_SOURCE_DESCRIPTION || "";
@@ -95,6 +172,7 @@
 	}
 	olap.Datasource.id = 1;
 	olap.Datasource.instances = {};
+	olap.Datasource.prefix = "olap.Datasource";
 	olap.Datasource.getInstance = function(id){
 	    return olap.Datasource.instances[id];
 	};	
@@ -116,6 +194,12 @@
 		},
 		getDataSourceInfo: function getDataSourceInfo() {
 			return this.DATA_SOURCE_INFO;
+		},
+		getProviderTypes: function getProviderTypes() {
+			return this.PROVIDER_TYPE;
+		},
+		getAuthenticationModes: function getAuthenticationModes() {
+			return this.AUTHENTICATION_MODE;
 		},
 		getCatalogs: function getCatalogs() {
 			if (this.catalogs.length == 0) {
@@ -149,7 +233,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Datasource} source The olap.Datasource that this catalog belongs to
 	*/
-	olap.Catalog = function Catalog(catalog, $s) {
+	olap.Catalog = function Catalog($catalog, $ds) {
+	var catalog = $catalog || {cubes:[]};
 		this.CATALOG_NAME  = catalog.CATALOG_NAME  || "";
 		this.DATE_MODIFIED = catalog.DATE_MODIFIED || "";
 		this.DESCRIPTION   = catalog.DESCRIPTION   || "";
@@ -163,16 +248,26 @@
 		}
 		
 		//this.SCHEMA_NAME = catalog.SCHEMA_NAME;
-		this.datasource    = $s;
+		this.datasource    = $ds;
 		this.id = olap.Catalog.id++;
 		olap.Catalog.instances[this.id] = this;				
 	}
 	olap.Catalog.id = 1;
 	olap.Catalog.instances = {};
+	olap.Catalog.prefix = "olap.Catalog";
 	olap.Catalog.getInstance = function(id){
 	    return olap.Catalog.instances[id];
 	};		
 	olap.Catalog.prototype = {
+		getName: function getName() {
+				return this.CATALOG_NAME;
+		},
+		getSchemas: function getSchemas() {
+				return this.schemas;
+		},
+		getDatabase: function getDatabase() {
+				return this.datasource;
+		},
 		addCube: function addCube(cube, callback) {
 			if ((cube instanceof Object) && (cube instanceof olap.Cube == false)) { //do we have an object as param and it is not already a Catalog
 				cube = new olap.Cube(cube, this);
@@ -192,6 +287,7 @@
 		},
 		fetchCubes: function fetchCubes() {	
 			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		}
 	}
 	
@@ -204,7 +300,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Catalog} catalog The olap.Catalog that this Cube belongs to
 	*/
-	olap.Cube = function Cube(cube, $cat) {
+	olap.Cube = function Cube($cube, $cat) {
+		var cube = $cube || {};
 		this.CUBE_NAME   = cube.CUBE_NAME || "";
 		this.CUBE_TYPE   = cube.CUBE_TYPE || "CUBE";
 		this.DESCRIPTION = cube.DESCRIPTION || "";
@@ -220,11 +317,11 @@
 		this.CATALOG_NAME = cube.CATALOG_NAME;
 		this.catalog    = $cat || {};
 		this.id = olap.Cube.id++;
-		olap.Cube.instances[this.id] = this;		
-
+		olap.Cube.instances[this.id] = this;
 	}
 	olap.Cube.id = 1;
 	olap.Cube.instances = {};
+	olap.Cube.prefix = "olap.Cube";
 	olap.Cube.getInstance = function(id){
 	    return olap.Cube.instances[id];
 	};
@@ -239,41 +336,77 @@
 		return null;
 	}
 	olap.Cube.prototype = {
+		getSchema: function getSchema() {
+			//TODO this should be a schema object not just the name
+			return this.SCHEMA_NAME;
+		},
 		getName: function getName() {
 			return this.CUBE_NAME;
 		},
 		addDimension: function addDimension(dimension, callback) {
-			this.dimensions.push(dimension);
-			if (typeof callback == 'function') {
-				callback(dimension);
-			} 
+			//console.debug('func Call: ' + arguments.callee.name);
+			if (dimension instanceof Object) {
+				if (dimension instanceof olap.Dimension == false) {
+					dimension = new olap.Dimension(dimension, this);
+				}
+				this.dimensions.push(dimension);
+				if (typeof callback == 'function') {
+					callback(dimension);
+				} 
+			}
+				
 			return dimension;
 		},
 		addMeasure: function addMeasure(measure, callback) {
-			this.measures.push(measure);
-			if (typeof callback == 'function') {
-				callback(measure);
-			} 
+			if (measure instanceof Object) {
+				if (measure instanceof olap.Measure == false){
+					measure = new olap.Measure(measure, this);
+				}
+				this.measures.push(measure);
+				if (typeof callback == 'function') {
+					callback(measure);
+				}				
+			}
 			return measure;
 		},
-		getLevelByUniqueName: function(LEVEL_UNIQUE_NAME, HIERARCHY_NAME){
-	
+		getHierarchyByUniqueName: function getHierarchyByUniqueName(HIERARCHY_UNIQUE_NAME){
+			console.debug('func Call: ' + arguments.callee.name);
+			console.debug(HIERARCHY_UNIQUE_NAME);
 			for (var i=0, j=this.dimensions.length;i<j;i++){
 				var dim = this.dimensions[i];
 				for (var h=0, k=dim.hierarchies.length;h<k;h++){
 					var hier = dim.hierarchies[h];
-					if (hier.HIERARCHY_NAME == HIERARCHY_NAME) {
-						for (var z=0, y=hier.levels.length;z<y;z++){
-							var lvl = hier.levels[z];
-							if (lvl.LEVEL_UNIQUE_NAME == LEVEL_UNIQUE_NAME){
-								return lvl;
+					if (hier.HIERARCHY_UNIQUE_NAME == HIERARCHY_UNIQUE_NAME) {
+						return hier;
+					}
+				}
+			}
+			throw new Error('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
+			return null;			
+		},
+		getLevelByUniqueName: function getLevelByUniqueName(LEVEL_UNIQUE_NAME, HIERARCHY_NAME){
+			console.debug('func Call: ' + arguments.callee.name);
+			console.debug(LEVEL_UNIQUE_NAME +':' + HIERARCHY_NAME);
+			
+			if (HIERARCHY_NAME == 'Measures') {
+				return {LEVEL_UNIQUE_NAME:LEVEL_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME:HIERARCHY_NAME};
+			} else {
+				for (var i=0, j=this.dimensions.length;i<j;i++){
+					var dim = this.dimensions[i];
+					for (var h=0, k=dim.hierarchies.length;h<k;h++){
+						var hier = dim.hierarchies[h];
+						if (hier.HIERARCHY_NAME == HIERARCHY_NAME) {
+							for (var z=0, y=hier.levels.length;z<y;z++){
+								var lvl = hier.levels[z];
+								if (lvl.LEVEL_UNIQUE_NAME == LEVEL_UNIQUE_NAME){
+									return lvl;
+								}
 							}
 						}
 					}
 				}
 			}
-			// Maybe throw error here
-			console.debug('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
+			throw new Error('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
 			return null;			
 		},
 		getMeasures: function getMeasures() {
@@ -288,9 +421,9 @@
 		},
 		fetchMeasures: function fetchMeasures() {	
 			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		},
 		getDimensions: function getDimensions() {
-			console.debug(this.dimensions.length);
 			if (this.dimensions.length == 0) {
 				var processDimensions = function processDimensions(dimensions){
 					return this.dimensions;
@@ -300,8 +433,19 @@
 				return this.dimensions;
 			}
 		},
+		getHierarchies: function getHierarchies() {
+			if (this.dimensions.length !== 0) {
+					var i, dims=this.dimensions, _hiers, hiers=[];
+					for (i=0, j=dims.length;i<j;i++){
+						_hiers = dims[i].getHierarchies();
+						hiers = hiers.concat(_hiers);
+					}
+					return hiers;
+			}
+		},
 		fetchDimensions: function fetchDimensions() {	
 			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		}
 	}
 	
@@ -314,7 +458,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Cube} cube The olap.Cube that this Measure belongs to
 	*/ 
-	olap.Measure = function Measure(measure, $cube) {
+	olap.Measure = function Measure($measure, $cube) {
+		var measure = $measure || {};
 		this.DATA_TYPE             = measure.DATA_TYPE || 0;
 		this.DEFAULT_FORMAT_STRING = measure.DEFAULT_FORMAT_STRING || ""
 		this.DESCRIPTION        = measure.DESCRIPTION || "";
@@ -332,6 +477,7 @@
 	}
 	olap.Measure.id = 1;
 	olap.Measure.instances = {};
+	olap.Measure.prefix = "olap.Measure";
 	olap.Measure.getInstance = function(id){
 	    return olap.Measure.instances[id];
 	};
@@ -393,7 +539,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Cube} cube The olap.Cube that this Dimension belongs to
 	*/
-	olap.Dimension = function Dimension(dim, $cube) {
+	olap.Dimension = function Dimension($dim, $cube) {
+		var dim = $dim || {};
 		this.DEFAULT_HIERARCHY = dim.DEFAULT_HIERARCHY || "";
 		this.DESCRIPTION       = dim.DESCRIPTION       || "";
 		this.DIMENSION_CAPTION = dim.DIMENSION_CAPTION || "";
@@ -431,19 +578,31 @@
 		this.SCHEMA_NAME = dim.SCHEMA_NAME;
 		this.CATALOG_NAME = dim.CATALOG_NAME;
 		this.cube = $cube;
+		if (dim.hierarchies instanceof Array) {
+			for (var idx in dim.hierarchies){
+				var hier = dim.hierarchies[idx];	
+				this.addHierarchy(hier);
+			}
+		}
 		this.id = olap.Dimension.id++;
 		olap.Dimension.instances[this.id] = this;				
 	}
 	olap.Dimension.id = 1;
 	olap.Dimension.instances = {};
+	olap.Dimension.prefix = "olap.Dimension";
 	olap.Dimension.getInstance = function(id){
 	    return olap.Dimension.instances[id];
 	};
 	olap.Dimension.prototype = {
 		addHierarchy: function addHierarchy(hierarchy, callback) {
-			this.hierarchies.push(hierarchy);
-			if (typeof callback == 'function') {
-				callback(hierarchy);
+			if (hierarchy instanceof Object) {
+				if (hierarchy instanceof olap.Hierarchy == false) {
+					hierarchy = new olap.Hierarchy(hierarchy, this);
+				}
+				this.hierarchies.push(hierarchy);
+				if (typeof callback == 'function') {
+					callback(hierarchy);
+				}
 			}
 			return hierarchy;
 		},
@@ -452,6 +611,24 @@
 		},
 		getName: function getUniqueName(){
 			return this.DIMENSION_NAME;
+		},
+		getDimensionType: function getDimensionType(){
+			return this.DIMENSION_TYPE;
+		},
+		getHierarchies: function getHierarchies() {
+			//console.debug(this.hierarchies.length);
+			if (this.hierarchies.length == 0) {
+				var processHierarchies = function processHierarchies(hierarchies){
+					return this.hierarchies;
+				};
+				this.fetchHierarchies(processHierarchies);
+			} else {
+				return this.hierarchies;
+			}
+		},
+		fetchHierarchies: function fetchHierarchies() {	
+			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		}
 	}
 	
@@ -464,7 +641,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Dimension} dimension The olap.Dimension that this Hierarchy belongs to
 	*/
-	olap.Hierarchy = function Hierarchy(hierarchy, $dim){
+	olap.Hierarchy = function Hierarchy($hierarchy, $dim){
+		var hierarchy = $hierarchy || {};
 		this.ALL_MEMBER = hierarchy.ALL_MEMBER || "";
 		this.DEFAULT_MEMBER = hierarchy.DEFAULT_MEMBER || "";
 		this.DESCRIPTION    = hierarchy.DESCRIPTION || "";
@@ -481,11 +659,18 @@
 		this.CATALOG_NAME          = hierarchy.CATALOG_NAME;
 		this.levels                = [];
 		this.dimension = $dim;
+		if (hierarchy.levels instanceof Array) {
+			for (var idx in hierarchy.levels){
+				var lvl = hierarchy.levels[idx];	
+				this.addLevel(lvl);
+			}
+		}
 		this.id = olap.Hierarchy.id++;
 		olap.Hierarchy.instances[this.id] = this;		
 	}
 	olap.Hierarchy.id = 1;
 	olap.Hierarchy.instances = {};
+	olap.Hierarchy.prefix = "olap.Hierarchy";
 	olap.Hierarchy.getInstance = function(id){
 	    return olap.Hierarchy.instances[id];
 	};
@@ -517,9 +702,20 @@
 	}
 	olap.Hierarchy.prototype = {
 		addLevel: function addLevel(level, callback) {
-			this.levels.push(level);
-			if (typeof callback == 'function') {
-				callback(level);
+			//console.debug('func Call: ' + arguments.callee.name);	
+			if (level instanceof Object) {
+				if (level instanceof olap.Level == false) {
+					//console.debug('not olap.Level, creating olap.Level');
+					//console.debug(level);
+					level = new olap.Level(level, this);
+				} else {
+					//console.debug('is an olap.Level');
+					//console.debug(level);
+				}
+				this.levels.push(level);
+				if (typeof callback == 'function') {
+					callback(level);
+				}
 			}
 			return level;
 		},
@@ -537,14 +733,31 @@
 				return "";
 			}
 		},
-		getHierarchy: function () {
+		getHierarchy: function getHierarchy() {
 			return this;
+		},
+		getDimension: function getDimension() {
+			return this.dimension;
 		},
 		getName: function () {
 			return this.HIERARCHY_NAME;
 		},
 		getUniqueName: function () {
 			return this.HIERARCHY_UNIQUE_NAME;
+		},
+		getLevels: function getLevels() {
+			if (this.levels.length == 0) {
+				var processLevels = function processLevels(levels){
+					return this.levels;
+				};
+				this.fetchLevels(processLevels);
+			} else {
+				return this.levels;
+			}
+		},
+		fetchLevels: function fetchLevels() {	
+			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		}
 	}
 	
@@ -557,7 +770,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Hierarchy} hierarchy The olap.Hierarchy that this Level belongs to
 	*/
-	olap.Level = function Level(level, $hier) {
+	olap.Level = function Level($level, $hier) {
+		var level = $level || {};
 		this.LEVEL_UNIQUE_NAME = level.LEVEL_UNIQUE_NAME;
 		this.LEVEL_NAME        = level.LEVEL_NAME;
 		this.LEVEL_CAPTION     = level.LEVEL_CAPTION;
@@ -596,6 +810,7 @@
 	}
 	olap.Level.id = 1;
 	olap.Level.instances = {};
+	olap.Level.prefix = "olap.Level";
 	olap.Level.getInstance = function(id){
 	    return olap.Level.instances[id];
 	};	
@@ -625,15 +840,29 @@
 		
 	}	
 	olap.Level.prototype = {
-		addMember: function addLevel(mem, callback) {
-			this.members.push(mem);
-			if (typeof callback == 'function') {
-				callback(mem);
+		addMember: function addMember(mem, callback) {
+			if (mem instanceof Object) {
+				if (mem instanceof olap.Member == false) {
+					mem = new olap.Member(mem, this);
+				}
+				this.members.push(mem);
+				if (typeof callback == 'function') {
+					callback(mem);
+				}
 			}
 			return mem;
 		},
 		getName:  function getName(){
 			return this.LEVEL_NAME;
+		},
+		getLevelType:  function getLevelType(){
+			return this.LEVEL_TYPE;
+		},
+		getDepth:  function getDepth(){
+			return this.LEVEL_NUMBER;
+		},
+		getCardinality:  function getCardinality(){
+			return this.LEVEL_CARDINALITY;
 		},
 		getUniqueName:  function getUniqueName(){
 			return this.LEVEL_UNIQUE_NAME;
@@ -648,6 +877,21 @@
 			else {
 				return "";
 			}
+		},
+		getMembers: function getMembers() {
+			//console.debug('func Call: ' + arguments.callee.name);
+			if (this.members.length == 0) {
+				var processMembers = function processMembers(members){
+					return members;
+				};
+				this.fetchMembers(processMembers);
+			} else {
+				return this.members;
+			}
+		},
+		fetchMembers: function fetchMembers() {	
+			//empty function that does not fetch anything
+			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		}
 
 	}
@@ -661,7 +905,8 @@
 	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Level} level The olap.Level that this Member belongs to
 	*/
-	olap.Member = function Member(member, $level) {
+	olap.Member = function Member($member, $level) {
+		var member = $member || {};
 		this.MEMBER_UNIQUE_NAME = member.MEMBER_UNIQUE_NAME;
 		this.MEMBER_NAME        = member.MEMBER_NAME;
 		this.MEMBER_TYPE        = member.MEMBER_TYPE;
@@ -683,6 +928,7 @@
 	}
 	olap.Member.id = 1;
 	olap.Member.instances = {};
+	olap.Member.prefix = "olap.Member";
 	olap.Member.getInstance = function(id){
 	    return olap.Level.instances[id];
 	};		
@@ -734,18 +980,120 @@
 			}
 		}
 	}
+
+/* olap.NamedSet
+	  *
+	*/
+	olap.Property = function CellSet($property, $level){
+		//console.debug('func Call: ' + arguments.callee.name);
+		var property = $property || {};
+		this.level = $level || {};
+		this.id = olap.Property.id++;
+		olap.Property.instances[this.id] = this;				
+	}
+	olap.Property.id = 1;
+	olap.Property.prefix = "olap.Property";
+	olap.Property.instances = {};
+	olap.Property.getInstance = function(id){
+	    return olap.Property.instances[id];
+	};
+	olap.Property.prototype = {
+		getDatatype: function getDatatype(){
+		},
+		getType: function getType(){
+		},
+		getContentType: function getContentType(){
+		}
+	}
+	/* olap.NamedSet
+	  *
+	*/
+	olap.NamedSet = function CellSet($namedset, $cube){
+		//console.debug('func Call: ' + arguments.callee.name);
+		var namedset = $namedset || {};
+		this.CUBE_NAME = namedset.CUBE_NAME || '' ;
+		this.SCHEMA_NAME = namedset.SCHEMA_NAME || '' ;
+		this.CATALOG_NAME = namedset.CATALOG_NAME || '' ;
+		this.SET_NAME = namedset.SET_NAME || 'unknown';
+		this.SCOPE = namedset.SCOPE || 1;
+		this.DESCRIPTION = namedset.DESCRIPTION || '' ;
+		this.EXPRESSION = namedset.EXPRESSION || '';
+		this.DIMENSIONS = namedset.DIMENSIONS || '';
+		this.SET_CAPTION = namedset.SET_CAPTION || this.SET_NAME;
+		this.SET_DISPLAY_FOLDER = namedset.SET_DISPLAY_FOLDER;		
+		this.cube = $cube;
+		this.id = olap.NamedSet.id++;
+		olap.NamedSet.instances[this.id] = this;				
+	}
+	olap.NamedSet.id = 1;
+	olap.NamedSet.prefix = "olap.NamedSet";
+	olap.NamedSet.instances = {};
+	olap.NamedSet.getInstance = function(id){
+	    return olap.NamedSet.instances[id];
+	};
+	olap.NamedSet.prototype = {
+		getExpression: function getExpression(){
+			return this.EXPRESSION;
+		},
+		getCube: function getCube(){
+			return this.cube;
+		},
+		getName: function getName(){
+			return this.SET_NAME;
+		},
+		getCaption: function getCaption(){
+			return this.SET_CAPTION;
+		},
+		getDescription: function getDescription(){
+			return this.DESCRIPTION;
+		}
+		
+	}
 	
 	/* olap.CellSet
 	  *
 	*/
-	olap.CellSet = function CellSet($cellset){
+	olap.CellSet = function CellSet($cellset, $catalog){
 		//console.debug('func Call: ' + arguments.callee.name);
-		this.axes       = $cellset.axes || [];
-		this.filterAxis = $cellset.filterAxis || {};
-		this.cells      = $cellset.cells || [];
-		this.CUBE_NAME  = $cellset.cubeName || '';
+		var cellset = $cellset || {axes:[], filterAxis:{}, cells:[], CUBE_NAME: ''}, idx, axis, cell;
+		
+		this.CUBE_NAME  = cellset.CUBE_NAME;
+		this.CATALOG_NAME = $catalog;
+		this.setSlicer(cellset.SLICER);
+		this.cells = [];
+		this.axes  = [];
+		if (cellset.axes instanceof Array) {
+			for (var i=0, j=cellset.axes.length;i<j;i++){
+				axis = cellset.axes[i];
+				axis.ordinal = i;
+				this.addAxis(axis);
+			}
+		}
+		if (cellset.cells instanceof Array) {
+			for (idx in cellset.cells){
+				cell = cellset.cells[idx];	
+				this.addCell(cell);
+			}
+		}
+
+		this.id = olap.CellSet.id++;
+		olap.CellSet.instances[this.id] = this;				
 	}
+	olap.CellSet.id = 1;
+	olap.CellSet.prefix = "olap.CellSet";
+	olap.CellSet.instances = {};
+	olap.CellSet.getInstance = function(id){
+	    return olap.CellSet.instances[id];
+	};
 	olap.CellSet.prototype = {
+		setSlicer: function setSlicer(slicer){
+			if (slicer instanceof Object) {
+				if (slicer instanceof olap.CellSetAxis == false) {
+					slicer = new olap.CellSetAxis(slicer, this);
+				}
+				this.SLICER = slicer;
+			}		
+		},
 		getAxes: function getAxes(){
 			return this.axes;
 		},
@@ -757,9 +1105,180 @@
 		},
 		getCubeName: function getCubeName(){
 			return this.CUBE_NAME;
+		},
+		addAxis: function addAxis(axis, callback) {
+			//console.debug('func Call: ' + arguments.callee.name);	
+			if (axis instanceof Object) {
+				if (axis instanceof olap.CellSetAxis == false) {
+					axis = new olap.CellSetAxis(axis, this);
+				} else {
+				}
+				this.axes.push(axis);
+				if (typeof callback == 'function') {
+					callback(axis);
+				}
+			}
+			return axis;
+		},
+		addCell: function addCell(cell, callback) {
+			//console.debug('func Call: ' + arguments.callee.name);	
+			if (cell instanceof Object) {
+				if (cell instanceof olap.Cell == false) {
+					cell = new olap.Cell(cell, this);
+				} else {
+				}
+				this.cells.push(cell);
+				if (typeof callback == 'function') {
+					callback(cell);
+				}
+			}
+			return cell;
+		}
+	}
+
+	/* olap.Cell
+	  *
+	*/
+	olap.Cell = function Cell($cell, $cellset) {
+		var cell = $cell | {};
+		this.cellset = $cellset;
+		this.id = olap.Cell.id++;
+		olap.Cell.instances[this.id] = this;				
+	}
+	olap.Cell.id = 1;
+	olap.Cell.prefix = "olap.Cell";
+	olap.Cell.instances = {};
+	olap.Cell.getInstance = function(id){
+	    return olap.Cell.instances[id];
+	};	
+	olap.Cell.prototype = {
+		getCellSet: function getCellSet(){
+			return this.cellset;
+		},
+		getOrdinal: function getOrdinal(){
+		},
+		getCoordinateList: function getCoordinateList(){
+			//return List<Integer> ;
+		},
+		getPropertyValue: function getPropertyValue(Property){
+		},
+		getValue: function getValue(){
+		},
+		getFormattedValue: function getFormattedValue(){
+			//return String;
+		}
+	}
+
+	/* olap.Position
+		*
+	*/
+	olap.Position = function Position($position, $axis) {
+		console.debug('func Call: ' + arguments.callee.name);	
+		//document.body.appendChild(prettyPrint($position, { maxDepth:3} ));
+		var position = $position || {}, memb, hier, cube = olap.Cube.getInstanceByName($axis.getCellSet().CUBE_NAME, $axis.getCellSet().CATALOG_NAME);
+
+		this.members = {};
+		for (idx in position){
+			memb = position[idx];	
+			hier = filterProperty.apply($axis.getHierarchies(), [{type:'equal', property:'HIERARCHY_UNIQUE_NAME', value:idx}]);
+			memb.HIERARCHY_UNIQUE_NAME = hier.HIERARCHY_UNIQUE_NAME
+			this.members[idx] = new olap.Member(memb);
+			//BELOW is from sample
+			//var tuple = rowAxis.positions[i][rowHierarchies[z].name];
+			var level = cube.getLevelByUniqueName(memb.LEVEL_UNIQUE_NAME, memb.HIERARCHY_UNIQUE_NAME);
+			document.body.appendChild(prettyPrint(level, { maxDepth:3} ));
+		}
+		
+		this.id = olap.Position.id++;
+		olap.Position.instances[this.id] = this;				
+	}
+	olap.Position.id = 1;
+	olap.Position.prefix = "olap.Position";
+	olap.Position.instances = {};
+	olap.Position.getInstance = function(id){
+	    return olap.Position.instances[id];
+	};	
+	olap.Position.prototype = {
+		getOrdinal: function getOrdinal(){
+			//return Axis;
+		},
+		getMembers: function getMembers(){
+			//return Axis;
 		}
 	}
 	
+	/* olap.CellSetAxis
+	  *
+	*/
+	olap.CellSetAxis = function CellSetAxis($axis, $cellset) {
+		//console.debug('func Call: ' + arguments.callee.name);	
+		var axis = $axis || {ordinal:0}, idx, pos, hier;
+		this.positions = [];
+		this.hierarchies = [];
+		this.cellset = $cellset;
+		this.ordinal = axis.ordinal
+		if (axis.hierarchies instanceof Array) {
+			for (idx in axis.hierarchies ){
+				hier = axis.hierarchies[idx];
+				this.hierarchies.push(new olap.Hierarchy(hier));
+			}
+		}
+		//document.body.appendChild(prettyPrint(this.hierarchies, { maxDepth:3} ));		
+		if (axis.positions instanceof Array) {
+			for (idx in axis.positions ){
+				pos = axis.positions[idx];	
+				this.addPosition(pos);
+			}
+		}
+
+		this.id = olap.CellSetAxis.id++;
+		olap.CellSetAxis.instances[this.id] = this;				
+		//document.body.appendChild(prettyPrint(this, { maxDepth:3} ));		
+	}
+	olap.CellSetAxis.id = 1;
+	olap.CellSetAxis.prefix = "olap.CellSetAxis";
+	olap.CellSetAxis.instances = {};
+	olap.CellSetAxis.getInstance = function(id){
+	    return olap.CellSetAxis.instances[id];
+	};	
+	olap.CellSetAxis.prototype = {
+		getOrdinal: function getOrdinal(){
+			//return Axis;
+		},
+		getCellSet: function getCellSet() {
+			return this.cellset;
+		},
+		getAxisMetaData: function getAxisMetaData(){
+			//return CellSetAxisMetaData ;
+		},
+		getPositions: function getPositions() {
+			return this.positions;
+		},
+		getPositionCount: function getPositionCount(){
+			return this.positions.length;
+		},
+		getHierarchies: function getHierarchies(){
+			return this.hierarchies;
+		},
+		getProperties: function getProperties(){
+			//return this.positions.length;
+		},
+		addPosition: function addPosition(position, callback) {
+			//console.debug('func Call: ' + arguments.callee.name);	
+			if (position instanceof Object) {
+				if (position instanceof olap.Position == false) {
+					position = new olap.Position(position, this);
+				} else {
+				}
+				this.positions.push(position);
+				if (typeof callback == 'function') {
+					callback(position);
+				}
+			}
+			return position;
+		}
+	}
+
 	/* olap.Query
 	  *
 	*/
@@ -852,7 +1371,7 @@
 		},
 		execute: function execute(callback){
 			//default implementation does not create results
-			var results = this.results || new olap.CellSet({});;
+			var results = this.results || new olap.CellSet({});
 			if (typeof callback == 'function') {
 				callback.call(this, results);
 				delete results;

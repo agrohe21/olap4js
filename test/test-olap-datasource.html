@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Datasource</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Datasource</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Datasource");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Datasource Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Datasource a valid Object": function () {
+					Y.Assert.isFunction(olap.Datasource);
+				},
+				"Test olap.Datasource class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Datasource.getInstance);
+				},
+				"Test olap.Datasource class methods id": function () {
+					Y.Assert.isNumber(olap.Datasource.id);
+				},
+				"Test olap.Datasource class methods prefix": function () {
+					Y.Assert.isString(olap.Datasource.prefix);
+				},
+				"Test olap.Datasource class methods instances": function () {
+					Y.Assert.isObject(olap.Datasource.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Datasource Prototype Methods",
+				setUp : function () {
+					this.Datasource = new olap.Datasource();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Datasource object": function () {
+					Y.Assert.isInstanceOf(olap.Datasource, this.Datasource);
+				},
+				"Test olap.Cell prototype method-getOlapConnection": function () {
+					Y.Assert.isFunction(this.Datasource.getOlapConnection);
+				},
+				"Test olap.Cell prototype method-getName": function () {
+					Y.Assert.isFunction(this.Datasource.getName);
+				},
+				"Test olap.Cell prototype method-getDescription": function () {
+					Y.Assert.isFunction(this.Datasource.getDescription);
+				},
+				"Test olap.Cell prototype method-getURL": function () {
+					Y.Assert.isFunction(this.Datasource.getURL);
+				},
+				"Test olap.Cell prototype method-getDataSourceInfo": function () {
+					Y.Assert.isFunction(this.Datasource.getDataSourceInfo);
+				},
+				"Test olap.Cell prototype method-getProviderName": function () {
+					Y.Assert.isFunction(this.Datasource.getProviderName);
+				},
+				"Test olap.Cell prototype method-getProviderTypes": function () {
+					Y.Assert.isFunction(this.Datasource.getProviderTypes);
+				},
+				"Test olap.Cell prototype method-getAuthenticationModes": function () {
+					Y.Assert.isFunction(this.Datasource.getAuthenticationModes);
+				},
+				"Test olap.Cell prototype method-getCatalogs": function () {
+					Y.Assert.isFunction(this.Datasource.getCatalogs);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

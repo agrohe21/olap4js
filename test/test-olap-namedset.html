@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-NamedSet</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-NamedSet</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) 
+{
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-NamedSet");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic NamedSet Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.NamedSet a valid Object": function () {
+					Y.Assert.isFunction(olap.NamedSet);
+				},
+				"Test olap.NamedSet class methods getInstance": function () {
+					Y.Assert.isFunction(olap.NamedSet.getInstance);
+				},
+				"Test olap.NamedSet class methods id": function () {
+					Y.Assert.isNumber(olap.NamedSet.id);
+				},
+				"Test olap.NamedSet class methods prefix": function () {
+					Y.Assert.isString(olap.NamedSet.prefix);
+				},
+				"Test olap.NamedSet class methods instances": function () {
+					Y.Assert.isObject(olap.NamedSet.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic NamedSet Prototype Methods",
+				setUp : function () {
+					this.NamedSet = new olap.NamedSet();
+				},
+				tearDown: function() {
+				},
+				"Test olap.NamedSet object": function () {
+					Y.Assert.isInstanceOf(olap.NamedSet, this.NamedSet);
+				},
+				"Test olap.NamedSet prototype method-getCube": function () {
+					Y.Assert.isFunction(this.NamedSet.getCube);
+				},				"Test olap.NamedSet prototype method-getExpression": function () {					Y.Assert.isFunction(this.NamedSet.getExpression);				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		})
+
+        </script>
+    </body>
+</html>

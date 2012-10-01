@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Cell</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Cell</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Cell");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Cell Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Cell a valid Object": function () {
+					Y.Assert.isFunction(olap.Cell);
+				},
+				"Test olap.Cell class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Cell.getInstance);
+				},
+				"Test olap.Cell class methods id": function () {
+					Y.Assert.isNumber(olap.Cell.id);
+				},
+				"Test olap.Cell class methods prefix": function () {
+					Y.Assert.isString(olap.Cell.prefix);
+				},
+				"Test olap.Cell class methods instances": function () {
+					Y.Assert.isObject(olap.Cell.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Cell Prototype Methods",
+				setUp : function () {
+					this.Cell = new olap.Cell();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Cell object": function () {
+					Y.Assert.isInstanceOf(olap.Cell, this.Cell);
+				},
+				"Test olap.Cell prototype method-getCellSet": function () {
+					Y.Assert.isFunction(this.Cell.getCellSet);
+				},
+				"Test olap.Cell prototype method-getOrdinal": function () {
+					Y.Assert.isFunction(this.Cell.getOrdinal);
+				},
+				"Test olap.Cell prototype method-getCoordinateList": function () {
+					Y.Assert.isFunction(this.Cell.getCoordinateList);
+				},
+				"Test olap.Cell prototype method-getPropertyValue": function () {
+					Y.Assert.isFunction(this.Cell.getPropertyValue);
+				},
+				"Test olap.Cell prototype method-getValue": function () {
+					Y.Assert.isFunction(this.Cell.getValue);
+				},
+				"Test olap.Cell prototype method-getFormattedValue": function () {
+					Y.Assert.isFunction(this.Cell.getFormattedValue);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

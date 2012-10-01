@@ -6,14 +6,17 @@
     </head>
     <body>
         <h1>Saiku Metadata Discover Sample</h1>
+		<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
+        <!-- <script>typeof(window.jQuery) !== "undefined" || document.write('<script src="/pentaho/content/pentaho-cdf/js/jquery.js"><\/script>')</script>-->
+        <script src="/pentaho/content/pentaho-cdf/js/jquery.js"></script>
         <script type="text/javascript" src="../olap.js"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-        <script>typeof(window.jQuery) !== "undefined" || document.write('<script src="js/jquery/jquery.min.js"><\/script>')</script>
         <script type="text/javascript" src="../olap-saiku.js"></script>
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
-			var olapConn = new olapSaiku.Connection({url:"http://centp45:8080/pentaho/content/saiku"}),
-			source, s, catalogs, catalog, c, cubes, cube, cu, measures, _measures=[], measure, m, dimensions, _dimensions=[], dimension, d;
+			var olapConn = new olapSaiku.Connection({url:"http://localhost:8080/pentaho/content/saiku"}),
+			source, s, catalogs, catalog, c, cubes, cube, cu, measures, _measures=[], measure, m, dimensions, _dimensions=[], dimension, d,
+			hierarchies, hierarchy, h, _hierarchies=[], levels, level, l, _levels=[], members, member, m, _members=[];
+			
 			olapConn.getOlapDatabases(
 			function(sources){
 				for (s in sources){
@@ -22,6 +25,7 @@
 						catalog = source.catalogs[c];
 						for (cu in catalog.cubes){
 							cube = catalog.cubes[cu];
+							//console.debug(cube);
 							
 							cube.getMeasures();
 							measures = cube.getMeasures();
@@ -32,16 +36,34 @@
 							
 							cube.getDimensions();
 							dimensions = cube.getDimensions();
-							//console.debug(dimensions);
 							_dimensions = _dimensions.concat(dimensions);
 							for (d in dimensions){
 								dimension = dimensions[d];
+								console.debug(dimension);
+								hierarchies = dimension.getHierarchies();
+								_hierarchies = _hierarchies.concat(hierarchies);
+								for (h in hierarchies){
+									hierarchy = hierarchies[h];
+									//console.debug(hierarchy);
+									levels = hierarchy.getLevels();
+									_levels = _levels.concat(levels);
+									for (l in levels){
+										level = levels[l];
+										//console.debug(level);
+										//level.getMembers();
+										members = level.getMembers();
+										_members = _members.concat(members);
+										/*for (idx in members){
+											member = members[idx];
+										}*/
+									}
+								}	    
+								
 							}
-							
 						}
 					}
 				}
-				document.body.appendChild(prettyPrint(_dimensions, { maxDepth:3 } ));							
+				document.body.appendChild(prettyPrint(_members, { maxDepth:3 } ));	
 			});
 			
         </script>

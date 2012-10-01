@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Cube</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Cube</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Cube");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Cube Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Cube a valid Object": function () {
+					Y.Assert.isFunction(olap.Cube);
+				},
+				"Test olap.Cube class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Cube.getInstance);
+				},
+				"Test olap.Cube class methods id": function () {
+					Y.Assert.isNumber(olap.Cube.id);
+				},
+				"Test olap.Cube class methods prefix": function () {
+					Y.Assert.isString(olap.Cube.prefix);
+				},
+				"Test olap.Cube class methods instances": function () {
+					Y.Assert.isObject(olap.Cube.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Cube Prototype Methods",
+				setUp : function () {
+					this.Cube = new olap.Cube();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Cube object": function () {
+					Y.Assert.isInstanceOf(olap.Cube, this.Cube);
+				},
+				"Test olap.Cube prototype method-getSchema": function () {
+					Y.Assert.isFunction(this.Cube.getSchema);
+				},
+				"Test olap.Cube prototype method-getDimensions": function () {
+					Y.Assert.isFunction(this.Cube.getDimensions);
+				},
+				"Test olap.Cube prototype method-getHierarchies": function () {
+					Y.Assert.isFunction(this.Cube.getHierarchies);
+				},
+				"Test olap.Cube prototype method-getMeasures": function () {
+					Y.Assert.isFunction(this.Cube.getMeasures);
+				},
+				"Test olap.Cube prototype method-getSets": function () {
+					Y.Assert.isFunction(this.Cube.getSets);
+				},
+				"Test olap.Cube prototype method-getName": function () {
+					Y.Assert.isFunction(this.Cube.getName);
+				},
+				"Test olap.Cube prototype method-lookupMember": function () {
+					Y.Assert.isFunction(this.Cube.lookupMember);
+				},
+				"Test olap.Cube prototype method-lookupMembers": function () {
+					Y.Assert.isFunction(this.Cube.lookupMembers);
+				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+
+        </script>
+    </body>
+</html>

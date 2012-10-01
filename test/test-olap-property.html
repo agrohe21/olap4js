@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS Testing-Property</title>
+    </head>
+    <body>
+        <h1>OLAP4JS Testing-Property</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) 
+{
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects-Property");
+		    var testCase1 = new Y.Test.Case({
+				name: "Basic Property Object",
+				setUp : function () {
+				},
+				tearDown: function() {
+				},
+				"Is olap.Property a valid Object": function () {
+					Y.Assert.isFunction(olap.Property);
+				},
+				"Test olap.Property class methods getInstance": function () {
+					Y.Assert.isFunction(olap.Property.getInstance);
+				},
+				"Test olap.Property class methods id": function () {
+					Y.Assert.isNumber(olap.Property.id);
+				},
+				"Test olap.Property class methods prefix": function () {
+					Y.Assert.isString(olap.Property.prefix);
+				},
+				"Test olap.Property class methods instances": function () {
+					Y.Assert.isObject(olap.Property.instances);
+				}
+		    });
+		    suite.add(testCase1);
+
+			var testCase2 = new Y.Test.Case({
+				name: "Basic Property Prototype Methods",
+				setUp : function () {
+					this.Property = new olap.Property();
+				},
+				tearDown: function() {
+				},
+				"Test olap.Property object": function () {
+					Y.Assert.isInstanceOf(olap.Property, this.Property);
+				},
+				"Test olap.Property prototype method-getDatatype": function () {
+					Y.Assert.isFunction(this.Property.getDatatype);
+				},				"Test olap.Property prototype method-getType": function () {					Y.Assert.isFunction(this.Property.getType);				}
+		    });
+		    suite.add(testCase2);
+
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		})
+
+        </script>
+    </body>
+</html>
