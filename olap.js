@@ -643,6 +643,9 @@
 	*/
 	olap.Hierarchy = function Hierarchy($hierarchy, $dim){
 		var hierarchy = $hierarchy || {};
+		if ((hierarchy.HIERARCHY_UNIQUE_NAME == "") || (hierarchy.HIERARCHY_UNIQUE_NAME == undefined)) {
+			throw new Error("Must supply a Unique Name");
+		}
 		this.ALL_MEMBER = hierarchy.ALL_MEMBER || "";
 		this.DEFAULT_MEMBER = hierarchy.DEFAULT_MEMBER || "";
 		this.DESCRIPTION    = hierarchy.DESCRIPTION || "";
@@ -650,7 +653,7 @@
 		this.HIERARCHY_CARDINALITY = hierarchy.HIERARCHaY_CARDINALITY || "";
 		this.HIERARCHY_NAME        = hierarchy.HIERARCHY_NAME || "";
 		this.HIERARCHY_ORDINAL     = hierarchy.HIERARCHY_ORDINAL || 0;
-		this.HIERARCHY_UNIQUE_NAME = hierarchy.HIERARCHY_UNIQUE_NAME || "";
+		this.HIERARCHY_UNIQUE_NAME = hierarchy.HIERARCHY_UNIQUE_NAME;
 		this.PARENT_CHILD          = hierarchy.PARENT_CHILD == 'true' ? true : false;
 		this.STRUCTURE             = hierarchy.STRUCTURE || 0;
 		this.DIMENSION_UNIQUE_NAME = hierarchy.DIMENSION_UNIQUE_NAME;
@@ -981,31 +984,7 @@
 		}
 	}
 
-/* olap.NamedSet
-	  *
-	*/
-	olap.Property = function CellSet($property, $level){
-		//console.debug('func Call: ' + arguments.callee.name);
-		var property = $property || {};
-		this.level = $level || {};
-		this.id = olap.Property.id++;
-		olap.Property.instances[this.id] = this;				
-	}
-	olap.Property.id = 1;
-	olap.Property.prefix = "olap.Property";
-	olap.Property.instances = {};
-	olap.Property.getInstance = function(id){
-	    return olap.Property.instances[id];
-	};
-	olap.Property.prototype = {
-		getDatatype: function getDatatype(){
-		},
-		getType: function getType(){
-		},
-		getContentType: function getContentType(){
-		}
-	}
-	/* olap.NamedSet
+		/* olap.NamedSet
 	  *
 	*/
 	olap.NamedSet = function CellSet($namedset, $cube){
@@ -1022,7 +1001,7 @@
 		this.SET_CAPTION = namedset.SET_CAPTION || this.SET_NAME;
 		this.SET_DISPLAY_FOLDER = namedset.SET_DISPLAY_FOLDER;		
 		this.cube = $cube;
-		this.id = olap.NamedSet.id++;
+		this.id = olap.CellSet.id++;
 		olap.NamedSet.instances[this.id] = this;				
 	}
 	olap.NamedSet.id = 1;
@@ -1059,7 +1038,7 @@
 		
 		this.CUBE_NAME  = cellset.CUBE_NAME;
 		this.CATALOG_NAME = $catalog;
-		this.setSlicer(cellset.SLICER);
+		this.setSlicer(cellset.filterAxis);
 		this.cells = [];
 		this.axes  = [];
 		if (cellset.axes instanceof Array) {
@@ -1140,7 +1119,10 @@
 	  *
 	*/
 	olap.Cell = function Cell($cell, $cellset) {
-		var cell = $cell | {};
+		var cell = $cell || {};
+		this.value = cell.value;
+		this.formattedValue = cell.formattedValue;
+		this.ordinal = cell.ordinal;
 		this.cellset = $cellset;
 		this.id = olap.Cell.id++;
 		olap.Cell.instances[this.id] = this;				
@@ -1156,6 +1138,7 @@
 			return this.cellset;
 		},
 		getOrdinal: function getOrdinal(){
+			return this.ordinal;
 		},
 		getCoordinateList: function getCoordinateList(){
 			//return List<Integer> ;
@@ -1163,9 +1146,10 @@
 		getPropertyValue: function getPropertyValue(Property){
 		},
 		getValue: function getValue(){
+			return this.value;
 		},
 		getFormattedValue: function getFormattedValue(){
-			//return String;
+			return this.formattedValue;
 		}
 	}
 
@@ -1173,7 +1157,7 @@
 		*
 	*/
 	olap.Position = function Position($position, $axis) {
-		console.debug('func Call: ' + arguments.callee.name);	
+		//console.debug('func Call: ' + arguments.callee.name);	
 		//document.body.appendChild(prettyPrint($position, { maxDepth:3} ));
 		var position = $position || {}, memb, hier, cube = olap.Cube.getInstanceByName($axis.getCellSet().CUBE_NAME, $axis.getCellSet().CATALOG_NAME);
 
@@ -1185,8 +1169,8 @@
 			this.members[idx] = new olap.Member(memb);
 			//BELOW is from sample
 			//var tuple = rowAxis.positions[i][rowHierarchies[z].name];
-			var level = cube.getLevelByUniqueName(memb.LEVEL_UNIQUE_NAME, memb.HIERARCHY_UNIQUE_NAME);
-			document.body.appendChild(prettyPrint(level, { maxDepth:3} ));
+			//var level = cube.getLevelByUniqueName(memb.LEVEL_UNIQUE_NAME, memb.HIERARCHY_UNIQUE_NAME);
+			//document.body.appendChild(prettyPrint(level, { maxDepth:3} ));
 		}
 		
 		this.id = olap.Position.id++;
@@ -1276,6 +1260,30 @@
 				}
 			}
 			return position;
+		},
+		addHierarchy: function addHierarchy(hierarchy, callback) {
+			//console.debug('func Call: ' + arguments.callee.name);	
+			var found = false;
+			if (hierarchy instanceof Object) {
+				//try to only add if not exists
+				for (var i=0,j=this.hierarchies.length;i<j;i++){
+					if (this.hierarchies[i].HIERARCHY_UNIQUE_NAME == hierarchy.HIERARCHY_UNIQUE_NAME) {
+						found = true;
+					}
+				}
+				if (found ==  false){
+					if ((hierarchy instanceof olap.Hierarchy == false) && (hierarchy.HIERARCHY_UNIQUE_NAME) && (hierarchy.HIERARCHY_UNIQUE_NAME !== '')&& (hierarchy.HIERARCHY_UNIQUE_NAME !== undefined)&& (hierarchy.HIERARCHY_UNIQUE_NAME !== " ")) {
+						hierarchy = new olap.Hierarchy(hierarchy, this);
+						this.hierarchies.push(hierarchy);
+					} else if (hierarchy instanceof olap.Hierarchy == true){
+						this.hierarchies.push(hierarchy);
+					}
+				}
+				if (typeof callback == 'function') {
+					callback(hierarchy);
+				}
+			}
+			return hierarchy;
 		}
 	}
 

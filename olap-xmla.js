@@ -11,12 +11,13 @@
 	}
 
     olapXmla.Connection = function XmlaConnection($connection){
+	if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;	
 	var conn = $connection || {};
 	olap.Connection.call(this, conn);
 	this.xmla = new Xmla({});
 	this.xmla.setOptions({
 	    async: false,
-	    url: conn.url || "http://localhost:8080/pentaho/Xmla",
+	    url: conn.url || window.location.origin + "/" + window.location.pathname.split( '/' )[1] + "/Xmla",
 	    roles: conn.roles || [],
 	    DataSourceInfo: 'Provider=' + conn.provider || 'Mondrian' + ';DataSource=' + conn.datasource || 'Pentaho'
 	    });
@@ -59,6 +60,7 @@
 				}
 				return axis;
 			}
+			//document.body.appendChild(prettyPrint(xmla_dataset, { maxDepth:10 } ));
 		    var xmla_cellset = xmla_dataset.fetchAsObject();
 			var cellset = {
 				CUBE_NAME:xmla_cellset.cubeName,

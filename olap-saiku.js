@@ -13,12 +13,14 @@
     olapSaiku.Connection = function SaikuConnection($connection){
 		var conn = $connection || {}, that = this;
 		olap.Connection.call(this, conn);
-		this.url = conn.url;
+		that.url = conn.url || window.location.origin + "/" + window.location.pathname.split( '/' )[1] + "/content/saiku";
 		$.ajax({
-		  url: conn.url +'/session',
+		  async: false, //this is so we get the session and username back before proceeding
+		  url: that.url + "/session",
 		  data:{}
 		}).done(function(data) { 
-		  that.sessionid = data;
+		  that.sessionid = data.sessionid;
+		  that.username = data.username;
 		});		
     }
     
@@ -33,7 +35,7 @@
                 return v.toString(16);
             }).toUpperCase();
 		$.ajax({
-		  url: that.url +'/joe/query/'+ uuid,
+		  url: that.url + '/' + that.username + '/query/'+ uuid,
 		  type: 'POST',
 		  data: {
 			connection: options.cube.catalog.datasource.DATA_SOURCE_NAME,
@@ -43,9 +45,10 @@
 		  }
 		}).done(function(data) { 
 			that.response = data;
-			//console.debug(data);
 			$.ajax({
-			  url: that.url +'/joe/query/'+ uuid + '/result/flattened',
+			  //url: that.url + '/' + that.username + '/query/'+ uuid + '/result/flat',
+			  //url: that.url + '/' + that.username + '/query/'+ uuid + '/result/flattened',
+			  url: that.url + '/' + that.username + '/query/'+ uuid + '/result/hierarchical',
 			  type: 'POST',
 			  data: {
 				connection: options.cube.catalog.datasource.DATA_SOURCE_NAME,
@@ -102,7 +105,7 @@
 		}
 		
 		$.ajax({
-		  url: that.url +'/joe/discover/',
+		  url: that.url +'/'+ that.username + '/discover/',
 		  data:{'_':that.sessionid}
 		}).done(processSaikuDiscover);
 	}
@@ -201,7 +204,7 @@
 	
 
 		$.ajax({
-		  url: that.catalog.datasource.connection.url +'/joe/discover/'+ that.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME + '/' + that.SCHEMA_NAME +'/'+that.DESCRIPTION +'/dimensions',
+		  url: that.catalog.datasource.connection.url + '/' + that.username + '/discover/'+ that.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME + '/' + that.SCHEMA_NAME +'/'+that.DESCRIPTION +'/dimensions',
 		  data:{'_':that.sessionid},
 		  async:false,
 		  success:processSaikuDimensions
@@ -229,7 +232,7 @@
 	
 
 		$.ajax({
-		url: that.catalog.datasource.connection.url +'/joe/discover/'+ that.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME + '/' + that.SCHEMA_NAME +'/'+that.DESCRIPTION +'/measures',
+		url: that.catalog.datasource.connection.url + '/' + that.username + '/discover/'+ that.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME + '/' + that.SCHEMA_NAME +'/'+that.DESCRIPTION +'/measures',
 		  data:{'_':that.sessionid},
 		  async:false,
 		  success:processSaikuMeasures
@@ -305,7 +308,7 @@
 	
 		var conn = that.hierarchy.dimension.cube.catalog.datasource.connection;
 		$.ajax({
-		url: that.hierarchy.dimension.cube.catalog.datasource.connection.url +'/joe/discover/'+ that.hierarchy.dimension.cube.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME +
+		url: that.hierarchy.dimension.cube.catalog.datasource.connection.url + '/' + that.username + '/discover/'+ that.hierarchy.dimension.cube.catalog.datasource.DATA_SOURCE_NAME +'/'+ that.CATALOG_NAME +
 			'/' + that.SCHEMA_NAME +'/'+that.hierarchy.dimension.cube.DESCRIPTION +'/dimensions/' + that.hierarchy.dimension.DIMENSION_NAME +'/hierarchies/' + that.hierarchy.getName() +'/levels/' + that.LEVEL_NAME,
 		  data:{'_':that.sessionid},
 		  async:false,

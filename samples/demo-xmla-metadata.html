@@ -11,7 +11,7 @@
         <script type="text/javascript" src="../olap-xmla.js"></script>
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
-		olapConn = new olapXmla.Connection({url:"http://centp45:8080/pentaho/Xmla"});
+		olapConn = new olapXmla.Connection({url:"http://localhost:8080/pentaho/Xmla"});
 		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, _hierarchies=[], hierarchy, levels, level, members, member, measures, measure;
 		olapConn.getOlapDatabases(function(sources){
 		    for (idx in sources) {

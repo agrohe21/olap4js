@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Discover Connection</title>
+    </head>
+    <body>
+        <h1>Discover Testing Connection</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script type="text/javascript" src="../../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="../olap-xmla.js"></script>
+	<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript">
+		YUI().use('test', function (Y) {
+
+		    var suite = new Y.Test.Suite("Test of olap4js Objects");
+	
+		    xmlaConnection1 = new Y.Test.Case({
+			name: "xmlaConnection.getCubes",
+			setUp : function () {
+			    var that = this;
+			    this.Connection = new olapXmla.Connection({url:"http://centp45:8080/pentaho/Xmla"});
+			},
+			tearDown: function() {
+			    olapConn.close();
+			},
+			"Cubes are returned from Connection": function () {
+			    var idx, cubes, cube;
+			    this.Connection.getCubes(
+					function(cubes){
+						Y.Assert.isArray(cubes);
+					}
+				);
+			},
+			"Cube is olapXmla Cube": function () {
+			    var idx, cubes, cube;
+			    this.Connection.getCubes(
+					function(cubes){
+						Y.Assert.areEqual(true, cubes[0] instanceof olapXmla.Cube);					}
+				);
+			}
+		    });
+		    suite.add(xmlaConnection1);
+
+		    xmlaConnection2 = new Y.Test.Case({
+			name: "xmlaConnection.getCubes",
+			setUp : function () {
+			    var that = this;
+			    this.Connection = new olapXmla.Connection({url:"http://centp45:8080/pentaho/Xmla"});
+			},
+			tearDown: function() {
+			    olapConn.close();
+			},
+			"execute Returns olap.CellSet": function () {
+   			var dataset = this.Connection.executeOlapQuery({
+				catalog:"SteelWheels",
+				mdx: "select NON EMPTY crossjoin(hierarchize({Time.years.members, Time.Months.members}), [Product].[Line].members) on rows, [Measures].[Quantity] on columns from SteelWheelsSales",
+				success: function executeOlapQuerySuccess(results){
+					Y.Assert.isInstanceOf(olap.CellSet, results);
+				}
+			});
+
+			}
+		    });
+		    suite.add(xmlaConnection2);
+			
+/*
+		    testCase3 = new Y.Test.Case({
+			name: "Get Dimensions",
+			setUp : function () {
+			    var that = this;
+			    this.olapConn = new olapXmla.Connection({});
+			    this.olapConn.getOlapDatabases(function(sources){
+				that.source = sources[0];
+				that.dims = olapXmla.Dimension.getDimensions(that.source);
+			    });
+			},
+			tearDown: function() {
+			    olapConn.close();
+			},
+			"Get Dimensions Array": function () {
+			    Y.Assert.areEqual(24, this.dims.length);
+			},
+			"Dim is olapXmla Dimension": function () {
+			    Y.Assert.areEqual(true, this.dims[0] instanceof olapXmla.Dimension);
+			}
+		    });
+		    suite.add(testCase3);
+
+		    testCase4 = new Y.Test.Case({
+			name: "Get Hierarchies",
+			setUp : function () {
+			    var that = this;
+			    this.olapConn = new olapXmla.Connection({});
+			    this.olapConn.getOlapDatabases(function(sources){
+				that.source = sources[0];
+				that.hiers = olapXmla.Hierarchy.getHierarchies(that.source);
+			    });
+			},
+			tearDown: function() {
+			    olapConn.close();
+			},
+			"Get Hierarchies Array": function () {
+			    Y.Assert.areEqual(24, this.hiers.length);
+			},
+			"Hiear is olapXmla Hierarchy": function () {
+			    Y.Assert.areEqual(true, this.hiers[0] instanceof olapXmla.Hierarchy);
+			    console.debug(this.hiers[0]);
+			}
+		    });
+		    suite.add(testCase4);
+*/	    
+		    //add the test cases and suites
+		    Y.Test.Runner.add(suite);
+		    
+		    //run all tests
+		    Y.Test.Runner.run();
+		});
+/*
+		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, hierarchy, levels, level, members, member, measures, measure;
+		olapConn.getOlapDatabases(function(sources){
+		    for (idx in sources) {
+			dimensions = olapXmla.Dimension.getDimensions(source);
+			for (idx in dimensions){
+			    dimension = dimensions[idx];
+			}
+		    }
+		    document.body.appendChild(pretatyPrint(dimensions, { maxDepth:10 } ));
+		})
+		*/
+        </script>
+    </body>
+</html>
