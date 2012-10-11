@@ -164,7 +164,6 @@
 					hierarchies: []
 				};
 				dim = new olapSaiku.Dimension(dim_obj, that);
-				console.log('after addDimension');
 				hierarchies = dimensions[i].hierarchies;
 				for (idx in hierarchies){
 					hierarchy = hierarchies[idx];

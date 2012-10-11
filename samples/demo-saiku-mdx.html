@@ -17,48 +17,10 @@
 				var cube = filterProperty.apply(cubes, [{type:'equal', property:'DESCRIPTION', value:'SteelWheelsSales'}])				
 				olapConn.executeOlapQuery({
 					catalog:"SteelWheels",
-					cube: cube,
-					//mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members})on rows, non empty [Product].[Line].members on columns, non empty {[Order Status].[Type].members} on pages from SteelWheelsSales where [Measures].[Quantity]",
-					//mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members})on rows, non empty [Product].[Line].members on columns from SteelWheelsSales where [Measures].[Quantity]",
-					mdx:"select NON EMPTY crossjoin(hierarchize({Time.years.members, Time.Months.members}), [Order Status].[Type].members) on columns, non empty [Product].[Line].members on rows from SteelWheelsSales where [Measures].[Quantity]",
+					cube: cube,					
+					mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members}) on rows, [Measures].[Quantity] on columns from SteelWheelsSales",
 					success: function ExecuteOlapQuerySuccess(results){
-						document.body.appendChild(prettyPrint(results, { maxDepth:1 } ));
-						var cs = new olap.CellSet({}, "SteelWheels");
-						var axis0 = new olap.CellSetAxis( {ordinal:0}, cs);
-						cs.addAxis(axis0);
-						var axis1 = new olap.CellSetAxis( {ordinal:1}, cs);
-						cs.addAxis(axis1);
-						
-						var cell, row, coord, ord=-1, oc, colCount=results.width, hier;
-						for (var i=0, j=results.cellset.length;i<j;i++){
-							row = results.cellset[i];
-							//document.body.appendChild(prettyPrint(row, { maxDepth:2 } ));
-							for (var z=0, y=row.length;z<y;z++){
-								cell = row[z];
-								if (cell.type == 'DATA_CELL'){
-									coord = cell.properties.position.split(":");
-									ord ++;
-									cell_obj = {value:cell.properties.raw, formattedValue:cell.value, ordinal:ord};
-									oc = new olap.Cell(cell_obj, cs);
-									cs.addCell(oc);
-								}
-								if (cell.type == 'COLUMN_HEADER'){
-									hier = {HIERARCHY_UNIQUE_NAME:cell.properties.hierarchy, DIMENSION_UNIQUE_NAME:cell.properties.dimension};
-									axis0.addHierarchy(hier);
-									pos = {
-									//LEVEL_UNIQUE_NAME:cell.properties.level,
-									MEMBER_UNIQUE_NAME: cell.properties.uniqueName,
-									//CAPTION: 
-									};
-								}
-								if (cell.type == 'ROW_HEADER'){
-									hier = {HIERARCHY_UNIQUE_NAME:cell.properties.hierarchy, DIMENSION_UNIQUE_NAME:cell.properties.dimension};
-									axis1.addHierarchy(hier);
-								}
-							}
-						} //end results.cellset loop
-						//document.body.appendChild(prettyPrint(axis0, { maxDepth:3 } ));
-						//document.body.appendChild(prettyPrint(axis1, { maxDepth:3 } ));
+						document.body.appendChild(prettyPrint(results, { maxDepth:2 } ));
 					}
 				});
 			}

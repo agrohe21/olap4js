@@ -7,172 +7,18 @@
     <body>
         <h1>OLAP Xmla MDX Testing</h1>
         <script type="text/javascript" src="../olap.js"></script>
-        <script type="text/javascript" src="../../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="Xmla.js"></script>
         <script type="text/javascript" src="../olap-xmla.js"></script>
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
-		//var olapConn = new olapXmla.Connection({url:"http://localhost:8080/pentaho/Xmla"});
-		//var olapConn = new olapXmla.Connection({url:window.location.origin + "/pentaho/Xmla"});
 		var olapConn = new olapXmla.Connection();
 		var cubeList = olapConn.getCubes();		
 		
 		olapConn.executeOlapQuery({
 		    catalog:"SteelWheels",
-		    //mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members})on rows, non empty [Product].[Line].members on columns, non empty {[Order Status].[Type].members} on pages from SteelWheelsSales where [Measures].[Quantity]",
-			//mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members})on rows, non empty [Product].[Line].members on columns from SteelWheelsSales where [Measures].[Quantity]",
-			//mdx: "select NON EMPTY crossjoin(hierarchize({Time.years.members, Time.Months.members}), [Product].[Line].members) on rows, [Measures].[Quantity] on columns from SteelWheelsSales",
 			mdx: "select NON EMPTY hierarchize({Time.years.members, Time.Months.members}) on rows, [Measures].[Quantity] on columns from SteelWheelsSales",
 		    success: function ExecuteOlapQuerySuccess(results){
-				document.body.appendChild(prettyPrint(results, { maxDepth:10 } ));
-				var colAxis = results.axes[0], colCount = colAxis.positions.length, colHierarchies = colAxis.hierarchies;
-				var rowAxis = results.axes[1], rowCount = rowAxis.positions.length, rowHierarchies = rowAxis.hierarchies, lvlCount = 0, lvls=[];
-				var headerCount=0, cubeName = results.getCubeName(), headerLevels=[];
-				return;
-				//console.debug(results.getCubeName());
-				var cube = olap.Cube.getInstanceByName(cubeName, 'SteelWheels');
-				var dimensions = cube.getDimensions(), idx, dimension, hierarchies, hierarchy, levels;
-				for (idx in dimensions){
-				    dimension = dimensions[idx];
-				    hierarchies = dimension.getHierarchies();
-				    for (idx in hierarchies){
-						hierarchy = hierarchies[idx];
-						levels = hierarchy.getLevels();
-					}
-				}
-				for (var i=0, j=rowCount;i<j;i++){
-					for (var z=0, y=rowHierarchies.length;z<y;z++){
-						var tuple = rowAxis.positions[i][rowHierarchies[z].name];
-						var level = cube.getLevelByUniqueName(tuple.LName, tuple.hierarchy);
-						//now do something with level
-						if (lvls.indexOf(level.getUniqueName()) == -1) {
-							lvls.push(level.getUniqueName());
-							headerLevels.push(level);
-						}						
-					}
-				}
-				rowCount = lvls.length;
-				
-				headerCount = rowCount + colCount;
-				
-				var headers = [];
-				for (i=0, j=lvls.length;i<j;i++){
-					//TODO do a lookup on level metadata
-					headers.push(headerLevels[i].getName());
-				}
-				
-				for (i=0, j=colCount;i<j;i++){
-					for (z=0, y=colHierarchies.length;z<y;z++){
-						var tuple = colAxis.positions[i][colHierarchies[z].name];
-							//TODO do a lookup on member metadata
-							headers.push(tuple.Caption);
-					}
-				}
-				//console.debug(headers);
-
-				/***********
-				separate stuff here to get data
-				*/
-				
-				var table = [], data = [], i,j,idx, h,k,p,l, c=0, end, val, start=0, end=0, cell, posTotal=1, row, axis;
-				
-				var readRow = function(row, cells, start, end){
-					for (var i=start;i<end;i++){
-						row.push(cells[i]);
-					}
-					return row;
-				}
-				
-				var resultAxis = results.axes[1];
-				
-				var idx = 0;
-				//console.debug('rows: ' + rowAxis.positions.length);
-				//console.debug(results.axes.length-1 + ':' );
-				for (var a = results.axes.length-1, b=1;a >= b;a--){
-					axis = results.axes[a];
-					//console.debug(axis);
-					for (row=0;row<axis.positions.length;row++){
-						data = readRow([], results.cells, idx, idx+colCount);
-						table.push(data);
-						idx = idx+colCount;
-					}
-				}
-				/*
-				data = readRow([], results.cells, idx, idx+colCount);
-				table.push(data);
-
-
-				idx = idx+colCount;
-				data = readRow([], results.cells, idx, idx+colCount);
-				table.push(data);
-				*/
-				/*
-				//Loop through all axis
-				for (i=0,j=results.axes.length;i<j;i++){
-					var resultAxis = results.axes[i];
-					//console.debug('resultAxis: ' + i);
-					//console.debug(resultAxis);
-					for (h=0, k=resultAxis.hierarchies.length;h<k;h++){
-						var axisHierarchy = resultAxis.hierarchies[h];
-						//console.debug('axisHierarchy: ' + h);
-						//console.debug(axisHierarchy);
-						posTotal = posTotal * resultAxis.positions.length;
-						console.debug(posTotal)						
-						for (p=0,l=resultAxis.positions.length;p<l;p++){
-							var axisPosition = resultAxis.positions[p];
-							//console.debug('axisPosition: ' + p);
-							//console.debug(axisPosition);
-							if (i<j) {//not at columns yet
-								//console.debug(c, colCount);
-								for (start=c, end=colCount+c;start<=end;start++){
-									for (z=0, y=colHierarchies.length;z<y;z++){
-										var tuple = colAxis.positions[i][colHierarchies[z].name];
-											//TODO do a lookup on member metadata
-											//headers.push(tuple.Caption);
-											console.debug();
-										
-											data.push(tuple);
-									}
-									cell = results.cells[start] || {Value:0};
-									val =  cell.Value;
-									data.push(val);
-									//console.debug(val);
-									c++;
-								}
-								var level = cube.getLevelByUniqueName(axisPosition[axisHierarchy.name].LName, axisPosition[axisHierarchy.name].hierarchy);
-								data.splice(0,0,level.getUniqueName());//modify to just level later;
-								//data.push(axisPosition[axisHierarchy.name].UName);
-							} 
-							if (data.length !==0) {
-								table.push(data);
-								data = [];
-							}							
-						}
-					}
-				}*/
-
-				//document.body.appendChild(prettyPrint(table, { maxDepth:10 } ));
-				/*
-				for (var i=0, j=rowCount;i<j;i++){
-					for (var z=0, y=rowHierarchies.length;z<y;z++){
-						var tuple = rowAxis.positions[i][rowHierarchies[z].name];
-						var level = cube.getLevelByUniqueName(tuple.LName, tuple.hierarchy);
-						//now do something with level
-						if (lvls.indexOf(level.getUniqueName()) == -1) {
-							lvls.push(level.getUniqueName());
-							headerLevels.push(level);
-						}						
-					}
-				}
-				*/			
-			
-				//get data for all rows and columns
-				//TODO to make this N dimension capable,add on a column for each axis above rows
-				
-				//for each hierarch in rows axis, figure out unique levels and their level number
-				//take highest level number of each hierarchy
-				//remove data that is not for highest level in all hierarchy
-				//add back in columns for lower levels in hierarchy that were removed
-				
+				document.body.appendChild(prettyPrint(results, { maxDepth:2 } ));
 		    }
 		});
         </script>

@@ -64,25 +64,21 @@
 		},
 		getCubes: function getCubes(callback) {
 		
-			var getCubesInDatasource = function getCubesInDatasource(sources){
-				var idx, source, catalogs, catalog, cubes, cube, _cubes = [];
-				for (idx in sources) {
-				source = sources[idx];
-				catalogs = source.getCatalogs();
-					for (idx in catalogs){
-						catalog = catalogs[idx];
-						cubes = catalog.getCubes();
-						_cubes = _cubes.concat(cubes);
-					}
-				}
-				return _cubes;
-			}
+			var idx_ds, idx_cat, source, catalogs, catalog, cubes, cube, _cubes = [];
 			this.getOlapDatabases(function(sources){
-				var cubes = getCubesInDatasource(sources);
+				for (idx_ds in sources) {
+					source = sources[idx_ds];
+					catalogs = source.getCatalogs();
+						for (idx_cat in catalogs){
+							catalog = catalogs[idx_cat];
+							cubes = catalog.getCubes();
+							_cubes = _cubes.concat(cubes);
+						}
+				}
 				if (typeof callback == 'function') {
-					callback.call(this, cubes);
+					callback.call(this, _cubes);
 				} else {
-					return cubes;
+					return _cubes;
 				}
 			})    
 		},
@@ -411,10 +407,7 @@
 		},
 		getMeasures: function getMeasures() {
 			if (this.measures.length == 0) {
-				var processMeasures = function processMeasures(measures){
-					return this.measures;
-				};
-				this.fetchMeasures(processMeasures);
+				return this.fetchMeasures();
 			} else {
 				return this.measures;
 			}
@@ -446,7 +439,30 @@
 		fetchDimensions: function fetchDimensions() {	
 			//empty function that does not fetch anything
 			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
-		}
+		},
+		getMetadata: function getMetadata(){
+			var idx_dim, idx_hier, dimensions, dimension, hierarchy, hierarchies, levels, level, measures, measure, meta= {};
+			dimensions = this.getDimensions();
+			for (idx_dim in dimensions){
+				dimension = dimensions[idx_dim];
+				hierarchies = dimension.getHierarchies();
+				for (idx_hier in hierarchies){
+					hierarchy = hierarchies[idx_hier];
+					levels = hierarchy.getLevels();
+					/*
+					for (idx in levels){
+						level = levels[idx];
+						members = level.getMembers();
+						for (idx in members){
+							member = members[idx];
+						}
+					}*/
+				}
+			}
+			meta.dimensions = dimensions;
+			meta.measures   = this.getMeasures();
+			return meta;			
+		} //end getMetadata
 	}
 	
 	/* olap.Measure

@@ -13,59 +13,46 @@
         <script type="text/javascript" src="../olap-saiku.js"></script>
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
-			var olapConn = new olapSaiku.Connection({url:"http://localhost:8080/pentaho/content/saiku"}),
-			source, s, catalogs, catalog, c, cubes, cube, cu, measures, _measures=[], measure, m, dimensions, _dimensions=[], dimension, d,
-			hierarchies, hierarchy, h, _hierarchies=[], levels, level, l, _levels=[], members, member, m, _members=[];
-			
-			olapConn.getOlapDatabases(
-			function(sources){
-				for (s in sources){
-					source = sources[s];
-					for (c in source.catalogs){
-						catalog = source.catalogs[c];
-						for (cu in catalog.cubes){
-							cube = catalog.cubes[cu];
-							//console.debug(cube);
-							
-							cube.getMeasures();
-							measures = cube.getMeasures();
-							_measures = _measures.concat(measures);
-							for (m in measures){
-								measure = measures[m];
-							}
-							
-							cube.getDimensions();
-							dimensions = cube.getDimensions();
-							_dimensions = _dimensions.concat(dimensions);
-							for (d in dimensions){
-								dimension = dimensions[d];
-								console.debug(dimension);
-								hierarchies = dimension.getHierarchies();
-								_hierarchies = _hierarchies.concat(hierarchies);
-								for (h in hierarchies){
-									hierarchy = hierarchies[h];
-									//console.debug(hierarchy);
-									levels = hierarchy.getLevels();
-									_levels = _levels.concat(levels);
-									for (l in levels){
-										level = levels[l];
-										//console.debug(level);
-										//level.getMembers();
-										members = level.getMembers();
-										_members = _members.concat(members);
-										/*for (idx in members){
-											member = members[idx];
-										}*/
-									}
-								}	    
-								
-							}
+		var olapConn = new olapSaiku.Connection();
+		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, _hierarchies=[], hierarchy, levels, level, members, member, measures, measure;
+		olapConn.getOlapDatabases(function(sources){
+		    for (idx in sources) {
+				source = sources[idx];
+				catalogs = source.getCatalogs();
+				for (idx in catalogs){
+					catalog = catalogs[idx];
+					cubes = catalog.getCubes();
+					for (idx in cubes){
+						cube = cubes[idx];
+						measures = cube.getMeasures();
+						for (idx in measures){
+							measure = measures[idx];
 						}
-					}
-				}
-				document.body.appendChild(prettyPrint(_hierarchies, { maxDepth:3 } ));	
-			});
-			
+						dimensions = cube.getDimensions();
+						for (idx in dimensions){
+							dimension = dimensions[idx];
+							hierarchies = dimension.getHierarchies();
+							_hierarchies = _hierarchies.concat(hierarchies);
+							for (idx in hierarchies){
+								hierarchy = hierarchies[idx];
+								levels = hierarchy.getLevels();
+								for (idx in levels){
+									level = levels[idx];
+									/* don't bother with members for now
+									Uncomment if you like, but this takes a while
+									members = level.getMembers();
+									for (idx in members){
+									member = members[idx];
+									}
+									*/
+								}
+							}
+							}
+					} //end cubes
+				} //end catalogs
+			} //end sources
+			document.body.appendChild(prettyPrint(sources, { maxDepth:3 } )); //output only the first source as most providers only have one
+		})
         </script>
     </body>
 </html>

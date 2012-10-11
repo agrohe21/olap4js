@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Xmla Discover Sample</title>
+    </head>
+    <body>
+        <h1>Discover all cubes for active Connection and get metadata for SteelWheels</h1>
+        <script type="text/javascript" src="../olap.js"></script>
+        <script type="text/javascript" src="Xmla.js"></script>
+        <script type="text/javascript" src="../olap-xmla.js"></script>
+        <script type="text/javascript" src="prettyprint.js"></script>
+        <script type="text/javascript">
+	    var olapConn = new olapXmla.Connection(), cubes, cube, sw_meta;
+		//get all cubes for active connection
+		olapConn.getCubes(function(cubes){
+			//filter cubes array down to only CATALOG_NAME = SteelWheels
+			var sw = filterProperty.apply(cubes, [{type:'equal', property:'CATALOG_NAME', value:'SteelWheels'}]);
+			//get the dims, hierarchies, levels and measures for the cube
+			sw_meta = sw.getMetadata();
+			//simply dump it out to Page DOM
+			document.body.appendChild(prettyPrint(sw_meta, { maxDepth:3 } ));
+		});
+        </script>
+    </body>
+</html>

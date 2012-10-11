@@ -30,9 +30,9 @@
 	    var that=this, properties = {}, results, dataset, cells, tmp_results, axis;
 	    properties[Xmla.PROP_FORMAT]         = Xmla.PROP_FORMAT_MULTIDIMENSIONAL;
 	    if (options.catalog && options.catalog !== "") {
-		properties[Xmla.PROP_CATALOG] = options.catalog;
+			properties[Xmla.PROP_CATALOG] = options.catalog;
 	    } else {
-		throw new Error('An MDX query must have a catalog specified in options')
+			throw new Error('An MDX query must have a catalog specified in options')
 	    }
 	    dataset = that.xmla.execute({
 		statement: options.mdx,
@@ -65,13 +65,18 @@
 			var cellset = {
 				CUBE_NAME:xmla_cellset.cubeName,
 				axes: [],
+				cells:[],
 				SLICER: {}
-			}, axis = {};
+			}, axis = {}, cell;
 			for (var i=0, j=xmla_cellset.axes.length;i<j;i++) {
 				axis = xmla_cellset.axes[i];
 				cellset.axes.push(getAxisAsObject(axis));
 			}
 			cellset.SLICER = getAxisAsObject(xmla_cellset.filterAxis);
+			for (i=0,j=xmla_cellset.cells.length;i<j;i++){
+				cell = xmla_cellset.cells[i];
+				cellset.cells.push({value:cell.Value, formattedValue:cell.FmtValue, formatString:cell.FormatString, ordinal:cell.ordinal})
+			};
 		    results = new olap.CellSet(cellset, options.catalog);
 		    if (typeof options.success ==  'function') {
 				options.success(results);
@@ -104,6 +109,7 @@
 		delete raw_sources;
 		callback.call(that, that.sources)
 	    }});
+		return that.soures;
 	    
 	}
     
@@ -116,6 +122,7 @@
     olapXmla.Datasource.prototype.fetchCatalogs = function XmlaFetchCatalogs() {
     
 	    var properties = {}, rowset, catalog, that=this;
+		//TODO add async
 	    rowset = this.connection.xmla.discoverDBCatalogs({
 		    properties: properties
 	    });
@@ -148,6 +155,7 @@
     
 	    var properties = {}, rowset, cube, that=this;
 	    properties[Xmla.PROP_CATALOG] = this.CATALOG_NAME;
+		//TODO Add Async
 	    rowset = this.datasource.connection.xmla.discoverMDCubes({
 		    properties: properties
 	    });
@@ -178,6 +186,7 @@
 	    var restrictions = {};
 	    restrictions["CATALOG_NAME"] = this.CATALOG_NAME;
 	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;
+		//TODO Add Async
 	    rowset = this.catalog.datasource.connection.xmla.discoverMDDimensions({
 		    properties: properties,
 		    restrictions: restrictions
@@ -197,6 +206,7 @@
 	    var restrictions = {};
 	    restrictions["CATALOG_NAME"] = this.CATALOG_NAME;
 	    restrictions["CUBE_NAME"]    = this.CUBE_NAME;
+		//TODO Add Async
 	    rowset = this.catalog.datasource.connection.xmla.discoverMDMeasures({
 		    properties: properties,
 		    restrictions: restrictions
@@ -220,6 +230,7 @@
     
 	var properties = {}, rowset, dim, dims=[];
 	var restrictions = {};
+	//TODO Add Async
 	rowset = source.connection.xmla.discoverMDDimensions({
 		restrictions: restrictions
 	});
@@ -240,6 +251,7 @@
 	restrictions["CATALOG_NAME"] = this.cube.catalog.CATALOG_NAME;
 	restrictions["CUBE_NAME"]    = this.cube.CUBE_NAME;	
 	restrictions["DIMENSION_UNIQUE_NAME"] = this.DIMENSION_UNIQUE_NAME;	
+	//TODO Add Async
 	rowset = this.cube.catalog.datasource.connection.xmla.discoverMDHierarchies({
 	    properties: properties,
 	    restrictions: restrictions
@@ -260,6 +272,7 @@
     olapXmla.Hierarchy.getHierarchies = function getHierarchies(connection) {
 	//console.debug('func Call: ' + arguments.callee.name);
 	var properties = {}, rowset, hierarchy, that=this, hiers=[], restrictions = {};
+	//TODO Add Async
 	rowset = connection.xmla.discoverMDHierarchies({
 		restrictions: restrictions
 	});
@@ -281,6 +294,7 @@
 	restrictions["CUBE_NAME"]    = this.dimension.cube.CUBE_NAME;	
 	restrictions["DIMENSION_UNIQUE_NAME"] = this.dimension.DIMENSION_UNIQUE_NAME;	
 	restrictions["HIERARCHY_UNIQUE_NAME"] = this.HIERARCHY_UNIQUE_NAME;
+	//TODO Add Async
 	rowset = this.dimension.cube.catalog.datasource.connection.xmla.discoverMDLevels({
 		properties: properties,
 		restrictions: restrictions
@@ -308,6 +322,7 @@
 	restrictions["DIMENSION_UNIQUE_NAME"] = this.dimension.DIMENSION_UNIQUE_NAME;	
 	restrictions["HIERARCHY_UNIQUE_NAME"] = this.HIERARCHY_UNIQUE_NAME;
 	*/
+	//TODO Add Async
 	rowset = connection.xmla.discoverMDLevels({
 		restrictions: restrictions
 	});
@@ -330,6 +345,7 @@
 	restrictions["DIMENSION_UNIQUE_NAME"] = this.hierarchy.dimension.DIMENSION_UNIQUE_NAME;	
 	restrictions["HIERARCHY_UNIQUE_NAME"] = this.hierarchy.HIERARCHY_UNIQUE_NAME;
 	restrictions["LEVEL_UNIQUE_NAME"]          = this.LEVEL_UNIQUE_NAME;
+	//TODO Add Async
 	rowset = this.hierarchy.dimension.cube.catalog.datasource.connection.xmla.discoverMDMembers({
 		properties: properties,
 		restrictions: restrictions

@@ -5,47 +5,51 @@
         <title>OLAP4JS: Discover Test</title>
     </head>
     <body>
-        <h1>Discover Testing</h1>
+        <h1>Discover All Datasource and all metadata for those sources</h1>
         <script type="text/javascript" src="../olap.js"></script>
-        <script type="text/javascript" src="../../xmla4js/src/Xmla.js"></script>
+        <script type="text/javascript" src="Xmla.js"></script>
         <script type="text/javascript" src="../olap-xmla.js"></script>
         <script type="text/javascript" src="prettyprint.js"></script>
         <script type="text/javascript">
-		olapConn = new olapXmla.Connection({url:"http://localhost:8080/pentaho/Xmla"});
+		olapConn = new olapXmla.Connection();
 		var idx, catalogs, catalog, cubes, cube, dimensions, dimension, hierarchies, _hierarchies=[], hierarchy, levels, level, members, member, measures, measure;
 		olapConn.getOlapDatabases(function(sources){
 		    for (idx in sources) {
-			source = sources[idx];
-			catalogs = source.getCatalogs();
-			for (idx in catalogs){
-			    catalog = catalogs[idx];
-			    cubes = catalog.getCubes();
-			    for (idx in cubes){
-				cube = cubes[idx];
-				measures = cube.getMeasures();
-				for (idx in measures){
-				    measure = measures[idx];
-				}
-				dimensions = cube.getDimensions();
-				for (idx in dimensions){
-				    dimension = dimensions[idx];
-				    hierarchies = dimension.getHierarchies();
-					_hierarchies = _hierarchies.concat(hierarchies);
-				    for (idx in hierarchies){
-					hierarchy = hierarchies[idx];
-					levels = hierarchy.getLevels();
-					for (idx in levels){
-					    level = levels[idx];
-					    //members = level.getMembers();
-					    //for (idx in members){
-						//member = members[idx];
-					    }	    
-					}	    
-				    }	    
-				}	    
-			    }
-			}
-		document.body.appendChild(prettyPrint(_hierarchies, { maxDepth:2 } ));			
+				source = sources[idx];
+				catalogs = source.getCatalogs();
+				for (idx in catalogs){
+					catalog = catalogs[idx];
+					cubes = catalog.getCubes();
+					for (idx in cubes){
+						cube = cubes[idx];
+						measures = cube.getMeasures();
+						for (idx in measures){
+							measure = measures[idx];
+						}
+						dimensions = cube.getDimensions();
+						for (idx in dimensions){
+							dimension = dimensions[idx];
+							hierarchies = dimension.getHierarchies();
+							_hierarchies = _hierarchies.concat(hierarchies);
+							for (idx in hierarchies){
+								hierarchy = hierarchies[idx];
+								levels = hierarchy.getLevels();
+								for (idx in levels){
+									level = levels[idx];
+									/* don't bother with members for now
+									Uncomment if you like, but this takes a while
+									members = level.getMembers();
+									for (idx in members){
+									member = members[idx];
+									}
+									*/
+								}
+							}
+						}
+					} //end cubes
+				} //end catalogs
+			} //end sources
+			document.body.appendChild(prettyPrint(sources[0], { maxDepth:3 } )); //output only the first source as most providers only have one
 		})
         </script>
     </body>
