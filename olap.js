@@ -339,6 +339,9 @@
 		getName: function getName() {
 			return this.CUBE_NAME;
 		},
+		getDescription: function getDescription() {
+			return this.DESCRIPTION;
+		},
 		addDimension: function addDimension(dimension, callback) {
 			//console.debug('func Call: ' + arguments.callee.name);
 			if (dimension instanceof Object) {
@@ -427,14 +430,16 @@
 			}
 		},
 		getHierarchies: function getHierarchies() {
-			if (this.dimensions.length !== 0) {
-					var i, dims=this.dimensions, _hiers, hiers=[];
+			var dims = this.getDimensions();
+			if (dims.length !== 0) {
+					var i, _hiers, hiers=[];
 					for (i=0, j=dims.length;i<j;i++){
 						_hiers = dims[i].getHierarchies();
 						hiers = hiers.concat(_hiers);
 					}
 					return hiers;
 			}
+			return [];
 		},
 		fetchDimensions: function fetchDimensions() {	
 			//empty function that does not fetch anything

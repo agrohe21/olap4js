@@ -10,7 +10,7 @@ levelSelector =
   valuesArray:[["1","Lisbon"],["2","Dusseldorf"]],
   executeAtStart: true,
   postExecution:function(){
-	//Dashboards.processChange(this.name);
+	Dashboards.processChange(this.name);
   }
 }
 
@@ -72,8 +72,8 @@ memberSelector =
 
 var components = [levelSelector];
 
-//$(document).ready(
-  //function(){
+$(document).ready(
+  function(){
     Dashboards.init(components);
-  //}
-// )
+  }
+ )
