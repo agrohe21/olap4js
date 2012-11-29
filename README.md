@@ -1,12 +1,10 @@
 
-Alpha code at this point.
-
 # Overview
 olap4js is intended to be a common set of JS objects that can run on multiple clients and with multiple OLAP backends
 
 # Host Environments
 ## Browser: Main testing evnironment at the moment
-### Xmla: The XMLA implementation depends on [Xmla4js](http://code.google.com/p/xmla4js/).
+### Xmla: The XMLA implementation has full metadata and query execution
 ### Saiku: The Saiku implementation has a metadata discovery implementation and basic query processing
 ## Node.js
 The basic olap connection is working, but not Xmla
