@@ -9,11 +9,11 @@
 		<br/>
 		<div id="log"></div>
 		Output is in browser console.  use Firebug or Chrome developer tools.
-        <script type="text/javascript" src="../olap.js"></script>
-		<script src="/pentaho/js/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript" src="../build/olap-min.js"></script>
+	<script type="text/javascript" src="../lib/yui/yui/yui-min.js"></script>	
         <script type="text/javascript" src="../samples/prettyprint.js"></script>
         <script type="text/javascript">
-		YUI({ logInclude: { TestRunner: true } }).use('test-console', 'test', 'JSON', 'json', function (Y) {
+		YUI({ logInclude: { TestRunner: true } }).use('test', 'JSON', 'json', function (Y) {
 		//YUI({ useBrowserConsole: true }).use('test', 'JSON', function (Y) {
 
 		    var suite = new Y.Test.Suite("Test of olap4js Objects ");
