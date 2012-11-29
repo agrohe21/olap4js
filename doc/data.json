@@ -1,0 +1,36 @@
+{
+    "project": {
+        "name": "OLAP4JS API",
+        "description": "OLAP4JS: a library for call various OLAP servers from various Javascript envrironments",
+        "version": "0.1.1",
+        "url": "http://github.com/agrohe21/olap4js/"
+    },
+    "files": {
+        "olap.js": {
+            "name": "olap.js",
+            "modules": {
+                "olap": 1
+            },
+            "classes": {},
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "olap": {
+            "name": "olap",
+            "submodules": {},
+            "classes": {},
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "olap.js",
+            "line": 2,
+            "description": "This is olap4js - a javascript library for working with OLAP datasources.",
+            "title": "Olap"
+        }
+    },
+    "classes": {},
+    "classitems": [],
+    "warnings": []
+}

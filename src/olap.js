@@ -1,3 +1,10 @@
+
+/**
+*
+*  This is olap4js - a javascript library for working with OLAP datasources.
+*  @module olap
+*  @title Olap
+*/
 (function olap(global){
 
 	/* olap module boiler plate
