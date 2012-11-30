@@ -41,11 +41,33 @@
         <div id="api-tabview-panel">
             <ul id="api-classes" class="apis classes">
             
+                <li><a href="..&#x2F;classes/olap.Catalog.html">olap.Catalog</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Connection.html">olap.Connection</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Cube.html">olap.Cube</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Datasource.html">olap.Datasource</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Dimension.html">olap.Dimension</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Hierarchy.html">olap.Hierarchy</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Level.html">olap.Level</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Measure.html">olap.Measure</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Member.html">olap.Member</a></li>
+            
+                <li><a href="..&#x2F;classes/olapXmla.Connection.html">olapXmla.Connection</a></li>
+            
             </ul>
 
             <ul id="api-modules" class="apis modules">
             
                 <li><a href="..&#x2F;modules/olap.html">olap</a></li>
+            
+                <li><a href="..&#x2F;modules/olapXmla.html">olapXmla</a></li>
             
             </ul>
         </div>
@@ -99,8 +121,11 @@
 	*&#x2F;
 	var olap; if (typeof exports !== &#x27;undefined&#x27;) {olap = exports;} else {olap = global.olap = {};}
 
-	&#x2F;* olap.Connection
-	*&#x2F;
+	&#x2F;** olap.Connection
+	*   @class olap.Connection
+	*   @constructor
+	*   @param connection Object literal with properties to be created
+	**&#x2F;
 	olap.Connection = function Connection($connection){
 		&#x2F;&#x2F;console.debug(&#x27;func Call: &#x27; + arguments.callee.name);		
 		var src = {}, that=this;
@@ -226,7 +251,7 @@
 		}	
 	}
 	
-	&#x2F;* olap.Datasource
+	&#x2F;** olap.Datasource
 	*   &lt;p&gt;
 	*   This object provides pure JS constructs to create and use OLAP Datasources
 	*   &lt;&#x2F;p&gt;
@@ -236,8 +261,8 @@
 	*   @class olap.Datasource
 	*   @constructor
 	*   @param {Object} source JS object representing object properties.  Often used to rehydrate objects after external persistence
-	*   @param {Xmla} xmla The Xmla instance to be used to communicate with the server
-	*&#x2F;
+	*   @param {olap.Connection} conn The olap.Connection instance to be used to communicate with the server
+	**&#x2F;
 	olap.Datasource = function Datasource(source, $conn) {
 		&#x2F;&#x2F;var idx cat;
 		this.catalogs = [];
@@ -315,7 +340,7 @@
 		}
 	} &#x2F;&#x2F; olap.Datasource.prototype
 	
-	&#x2F;* olap.Catalog
+	&#x2F;** olap.Catalog
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Catalogs
 	*   &lt;&#x2F;p&gt;
@@ -382,7 +407,7 @@
 		}
 	}
 	
-	&#x2F;* olap.Cube
+	&#x2F;** olap.Cube
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Cubes
 	*   &lt;&#x2F;p&gt;
@@ -565,7 +590,7 @@
 		} &#x2F;&#x2F;end getMetadata
 	}
 	
-	&#x2F;* olap.Measure
+	&#x2F;** olap.Measure
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Measures
 	*   &lt;&#x2F;p&gt;
@@ -646,7 +671,7 @@
 		}
 	}
 	
-	&#x2F;* olap.Dimension
+	&#x2F;** olap.Dimension
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Dimensions
 	*   &lt;&#x2F;p&gt;
@@ -748,7 +773,7 @@
 		}
 	}
 	
-	&#x2F;* olap.Hierarchy
+	&#x2F;** olap.Hierarchy
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Hierarchies
 	*   &lt;&#x2F;p&gt;
@@ -880,7 +905,7 @@
 		}
 	}
 	
-	&#x2F;* olap.Level
+	&#x2F;** olap.Level
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Levels
 	*   &lt;&#x2F;p&gt;
@@ -1015,7 +1040,7 @@
 
 	}
 	
-	&#x2F;* olap.Member
+	&#x2F;** olap.Member
 	*   &lt;p&gt;
 	*   Wrapper for OLAP Members
 	*   &lt;&#x2F;p&gt;
@@ -1145,7 +1170,7 @@
 		
 	}
 	
-	&#x2F;* olap.CellSet
+	&#x2F;** olap.CellSet
 	  *
 	*&#x2F;
 	olap.CellSet = function CellSet($cellset, $catalog){
@@ -1231,7 +1256,7 @@
 		}
 	}
 
-	&#x2F;* olap.Cell
+	&#x2F;** olap.Cell
 	  *
 	*&#x2F;
 	olap.Cell = function Cell($cell, $cellset) {
@@ -1269,7 +1294,7 @@
 		}
 	}
 
-	&#x2F;* olap.Position
+	&#x2F;** olap.Position
 		*
 	*&#x2F;
 	olap.Position = function Position($position, $axis) {
@@ -1307,7 +1332,7 @@
 		}
 	}
 	
-	&#x2F;* olap.CellSetAxis
+	&#x2F;** olap.CellSetAxis
 	  *
 	*&#x2F;
 	olap.CellSetAxis = function CellSetAxis($axis, $cellset) {
@@ -1403,7 +1428,7 @@
 		}
 	}
 
-	&#x2F;* olap.Query
+	&#x2F;** olap.Query
 	  *
 	*&#x2F;
 	olap.Query = function Query(query, $cube) {
@@ -1506,7 +1531,7 @@
 	}
 	
 	
-	&#x2F;* olap.Axis
+	&#x2F;** olap.Axis
 	  *
 	*&#x2F;
 	olap.Axis = function Axis(axis, $query){
@@ -1588,7 +1613,7 @@
 		}		
 	}
 	
-	&#x2F;* olap.MemberExpression
+	&#x2F;** olap.MemberExpression
 	  *
 	*&#x2F;
 	olap.Expression = function Expression(expression){
@@ -1657,7 +1682,7 @@
 		}
 	}
 	
-	&#x2F;* olap.ExpressionCollection
+	&#x2F;** olap.ExpressionCollection
 	  *
 	*&#x2F;
 	olap.ExpressionCollection = function ExpressionCollection() {
@@ -1856,6 +1881,7 @@ filterProperty = function(filter, callback) {
 		}
 	}
 }
+
     </pre>
 </div>
 

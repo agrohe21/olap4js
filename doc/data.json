@@ -6,31 +6,420 @@
         "url": "http://github.com/agrohe21/olap4js/"
     },
     "files": {
+        "olap-xmla.js": {
+            "name": "olap-xmla.js",
+            "modules": {
+                "olapXmla": 1
+            },
+            "classes": {
+                "olapXmla.Connection": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        },
         "olap.js": {
             "name": "olap.js",
             "modules": {
                 "olap": 1
             },
-            "classes": {},
+            "classes": {
+                "olap.Connection": 1,
+                "olap.Datasource": 1,
+                "olap.Catalog": 1,
+                "olap.Cube": 1,
+                "olap.Measure": 1,
+                "olap.Dimension": 1,
+                "olap.Hierarchy": 1,
+                "olap.Level": 1,
+                "olap.Member": 1
+            },
             "fors": {},
             "namespaces": {}
         }
     },
     "modules": {
+        "olapXmla": {
+            "name": "olapXmla",
+            "submodules": {},
+            "classes": {
+                "olapXmla.Connection": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "olap-xmla.js",
+            "line": 18,
+            "description": "The Xmla specific implementation of the olap4js API",
+            "title": "OlapXmla"
+        },
         "olap": {
             "name": "olap",
             "submodules": {},
-            "classes": {},
+            "classes": {
+                "olap.Connection": 1,
+                "olap.Datasource": 1,
+                "olap.Catalog": 1,
+                "olap.Cube": 1,
+                "olap.Measure": 1,
+                "olap.Dimension": 1,
+                "olap.Hierarchy": 1,
+                "olap.Level": 1,
+                "olap.Member": 1
+            },
             "fors": {},
             "namespaces": {},
             "tag": "module",
             "file": "olap.js",
-            "line": 2,
+            "line": 933,
             "description": "This is olap4js - a javascript library for working with OLAP datasources.",
             "title": "Olap"
         }
     },
-    "classes": {},
-    "classitems": [],
-    "warnings": []
+    "classes": {
+        "olapXmla.Connection": {
+            "name": "olapXmla.Connection",
+            "shortname": "olapXmla.Connection",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olapXmla",
+            "namespace": "",
+            "file": "olap-xmla.js",
+            "line": 18,
+            "is_constructor": 1
+        },
+        "olap.Connection": {
+            "name": "olap.Connection",
+            "shortname": "olap.Connection",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 14,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "connection",
+                    "description": "Object literal with properties to be created"
+                }
+            ]
+        },
+        "olap.Datasource": {
+            "name": "olap.Datasource",
+            "shortname": "olap.Datasource",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 144,
+            "description": "<p>\nThis object provides pure JS constructs to create and use OLAP Datasources\n</p>\n<p>\nYou do not need to instantiate objects of this class yourself. YOu can use <code>olap.discoverSources()</code> or <code>olap.getSources({}, function(source) {/nconsole.log(source);})</code>\n\t</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "source",
+                    "description": "JS object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "conn",
+                    "description": "The olap.Connection instance to be used to communicate with the server",
+                    "type": "olap.Connection"
+                }
+            ]
+        },
+        "olap.Catalog": {
+            "name": "olap.Catalog",
+            "shortname": "olap.Catalog",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 233,
+            "description": "<p>\nWrapper for OLAP Catalogs\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "source",
+                    "description": "The olap.Datasource that this catalog belongs to",
+                    "type": "olap.Datasource"
+                }
+            ]
+        },
+        "olap.Cube": {
+            "name": "olap.Cube",
+            "shortname": "olap.Cube",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 300,
+            "description": "<p>\nWrapper for OLAP Cubes\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "catalog",
+                    "description": "The olap.Catalog that this Cube belongs to",
+                    "type": "olap.Catalog"
+                }
+            ]
+        },
+        "olap.Measure": {
+            "name": "olap.Measure",
+            "shortname": "olap.Measure",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 483,
+            "description": "<p>\nWrapper for OLAP Measures\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "cube",
+                    "description": "The olap.Cube that this Measure belongs to",
+                    "type": "olap.Cube"
+                }
+            ]
+        },
+        "olap.Dimension": {
+            "name": "olap.Dimension",
+            "shortname": "olap.Dimension",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 564,
+            "description": "<p>\nWrapper for OLAP Dimensions\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "cube",
+                    "description": "The olap.Cube that this Dimension belongs to",
+                    "type": "olap.Cube"
+                }
+            ]
+        },
+        "olap.Hierarchy": {
+            "name": "olap.Hierarchy",
+            "shortname": "olap.Hierarchy",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 666,
+            "description": "<p>\nWrapper for OLAP Hierarchies\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "dimension",
+                    "description": "The olap.Dimension that this Hierarchy belongs to",
+                    "type": "olap.Dimension"
+                }
+            ]
+        },
+        "olap.Level": {
+            "name": "olap.Level",
+            "shortname": "olap.Level",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 798,
+            "description": "<p>\nWrapper for OLAP Levels\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "hierarchy",
+                    "description": "The olap.Hierarchy that this Level belongs to",
+                    "type": "olap.Hierarchy"
+                }
+            ]
+        },
+        "olap.Member": {
+            "name": "olap.Member",
+            "shortname": "olap.Member",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 933,
+            "description": "<p>\nWrapper for OLAP Members\n</p>",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "JS",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "level",
+                    "description": "The olap.Level that this Member belongs to",
+                    "type": "olap.Level"
+                }
+            ]
+        }
+    },
+    "classitems": [
+        {
+            "file": "olap-xmla.js",
+            "line": 152,
+            "description": "olapXmla.Catalog",
+            "class": "olapXmla.Connection",
+            "module": "olapXmla"
+        },
+        {
+            "file": "olap.js",
+            "line": 1063,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1149,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1187,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1225,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1321,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1424,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1506,
+            "class": "olap.Member",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1575,
+            "class": "olap.Member",
+            "module": "olap"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nolapXmla.Catalog",
+            "line": " olap-xmla.js:152"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1063"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1149"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1187"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1225"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1321"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1424"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1506"
+        },
+        {
+            "message": "Missing item type",
+            "line": " olap.js:1575"
+        }
+    ]
 }
