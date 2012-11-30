@@ -12,6 +12,7 @@
 	var olap; if (typeof exports !== 'undefined') {olap = exports;} else {olap = global.olap = {};}
 
 	/** olap.Connection
+	*   olap.Connection is a connection to an OLAP data source.
 	*   @class olap.Connection
 	*   @constructor
 	*   @param connection Object literal with properties to be created
@@ -39,6 +40,11 @@
 	    return olap.Connection.instances[id];
 	};
 	olap.Connection.prototype = {
+		/**
+		* returns a list of all databases
+		* @method getOlapDatabases
+		* @param {function} callback A function to call after the databases have been retrieved from the OLAP server
+		*/
 		getOlapDatabases: function getOlapDatabases(callback){
 			if (this.sources.length ==0) {
 				this.fetchOlapDatasources(function(sources){
@@ -67,11 +73,20 @@
 			}
 			return source;
 		},
+		/**
+		* executes an MDX statement
+		* @method executeOlapQuery
+		*/
 		executeOlapQuery: function executeOlapQuery(options){
 			//just do the default for now
 			console.warn('Default execute being used');
 			return new olap.CellSet({});
 		},
+		/**
+		* Describes the structure of cubes within a database
+		* @method getCubes
+		* @param {function} callback A function to call after the cubes have been retrieved from the OLAP server
+		*/
 		getCubes: function getCubes(callback) {
 		
 			var idx_ds, idx_cat, source, catalogs, catalog, cubes, cube, _cubes = [];
@@ -183,30 +198,66 @@
 	    return olap.Datasource.instances[id];
 	};	
 	olap.Datasource.prototype = {
+		/**
+		* returns the current connection
+		* @method getOlapConnection
+		*/
 		getOlapConnection: function getOlapConnection() {
 			return this.connection;
 		},
+		/**
+		* returns the name of this database
+		* @method getName
+		*/
 		getName: function getName() {
 			return this.DATA_SOURCE_NAME;
 		},
+		/**
+		* returns the description of this database
+		* @method getDescription
+		*/
 		getDescription: function getDescription() {
 			return this.DATA_SOURCE_DESCRIPTION;
 		},
+		/**
+		* returns the name of the underlying OLAP provider
+		* @method getProviderName
+		*/
 		getProviderName: function getProviderName() {
 			return this.PROVIDER_NAME;
 		},
+		/**
+		* returns the redirection URL, if this database is a proxy to another server
+		* @method getURL
+		*/
 		getURL: function getURL() {
 			return this.URL;
 		},
+		/**
+		* returns provider-specific information
+		* @method getDataSourceInfo
+		*/
 		getDataSourceInfo: function getDataSourceInfo() {
 			return this.DATA_SOURCE_INFO;
 		},
+		/**
+		* returns the types of data that are supported by this provider
+		* @method getProviderTypes
+		*/
 		getProviderTypes: function getProviderTypes() {
 			return this.PROVIDER_TYPE;
 		},
+		/**
+		* returns the modes of authentication that are supported by this provider
+		* @method getAuthenticationModes
+		*/
 		getAuthenticationModes: function getAuthenticationModes() {
 			return this.AUTHENTICATION_MODE;
 		},
+		/**
+		* returns a list of catalogs in this database
+		* @method getCatalogs
+		*/
 		getCatalogs: function getCatalogs() {
 			if (this.catalogs.length == 0) {
 				this.fetchCatalogs();
