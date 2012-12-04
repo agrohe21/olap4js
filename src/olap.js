@@ -7,9 +7,7 @@
 */
 (function olap(global){
 
-	/* olap module boiler plate
-	*/
-	var olap; if (typeof exports !== 'undefined') {olap = exports;} else {olap = global.olap = {};}
+	var olap; if (typeof exports !== 'undefined') {olap = exports;} else {olap = global.olap = {};} //olap module boiler plate
 
 	/** olap.Connection
 	*   olap.Connection is a connection to an OLAP data source.
@@ -25,7 +23,6 @@
 			if ($connection.sources instanceof Array) {
 				for (var idx in $connection.sources){
 					src = $connection.sources[idx];	
-					//ds = new olap.Datasource(src, this)
 					this.addDataSource(src);
 				}
 			}
@@ -107,6 +104,7 @@
 				}
 			})    
 		},
+		//Probably get rid of this so we just have getCubes and then getMetadata for each cube.
 		getLevels: function getLevels(callback) {
 		
 			var getLevelsInDatasource = function getLevelsInDatasource(sources){
@@ -157,19 +155,15 @@
 	}
 	
 	/** olap.Datasource
-	*   <p>
-	*   This object provides pure JS constructs to create and use OLAP Datasources
-	*   </p>
-	*   <p>
-	*   You do not need to instantiate objects of this class yourself. YOu can use <code>olap.discoverSources()</code> or <code>olap.getSources({}, function(source) {/nconsole.log(source);})</code>
-	*	</p>
+	* A Datasource is the highest level element in the hierarchy of metadata objects. A database contains one or more catalogs.
+	* Some OLAP servers may only have one database. Mondrian is one such OLAP server.
+	* To obtain the collection of databases in the current server, call the olap.Connection.getOlapDatabases() method.
 	*   @class olap.Datasource
 	*   @constructor
 	*   @param {Object} source JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Connection} conn The olap.Connection instance to be used to communicate with the server
 	**/
 	olap.Datasource = function Datasource(source, $conn) {
-		//var idx cat;
 		this.catalogs = [];
 		if (source instanceof Object) { //have we been passed a valid JS object?
 			this.DATA_SOURCE_DESCRIPTION = source.DATA_SOURCE_DESCRIPTION || "";
@@ -282,13 +276,13 @@
 	} // olap.Datasource.prototype
 	
 	/** olap.Catalog
-	*   <p>
-	*   Wrapper for OLAP Catalogs
-	*   </p>
+	 * A Catalog is the second highest level element in the hierarchy of metadata objects. A catalog belongs to a database and contains one or more schemas.
+	 * Some OLAP servers may only have one catalog. Mondrian is one such OLAP server; its sole catalog is always called "LOCALDB".
+	 * To obtain the collection of catalogs in the current server, call the olap.Connection.getOlapCatalogs() method.
 	*   @class olap.Catalog
 	*   @constructor
-	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
-	*   @param {olap.Datasource} source The olap.Datasource that this catalog belongs to
+	*   @param {Object} Catalog Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Datasource} Datasource The olap.Datasource that this catalog belongs to
 	*/
 	olap.Catalog = function Catalog($catalog, $ds) {
 	var catalog = $catalog || {cubes:[]};
@@ -303,8 +297,7 @@
 				this.addCube(cube);
 			}
 		}
-		
-		//this.SCHEMA_NAME = catalog.SCHEMA_NAME;
+		this.schemas = [];
 		this.datasource    = $ds;
 		this.id = olap.Catalog.id++;
 		olap.Catalog.instances[this.id] = this;				
@@ -316,12 +309,24 @@
 	    return olap.Catalog.instances[id];
 	};		
 	olap.Catalog.prototype = {
+		/**
+		* returns the name of this catalog
+		* @method getName
+		*/
 		getName: function getName() {
 				return this.CATALOG_NAME;
 		},
+		/**
+		* returns a list of schemas in this catalog
+		* @method getSchemas
+		*/
 		getSchemas: function getSchemas() {
 				return this.schemas;
 		},
+		/**
+		* returns this catalog's parent database
+		* @method getDatabase
+		*/
 		getDatabase: function getDatabase() {
 				return this.datasource;
 		},
