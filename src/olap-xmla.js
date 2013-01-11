@@ -16,8 +16,12 @@
 	}
 
 	/** olapXmla.Connection
+	 * Provides Xmla specific implementation for Xmla specific connections
 	* @class olapXmla.Connection
 	* @constructor
+	* @param
+	* @extends olap.Connection
+	*   @param {Object} source JS object representing object properties.  Often used to rehydrate objects after external persistence
 	*/
     olapXmla.Connection = function XmlaConnection($connection){
 	if (!window.location.origin) window.location.origin = window.location.protocol+"//"+window.location.host;	
@@ -99,9 +103,11 @@
 	    olap.Connection.prototype.addDataSource.call(this, ds)
 	    return ds;
 	}
-    olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(callback){
+    olapXmla.Connection.prototype.fetchOlapDatasources = function XmlaFetchOlapDatasources(){
 	    var that = this, raw_sources, source, ds;
-	    this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
+	    //TODO Should this be async always
+	    raw_sources = this.xmla.discoverDataSources();
+	    //this.xmla.discoverDataSources({success: function XmlaDiscoverDatasourceSuccess(xmla, request, raw_sources){
 		while (source = raw_sources.fetchAsObject()) {
 			ds = new olapXmla.Datasource({
 			    DATA_SOURCE_DESCRIPTION:source.DataSourceDescription|| "",
@@ -116,12 +122,21 @@
 		}
 		raw_sources.close();
 		delete raw_sources;
-		callback.call(that, that.sources)
-	    }});
-		return that.soures;
+		//callback.call(that, that.sources)
+	    //}
+	    //});
+	    return that.sources;
 	    
 	}
     
+	/** olapXmla.Datasource
+	 * Provides Xmla specific implementation for Xmla specific datasources
+	* @class olapXmla.Datasource
+	* @constructor
+	* @extends olap.Datasource
+	*   @param {Object} source JS object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Connection} conn The olap.Connection instance to be used to communicate with the server
+	*/
     olapXmla.Datasource = function XmlaDatasource($datasource, conn){
 	olap.Datasource.call(this, $datasource, conn);
     }
@@ -401,7 +416,6 @@
     olapXmla.Query= function XmlaQuery($Query, $cube, $connection, $catalog){
 	olap.Query.call(this, $Query, $cube);
 	this.connection = $connection || {};
-	this.catalog = $catalog ||{};
     }
     
     inheritPrototype(olapXmla.Query, olap.Query);
@@ -410,13 +424,12 @@
 	    var that=this, properties = {}, mdx, results, dataset, cells, tmp_results, axis;
 	    
 	    mdx = this.getMDX();
-	    dataset = this.connection.executeOlapQuery({
+	    dataset = this.getCube().getCatalog().getDatabase().getOlapConnection().executeOlapQuery({
 		    mdx: mdx,
-		    catalog: this.catalog,
+		    catalog: this.getCube().getCatalog().getName(),
 		    success: function(results){
 			if (typeof callback == 'function') {
 			    callback.call(this, results);
-			    delete results;
 			}
 		    }
 	    });

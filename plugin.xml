@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin title="Javascript for OLAP">
-    <menu-items>
+
+  <overlays>
+	  <overlay id="startup.olap4js" resourcebundle="../content/olap4js/olap4js.properties">
+		  <overlay id="startup.olap4js">
+			  <toolbar id="mainToolbar">
+				  <toolbarbutton id="newOlap4js"
+					  image="../content/olap4js/resources/olap4js-menu-icon.gif"
+					  onclick="mainToolbarHandler.openUrl('Olap4JS Query','Olap4JS Query','content/olap4js/resources/new.html')"
+					  tooltiptext="New Olap4JS Query"
+					  insertafter="newAnalysisButton" />
+			  </toolbar>
+		  </overlay>
+	  </overlay>
+  </overlays>
+
+
+  <menu-items>
+	<menu-item id="new-olap4js-query" anchor="file-new-submenu" label="OLAP4JS Query" command="content/olap4js/resources/new.html" type="MENU_ITEM" how="LAST_CHILD"/>
         <menu-item 
             id="olap4js"
             anchor="tools-submenu"
@@ -11,8 +28,11 @@
         />
     </menu-items>
 
-    <static-paths>
-        <static-path url="/olap4js" localFolder="."/>
-    </static-paths> 
-    
+	<static-paths>
+		<static-path url="/olap4js/resources" localFolder="resources" />
+		<static-path url="/olap4js/build" localFolder="build" />
+		<static-path url="/olap4js/samples" localFolder="samples" />
+		<static-path url="/olap4js/doc" localFolder="doc" />
+		<static-path url="/olap4js" localFolder="" />
+	</static-paths>
 </plugin>

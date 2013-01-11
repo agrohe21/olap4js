@@ -1,5 +1,0 @@
-Alpha code at this point.
-
-#Overview
-olap4js is intended to be a common set of JS objects that can run on multiple clients(browser, node.js, rhino) and with multiple OLAP backends (Mondrian, XMLA, Saiku, js-hypercube).
-

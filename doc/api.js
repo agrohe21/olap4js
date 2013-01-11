@@ -2,6 +2,9 @@ YUI.add("yuidoc-meta", function(Y) {
    Y.YUIDoc = { meta: {
     "classes": [
         "olap.Catalog",
+        "olap.Cell",
+        "olap.CellSet",
+        "olap.CellSetAxis",
         "olap.Connection",
         "olap.Cube",
         "olap.Datasource",
@@ -10,7 +13,12 @@ YUI.add("yuidoc-meta", function(Y) {
         "olap.Level",
         "olap.Measure",
         "olap.Member",
-        "olapXmla.Connection"
+        "olap.Namedset",
+        "olap.Position",
+        "olap.Query",
+        "olap.Schema",
+        "olapXmla.Connection",
+        "olapXmla.Datasource"
     ],
     "modules": [
         "olap",

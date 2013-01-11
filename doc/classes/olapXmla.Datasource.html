@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>olap.Level - OLAP4JS API</title>
+    <title>olapXmla.Datasource - OLAP4JS API</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.7.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -120,21 +120,25 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>olap.Level Class</h1>
+                        <h1>olapXmla.Datasource Class</h1>
 <div class="box meta">
     
 
     
+        <div class="extends">
+            Extends <a href="../classes/olap.Datasource.html" class="crosslink">olap.Datasource</a>
+        </div>
+    
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l988"><code>olap.js:988</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap-xmla.js.html#l132"><code>olap-xmla.js:132</code></a>
         </div>
     
 
     
         
-            Module: <a href="../modules/olap.html">olap</a>
+            Module: <a href="../modules/olapXmla.html">olapXmla</a>
         
     
 
@@ -144,14 +148,14 @@
 
 
 <div class="box intro">
-    <p>Group of Member objects in a Hierarchy, all with the same attributes and at the same depth in the hierarchy</p>
+    <p>Provides Xmla specific implementation for Xmla specific datasources</p>
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_olap.Level" class="method item">
-    <h3 class="name"><code>olap.Level</code></h3>
+        <div id="method_olapXmla.Datasource" class="method item">
+    <h3 class="name"><code>olapXmla.Datasource</code></h3>
 
     
         <div class="args">
@@ -159,13 +163,13 @@
             
                 <li class="arg">
                     
-                        <code>Level</code>
+                        <code>source</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>Hierarchy</code>
+                        <code>conn</code>
                     
                 </li>
             
@@ -198,7 +202,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l988"><code>olap.js:988</code></a>
+        <a href="..&#x2F;files&#x2F;olap-xmla.js.html#l132"><code>olap-xmla.js:132</code></a>
         
         </p>
 
@@ -220,14 +224,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Level</code>
+                        <code class="param-name">source</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>object representing object properties.  Often used to rehydrate objects after external persistence</p>
+                        <p>JS object representing object properties.  Often used to rehydrate objects after external persistence</p>
                     </div>
 
                     
@@ -235,14 +239,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Hierarchy</code>
-                        <span class="type"><a href="../classes/olap.Hierarchy.html" class="crosslink">olap.Hierarchy</a></span>
+                        <code class="param-name">conn</code>
+                        <span class="type"><a href="../classes/olap.Connection.html" class="crosslink">olap.Connection</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The olap.Hierarchy that this Level belongs to</p>
+                        <p>The olap.Connection instance to be used to communicate with the server</p>
                     </div>
 
                     
@@ -280,45 +284,66 @@
                 <div class="index-section methods">
                     <h3>Methods</h3>
 
-                    <ul class="index-list methods">
+                    <ul class="index-list methods extends">
                         
-                            <li class="index-item method">
-                                <a href="#method_getCardinality">getCardinality</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getAuthenticationModes">getAuthenticationModes</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_getDepth">getDepth</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getCatalogs">getCatalogs</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_getLevelType">getLevelType</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getDataSourceInfo">getDataSourceInfo</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_getMembers">getMembers</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getDescription">getDescription</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
+                            <li class="index-item method inherited">
                                 <a href="#method_getName">getName</a>
 
                                 
                                 
                             </li>
                         
-                            <li class="index-item method">
-                                <a href="#method_getUniqueName">getUniqueName</a>
+                            <li class="index-item method inherited">
+                                <a href="#method_getOlapConnection">getOlapConnection</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_getProviderName">getProviderName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_getProviderTypes">getProviderTypes</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method inherited">
+                                <a href="#method_getURL">getURL</a>
 
                                 
                                 
@@ -340,17 +365,13 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getCardinality" class="method item">
-    <h3 class="name"><code>getCardinality</code></h3>
+                    <div id="method_getAuthenticationModes" class="method item inherited">
+    <h3 class="name"><code>getAuthenticationModes</code></h3>
 
     
         <span class="paren">()</span>
     
 
-    
-        <span class="returns-inline">
-            <span class="type">Integer</span>
-        </span>
     
 
     
@@ -368,15 +389,12 @@
     <div class="meta">
         
             
-                
-                <p>
-                
-                Defined in
-                
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getAuthenticationModes">olap.Datasource</a>:
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1101"><code>olap.js:1101</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l249"><code>olap.js:249</code></a>
         
         </p>
 
@@ -387,40 +405,24 @@
     </div>
 
     <div class="description">
-        <p>returns the approximate members of this Level in the Hierarchy</p>
+        <p>returns the modes of authentication that are supported by this provider</p>
     </div>
 
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Integer</span>:
-                    
-                
-            </div>
-        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_getDepth" class="method item">
-    <h3 class="name"><code>getDepth</code></h3>
+                    <div id="method_getCatalogs" class="method item inherited">
+    <h3 class="name"><code>getCatalogs</code></h3>
 
     
         <span class="paren">()</span>
     
 
-    
-        <span class="returns-inline">
-            <span class="type">Integer</span>
-        </span>
     
 
     
@@ -438,15 +440,12 @@
     <div class="meta">
         
             
-                
-                <p>
-                
-                Defined in
-                
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getCatalogs">olap.Datasource</a>:
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1093"><code>olap.js:1093</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l256"><code>olap.js:256</code></a>
         
         </p>
 
@@ -457,40 +456,24 @@
     </div>
 
     <div class="description">
-        <p>returns the depth of this Level in the Hierarchy</p>
+        <p>returns a list of catalogs in this database</p>
     </div>
 
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Integer</span>:
-                    
-                
-            </div>
-        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_getLevelType" class="method item">
-    <h3 class="name"><code>getLevelType</code></h3>
+                    <div id="method_getDataSourceInfo" class="method item inherited">
+    <h3 class="name"><code>getDataSourceInfo</code></h3>
 
     
         <span class="paren">()</span>
     
 
-    
-        <span class="returns-inline">
-            <span class="type">Integer</span>
-        </span>
     
 
     
@@ -508,15 +491,12 @@
     <div class="meta">
         
             
-                
-                <p>
-                
-                Defined in
-                
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getDataSourceInfo">olap.Datasource</a>:
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1085"><code>olap.js:1085</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l235"><code>olap.js:235</code></a>
         
         </p>
 
@@ -527,40 +507,24 @@
     </div>
 
     <div class="description">
-        <p>returns the type of this Level</p>
+        <p>returns provider-specific information</p>
     </div>
 
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">Integer</span>:
-                    
-                
-            </div>
-        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_getMembers" class="method item">
-    <h3 class="name"><code>getMembers</code></h3>
+                    <div id="method_getDescription" class="method item inherited">
+    <h3 class="name"><code>getDescription</code></h3>
 
     
         <span class="paren">()</span>
     
 
-    
-        <span class="returns-inline">
-            <span class="type"><a href="../classes/olap.Member.html" class="crosslink">olap.Member</a></span>
-        </span>
     
 
     
@@ -578,15 +542,12 @@
     <div class="meta">
         
             
-                
-                <p>
-                
-                Defined in
-                
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getDescription">olap.Datasource</a>:
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1128"><code>olap.js:1128</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l214"><code>olap.js:214</code></a>
         
         </p>
 
@@ -597,31 +558,18 @@
     </div>
 
     <div class="description">
-        <p>returns a list of the members of this Level</p>
+        <p>returns the description of this database</p>
     </div>
 
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type"><a href="../classes/olap.Member.html" class="crosslink">olap.Member</a></span>:
-                    
-                    An array of Members
-                
-            </div>
-        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_getName" class="method item">
+                    <div id="method_getName" class="method item inherited">
     <h3 class="name"><code>getName</code></h3>
 
     
@@ -629,10 +577,6 @@
     
 
     
-        <span class="returns-inline">
-            <span class="type">String</span>
-        </span>
-    
 
     
 
@@ -649,15 +593,12 @@
     <div class="meta">
         
             
-                
-                <p>
-                
-                Defined in
-                
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getName">olap.Datasource</a>:
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1077"><code>olap.js:1077</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l207"><code>olap.js:207</code></a>
         
         </p>
 
@@ -668,40 +609,24 @@
     </div>
 
     <div class="description">
-        <p>returns the name of this Level</p>
+        <p>returns the name of this database</p>
     </div>
 
     
 
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">String</span>:
-                    
-                
-            </div>
-        </div>
     
 
     
 </div>
 
                 
-                    <div id="method_getUniqueName" class="method item">
-    <h3 class="name"><code>getUniqueName</code></h3>
+                    <div id="method_getOlapConnection" class="method item inherited">
+    <h3 class="name"><code>getOlapConnection</code></h3>
 
     
         <span class="paren">()</span>
     
 
-    
-        <span class="returns-inline">
-            <span class="type">String</span>
-        </span>
     
 
     
@@ -719,15 +644,12 @@
     <div class="meta">
         
             
-                
-                <p>
-                
-                Defined in
-                
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getOlapConnection">olap.Datasource</a>:
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1109"><code>olap.js:1109</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l200"><code>olap.js:200</code></a>
         
         </p>
 
@@ -738,23 +660,164 @@
     </div>
 
     <div class="description">
-        <p>returns the UNIQUE_NAME of this Level</p>
+        <p>returns the current connection</p>
     </div>
 
     
 
     
-        <div class="returns">
-            <h4>Returns:</h4>
 
-            <div class="returns-description">
+    
+</div>
+
                 
-                    
-                        <span class="type">String</span>:
-                    
+                    <div id="method_getProviderName" class="method item inherited">
+    <h3 class="name"><code>getProviderName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getProviderName">olap.Datasource</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l221"><code>olap.js:221</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the name of the underlying OLAP provider</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
                 
-            </div>
-        </div>
+                    <div id="method_getProviderTypes" class="method item inherited">
+    <h3 class="name"><code>getProviderTypes</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getProviderTypes">olap.Datasource</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l242"><code>olap.js:242</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the types of data that are supported by this provider</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getURL" class="method item inherited">
+    <h3 class="name"><code>getURL</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                <p>Inherited from
+                <a href="..&#x2F;classes&#x2F;olap.Datasource.html#method_getURL">olap.Datasource</a>:
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l228"><code>olap.js:228</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the redirection URL, if this database is a proxy to another server</p>
+    </div>
+
+    
+
     
 
     

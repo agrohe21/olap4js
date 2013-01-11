@@ -43,6 +43,12 @@
             
                 <li><a href="..&#x2F;classes/olap.Catalog.html">olap.Catalog</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Cell.html">olap.Cell</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSet.html">olap.CellSet</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSetAxis.html">olap.CellSetAxis</a></li>
+            
                 <li><a href="..&#x2F;classes/olap.Connection.html">olap.Connection</a></li>
             
                 <li><a href="..&#x2F;classes/olap.Cube.html">olap.Cube</a></li>
@@ -59,7 +65,17 @@
             
                 <li><a href="..&#x2F;classes/olap.Member.html">olap.Member</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Namedset.html">olap.Namedset</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Position.html">olap.Position</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Query.html">olap.Query</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Schema.html">olap.Schema</a></li>
+            
                 <li><a href="..&#x2F;classes/olapXmla.Connection.html">olapXmla.Connection</a></li>
+            
+                <li><a href="..&#x2F;classes/olapXmla.Datasource.html">olapXmla.Datasource</a></li>
             
             </ul>
 
@@ -112,7 +128,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l144"><code>olap.js:144</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l162"><code>olap.js:162</code></a>
         </div>
     
 
@@ -128,13 +144,9 @@
 
 
 <div class="box intro">
-    <p>
-This object provides pure JS constructs to create and use OLAP Datasources
-</p>
-
-<p>
-You do not need to instantiate objects of this class yourself. YOu can use <code>olap.discoverSources()</code> or <code>olap.getSources({}, function(source) {/nconsole.log(source);})</code>
-    </p>
+    <p>A Datasource is the highest level element in the hierarchy of metadata objects. A database contains one or more catalogs.
+Some OLAP servers may only have one database. Mondrian is one such OLAP server.
+To obtain the collection of databases in the current server, call the olap.Connection.getOlapDatabases() method.</p>
 </div>
 
 
@@ -188,7 +200,7 @@ You do not need to instantiate objects of this class yourself. YOu can use <code
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l144"><code>olap.js:144</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l162"><code>olap.js:162</code></a>
         
         </p>
 
@@ -255,6 +267,8 @@ You do not need to instantiate objects of this class yourself. YOu can use <code
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
         
         
         
@@ -265,6 +279,77 @@ You do not need to instantiate objects of this class yourself. YOu can use <code
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getAuthenticationModes">getAuthenticationModes</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getCatalogs">getCatalogs</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDataSourceInfo">getDataSourceInfo</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDescription">getDescription</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getOlapConnection">getOlapConnection</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getProviderName">getProviderName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getProviderTypes">getProviderTypes</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getURL">getURL</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
 
             
 
@@ -273,6 +358,498 @@ You do not need to instantiate objects of this class yourself. YOu can use <code
             
         </div>
 
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_getAuthenticationModes" class="method item">
+    <h3 class="name"><code>getAuthenticationModes</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l249"><code>olap.js:249</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the modes of authentication that are supported by this provider</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getCatalogs" class="method item">
+    <h3 class="name"><code>getCatalogs</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l256"><code>olap.js:256</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a list of catalogs in this database</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getDataSourceInfo" class="method item">
+    <h3 class="name"><code>getDataSourceInfo</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l235"><code>olap.js:235</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns provider-specific information</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getDescription" class="method item">
+    <h3 class="name"><code>getDescription</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l214"><code>olap.js:214</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the description of this database</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l207"><code>olap.js:207</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the name of this database</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getOlapConnection" class="method item">
+    <h3 class="name"><code>getOlapConnection</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l200"><code>olap.js:200</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the current connection</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getProviderName" class="method item">
+    <h3 class="name"><code>getProviderName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l221"><code>olap.js:221</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the name of the underlying OLAP provider</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getProviderTypes" class="method item">
+    <h3 class="name"><code>getProviderTypes</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l242"><code>olap.js:242</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the types of data that are supported by this provider</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getURL" class="method item">
+    <h3 class="name"><code>getURL</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l228"><code>olap.js:228</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the redirection URL, if this database is a proxy to another server</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

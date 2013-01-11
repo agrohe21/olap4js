@@ -43,6 +43,12 @@
             
                 <li><a href="..&#x2F;classes/olap.Catalog.html">olap.Catalog</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Cell.html">olap.Cell</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSet.html">olap.CellSet</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSetAxis.html">olap.CellSetAxis</a></li>
+            
                 <li><a href="..&#x2F;classes/olap.Connection.html">olap.Connection</a></li>
             
                 <li><a href="..&#x2F;classes/olap.Cube.html">olap.Cube</a></li>
@@ -59,7 +65,17 @@
             
                 <li><a href="..&#x2F;classes/olap.Member.html">olap.Member</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Namedset.html">olap.Namedset</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Position.html">olap.Position</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Query.html">olap.Query</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Schema.html">olap.Schema</a></li>
+            
                 <li><a href="..&#x2F;classes/olapXmla.Connection.html">olapXmla.Connection</a></li>
+            
+                <li><a href="..&#x2F;classes/olapXmla.Datasource.html">olapXmla.Datasource</a></li>
             
             </ul>
 
@@ -112,7 +128,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l300"><code>olap.js:300</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l389"><code>olap.js:389</code></a>
         </div>
     
 
@@ -128,9 +144,8 @@
 
 
 <div class="box intro">
-    <p>
-Wrapper for OLAP Cubes
-</p>
+    <p>A Cube is the central metadata object for representing multidimensional data.
+It belongs to an olap.Schema, and is described by a list of dimensions and a list of measures. It may also have a collection of named sets, each defined by a formula.</p>
 </div>
 
 
@@ -145,7 +160,7 @@ Wrapper for OLAP Cubes
             
                 <li class="arg">
                     
-                        <code>JS</code>
+                        <code>Cube</code>
                     
                 </li>
             
@@ -184,7 +199,7 @@ Wrapper for OLAP Cubes
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l300"><code>olap.js:300</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l389"><code>olap.js:389</code></a>
         
         </p>
 
@@ -206,14 +221,14 @@ Wrapper for OLAP Cubes
             
                 <li class="param">
                     
-                        <code class="param-name">JS</code>
+                        <code class="param-name">Cube</code>
                         <span class="type">Object</span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>object representing object properties.  Often used to rehydrate objects after external persistence</p>
+                        <p>Object representing object properties.  Often used to rehydrate objects after external persistence</p>
                     </div>
 
                     
@@ -251,6 +266,8 @@ Wrapper for OLAP Cubes
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
         
         
         
@@ -261,6 +278,84 @@ Wrapper for OLAP Cubes
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getCatalog">getCatalog</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDescription">getDescription</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDimensions">getDimensions</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getHierarchies">getHierarchies</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getHierarchyByUniqueName">getHierarchyByUniqueName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getLevelByUniqueName">getLevelByUniqueName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getMeasures">getMeasures</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getMetadata">getMetadata</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getSchema">getSchema</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
 
             
 
@@ -269,6 +364,671 @@ Wrapper for OLAP Cubes
             
         </div>
 
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_getCatalog" class="method item">
+    <h3 class="name"><code>getCatalog</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l433"><code>olap.js:433</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a Cube's parent olap.Schema</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getDescription" class="method item">
+    <h3 class="name"><code>getDescription</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l455"><code>olap.js:455</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the description of this cube</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getDimensions" class="method item">
+    <h3 class="name"><code>getDimensions</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l556"><code>olap.js:556</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a list of olap.Dimensions in this cube</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getHierarchies" class="method item">
+    <h3 class="name"><code>getHierarchies</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l570"><code>olap.js:570</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a list of olap.Hierarchies in this cube</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getHierarchyByUniqueName" class="method item">
+    <h3 class="name"><code>getHierarchyByUniqueName</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>UNIQUE_NAME</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/olap.Hierarchy.html" class="crosslink">olap.Hierarchy</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l488"><code>olap.js:488</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the hierarchy in this cube with a specific UNIQUE_NAME</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">UNIQUE_NAME</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/olap.Hierarchy.html" class="crosslink">olap.Hierarchy</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getLevelByUniqueName" class="method item">
+    <h3 class="name"><code>getLevelByUniqueName</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>LEVEL_UNIQUE_NAME</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>HIERARCHY_UNIQUE_NAME</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/olap.Level.html" class="crosslink">olap.Level</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l509"><code>olap.js:509</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the level in this cube with a specific LEVEL<em>UNIQUE</em>NAME and HIERARCHY<em>UNIQUE</em>NAME</p>
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">LEVEL_UNIQUE_NAME</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">HIERARCHY_UNIQUE_NAME</code>
+                        <span class="type">String</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/olap.Level.html" class="crosslink">olap.Level</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getMeasures" class="method item">
+    <h3 class="name"><code>getMeasures</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l541"><code>olap.js:541</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a list of olap.Measures in this cube</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getMetadata" class="method item">
+    <h3 class="name"><code>getMetadata</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l590"><code>olap.js:590</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>recursively gets all metadata (except for olap.Members) in this cube</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l448"><code>olap.js:448</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the name of this Cube</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+                    <div id="method_getSchema" class="method item">
+    <h3 class="name"><code>getSchema</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l440"><code>olap.js:440</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a Cube's parent olap.Schema</p>
+    </div>
+
+    
+
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

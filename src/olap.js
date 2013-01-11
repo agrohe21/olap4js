@@ -44,14 +44,18 @@
 		*/
 		getOlapDatabases: function getOlapDatabases(callback){
 			if (this.sources.length ==0) {
-				this.fetchOlapDatasources(function(sources){
-					if (callback && typeof callback == 'function') {
-						callback.call(this, sources);
-					}
-				});
+				var sources = this.fetchOlapDatasources() //function(sources){
+				if (callback && typeof callback == 'function') {
+					callback.call(this, sources);
+				} else {
+				    return sources;
+				}
+				//});
 			} else {
 				if (callback && typeof callback == 'function') {
 					callback.call(this, this.sources);
+				} else {
+				    return sources;
 				}
 			}
 			return this.sources;
@@ -86,23 +90,24 @@
 		*/
 		getCubes: function getCubes(callback) {
 		
-			var idx_ds, idx_cat, source, catalogs, catalog, cubes, cube, _cubes = [];
-			this.getOlapDatabases(function(sources){
-				for (idx_ds in sources) {
-					source = sources[idx_ds];
-					catalogs = source.getCatalogs();
-						for (idx_cat in catalogs){
-							catalog = catalogs[idx_cat];
-							cubes = catalog.getCubes();
-							_cubes = _cubes.concat(cubes);
-						}
-				}
-				if (typeof callback == 'function') {
-					callback.call(this, _cubes);
-				} else {
-					return _cubes;
-				}
-			})    
+			var idx_ds, idx_cat, sources, source, catalogs, catalog, cubes, cube, _cubes = [];
+			//this.getOlapDatabases(function(sources){
+			sources = this.getOlapDatabases();
+			for (idx_ds in sources) {
+				source = sources[idx_ds];
+				catalogs = source.getCatalogs();
+					for (idx_cat in catalogs){
+						catalog = catalogs[idx_cat];
+						cubes = catalog.getCubes();
+						_cubes = _cubes.concat(cubes);
+					}
+			}
+			if (typeof callback == 'function') {
+				callback.call(this, _cubes);
+			} else {
+				return _cubes;
+			}
+			//})    
 		},
 		//Probably get rid of this so we just have getCubes and then getMetadata for each cube.
 		getLevels: function getLevels(callback) {
@@ -341,6 +346,10 @@
 			}
 			return cube;		
 		},
+ 		/**
+		* returns a list of cubes in this catalog
+		* @method getCubes
+		*/
 		getCubes: function getCubes() {
 			if (this.cubes.length == 0) {
 				this.fetchCubes();
@@ -353,13 +362,36 @@
 		}
 	}
 	
+	/** olap.Schema
+	*   A Schema is a collection of database objects that contain structural information, or metadata, about a database.
+	*   It belongs to a catalog and contains a number of cubes and shared dimensions
+	*   @class olap.Schema
+	*   @constructor
+	*   @param {Object} Schema Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Catalog} catalog The olap.Catalog that this Schema belongs to
+	*/
+	olap.Schema = function Schema($schema, $cat) {
+		var cube = $cube || {};
+		this.SCHEMA_NAME = cube.SCHEMA_NAME;
+		this.CATALOG_NAME = cube.CATALOG_NAME;
+		this.catalog    = $cat || {};
+		this.id = olap.Schema.id++;
+		olap.Schema.instances[this.id] = this;
+	}
+	olap.Schema.id = 1;
+	olap.Schema.instances = {};
+	olap.Schema.prefix = "olap.Schema";
+	olap.Schema.getInstance = function(id){
+	    return olap.Schema.instances[id];
+	};
+	olap.Schema.prototype = {}
+	
 	/** olap.Cube
-	*   <p>
-	*   Wrapper for OLAP Cubes
-	*   </p>
+	*   A Cube is the central metadata object for representing multidimensional data.
+	*   It belongs to an olap.Schema, and is described by a list of dimensions and a list of measures. It may also have a collection of named sets, each defined by a formula.
 	*   @class olap.Cube
 	*   @constructor
-	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {Object} Cube Object representing object properties.  Often used to rehydrate objects after external persistence
 	*   @param {olap.Catalog} catalog The olap.Catalog that this Cube belongs to
 	*/
 	olap.Cube = function Cube($cube, $cat) {
@@ -398,13 +430,32 @@
 		return null;
 	}
 	olap.Cube.prototype = {
+ 		/**
+		* returns a Cube's parent olap.Schema
+		* @method getCatalog
+		*/
+		getCatalog: function getCatalog(){
+		    return this.catalog;
+		},
+ 		/**
+		* returns a Cube's parent olap.Schema
+		* @method getSchema
+		*/
 		getSchema: function getSchema() {
 			//TODO this should be a schema object not just the name
 			return this.SCHEMA_NAME;
 		},
+		/**
+		* returns the name of this Cube
+		* @method getName
+		*/
 		getName: function getName() {
 			return this.CUBE_NAME;
 		},
+		/**
+		* returns the description of this cube
+		* @method getDescription
+		*/
 		getDescription: function getDescription() {
 			return this.DESCRIPTION;
 		},
@@ -434,9 +485,15 @@
 			}
 			return measure;
 		},
+		/**
+		* returns the hierarchy in this cube with a specific UNIQUE_NAME
+		* @method getHierarchyByUniqueName
+		* @return {olap.Hierarchy}
+		* @param {String} UNIQUE_NAME
+		*/
 		getHierarchyByUniqueName: function getHierarchyByUniqueName(HIERARCHY_UNIQUE_NAME){
-			console.debug('func Call: ' + arguments.callee.name);
-			console.debug(HIERARCHY_UNIQUE_NAME);
+			//console.debug('func Call: ' + arguments.callee.name);
+			//console.debug(HIERARCHY_UNIQUE_NAME);
 			for (var i=0, j=this.dimensions.length;i<j;i++){
 				var dim = this.dimensions[i];
 				for (var h=0, k=dim.hierarchies.length;h<k;h++){
@@ -449,9 +506,16 @@
 			throw new Error('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
 			return null;			
 		},
+		/**
+		* returns the level in this cube with a specific LEVEL_UNIQUE_NAME and HIERARCHY_UNIQUE_NAME
+		* @method getLevelByUniqueName
+		* @return {olap.Level}
+		* @param {String} LEVEL_UNIQUE_NAME
+		* @param {String} HIERARCHY_UNIQUE_NAME
+		*/
 		getLevelByUniqueName: function getLevelByUniqueName(LEVEL_UNIQUE_NAME, HIERARCHY_NAME){
-			console.debug('func Call: ' + arguments.callee.name);
-			console.debug(LEVEL_UNIQUE_NAME +':' + HIERARCHY_NAME);
+			//console.debug('func Call: ' + arguments.callee.name);
+			//console.debug(LEVEL_UNIQUE_NAME +':' + HIERARCHY_NAME);
 			
 			if (HIERARCHY_NAME == 'Measures') {
 				return {LEVEL_UNIQUE_NAME:LEVEL_UNIQUE_NAME,HIERARCHY_UNIQUE_NAME:HIERARCHY_NAME};
@@ -474,6 +538,10 @@
 			throw new Error('no match for: ' + LEVEL_UNIQUE_NAME + ':' + HIERARCHY_NAME)
 			return null;			
 		},
+ 		/**
+		* returns a list of olap.Measures in this cube
+		* @method getMeasures
+		*/ 
 		getMeasures: function getMeasures() {
 			if (this.measures.length == 0) {
 				return this.fetchMeasures();
@@ -485,6 +553,10 @@
 			//empty function that does not fetch anything
 			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		},
+ 		/**
+		* returns a list of olap.Dimensions in this cube
+		* @method getDimensions
+		*/ 
 		getDimensions: function getDimensions() {
 			if (this.dimensions.length == 0) {
 				var processDimensions = function processDimensions(dimensions){
@@ -495,6 +567,10 @@
 				return this.dimensions;
 			}
 		},
+ 		/**
+		* returns a list of olap.Hierarchies in this cube
+		* @method getHierarchies
+		*/ 
 		getHierarchies: function getHierarchies() {
 			var dims = this.getDimensions();
 			if (dims.length !== 0) {
@@ -511,6 +587,10 @@
 			//empty function that does not fetch anything
 			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
 		},
+ 		/**
+		* recursively gets all metadata (except for olap.Members) in this cube
+		* @method getMetadata
+		*/  
 		getMetadata: function getMetadata(){
 			var idx_dim, idx_hier, dimensions, dimension, hierarchy, hierarchies, levels, level, measures, measure, meta= {};
 			dimensions = this.getDimensions();
@@ -605,26 +685,41 @@
 				}
 				return "";
 			}
-		},
+		}, 
+		/**
+		* returns the name of this Measure's parent Hierarchy
+		* @method getName
+		* @return {olap.Hierarchy}
+		*/
 		getHierarchy: function () {
 			return new olap.Hierarchy({HIERARCHY_NAME:'Measures', HIERARCHY_UNIQUE_NAME:'[Measures]'});
 		},
+ 		/**
+		* returns the name of this Measure
+		* @method getName
+		* @return {String}
+		*/
 		getName: function () {
 			return this.MEASURE_NAME;
 		},
+ 		/**
+		* returns the unique name of this Measure within the cube
+		* @method getUniqueName
+		* @return {String}
+		*/
 		getUniqueName: function () {
 			return this.MEASURE_UNIQUE_NAME;
 		}
 	}
 	
 	/** olap.Dimension
-	*   <p>
-	*   Wrapper for OLAP Dimensions
-	*   </p>
+	*   An organized hierarchy of categories, known as levels, that describes data in a cube.
+	*   A Dimension typically describes a similar set of members upon which the user wants to base an analysis
+	*   A Dimension must have at least one Hierarchy, and may have more than one.
 	*   @class olap.Dimension
 	*   @constructor
-	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
-	*   @param {olap.Cube} cube The olap.Cube that this Dimension belongs to
+	*   @param {Object} Dimension object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Cube} Cube The cube that this Dimension belongs to
 	*/
 	olap.Dimension = function Dimension($dim, $cube) {
 		var dim = $dim || {};
@@ -693,17 +788,36 @@
 			}
 			return hierarchy;
 		},
+  		/**
+		* returns the unique name of this Dimension within the cube
+		* @method getUniqueName
+		* @return {String}
+		*/
 		getUniqueName: function getUniqueName(){
 			return this.DIMENSION_UNIQUE_NAME;
 		},
-		getName: function getUniqueName(){
+ 		/**
+		* returns the name of this Dimension
+		* @method getName
+		* @return {String}
+		*/
+		getName: function getName(){
 			return this.DIMENSION_NAME;
 		},
+  		/**
+		* returns the Type of this Dimension
+		* @method getDimensionType
+		* @return {String}
+		*/
 		getDimensionType: function getDimensionType(){
 			return this.DIMENSION_TYPE;
 		},
+ 		/**
+		* returns a list of hierarchies in this cube
+		* @method getHierarchies
+		* @return {olap.Hierarchy} Array of hierarchies
+		*/ 
 		getHierarchies: function getHierarchies() {
-			//console.debug(this.hierarchies.length);
 			if (this.hierarchies.length == 0) {
 				var processHierarchies = function processHierarchies(hierarchies){
 					return this.hierarchies;
@@ -725,8 +839,8 @@
 	*   </p>
 	*   @class olap.Hierarchy
 	*   @constructor
-	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
-	*   @param {olap.Dimension} dimension The olap.Dimension that this Hierarchy belongs to
+	*   @param {Object} Hierarchy object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Dimension} Dimension The dimension that this Hierarchy belongs to
 	*/
 	olap.Hierarchy = function Hierarchy($hierarchy, $dim){
 		var hierarchy = $hierarchy || {};
@@ -826,15 +940,35 @@
 		getHierarchy: function getHierarchy() {
 			return this;
 		},
+  		/**
+		* returns the parent Dimension of this hierarchy
+		* @method getDimension
+		* @return {olap.Dimension}
+		*/ 
 		getDimension: function getDimension() {
 			return this.dimension;
 		},
+  		/**
+		* returns the name of this Hierarchy
+		* @method getName
+		* @return {String}
+		*/
 		getName: function () {
 			return this.HIERARCHY_NAME;
 		},
+   		/**
+		* returns the unique name of this Hierarchy within the cube
+		* @method getUniqueName
+		* @return {String}
+		*/
 		getUniqueName: function () {
 			return this.HIERARCHY_UNIQUE_NAME;
 		},
+   		/**
+		* returns a list of Levels in this hierarchy
+		* @method getLevels
+		* @return {olap.Level} Array of levels
+		*/
 		getLevels: function getLevels() {
 			if (this.levels.length == 0) {
 				var processLevels = function processLevels(levels){
@@ -852,13 +986,11 @@
 	}
 	
 	/** olap.Level
-	*   <p>
-	*   Wrapper for OLAP Levels
-	*   </p>
+	*   Group of Member objects in a Hierarchy, all with the same attributes and at the same depth in the hierarchy
 	*   @class olap.Level
 	*   @constructor
-	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
-	*   @param {olap.Hierarchy} hierarchy The olap.Hierarchy that this Level belongs to
+	*   @param {Object} Level object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Hierarchy} Hierarchy The olap.Hierarchy that this Level belongs to
 	*/
 	olap.Level = function Level($level, $hier) {
 		var level = $level || {};
@@ -942,18 +1074,43 @@
 			}
 			return mem;
 		},
+  		/**
+		* returns the name of this Level
+		* @method getName
+		* @return {String}
+		*/
 		getName:  function getName(){
 			return this.LEVEL_NAME;
 		},
+  		/**
+		* returns the type of this Level
+		* @method getLevelType
+		* @return {Integer}
+		*/
 		getLevelType:  function getLevelType(){
 			return this.LEVEL_TYPE;
 		},
+  		/**
+		* returns the depth of this Level in the Hierarchy
+		* @method getDepth
+		* @return {Integer}
+		*/
 		getDepth:  function getDepth(){
 			return this.LEVEL_NUMBER;
 		},
+  		/**
+		* returns the approximate members of this Level in the Hierarchy
+		* @method getCardinality
+		* @return {Integer}
+		*/
 		getCardinality:  function getCardinality(){
 			return this.LEVEL_CARDINALITY;
 		},
+  		/**
+		* returns the UNIQUE_NAME of this Level
+		* @method getUniqueName
+		* @return {String}
+		*/
 		getUniqueName:  function getUniqueName(){
 			return this.LEVEL_UNIQUE_NAME;
 		},
@@ -968,6 +1125,11 @@
 				return "";
 			}
 		},
+  		/**
+		* returns a list of the members of this Level
+		* @method getMembers
+		* @return {olap.Member} An array of Members
+		*/
 		getMembers: function getMembers() {
 			//console.debug('func Call: ' + arguments.callee.name);
 			if (this.members.length == 0) {
@@ -987,13 +1149,11 @@
 	}
 	
 	/** olap.Member
-	*   <p>
-	*   Wrapper for OLAP Members
-	*   </p>
+	*   Member is a data value in an OLAP dimension
 	*   @class olap.Member
 	*   @constructor
-	*   @param {Object} JS object representing object properties.  Often used to rehydrate objects after external persistence
-	*   @param {olap.Level} level The olap.Level that this Member belongs to
+	*   @param {Object} Member object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Level} Level The olap.Level that this Member belongs to
 	*/
 	olap.Member = function Member($member, $level) {
 		var member = $member || {};
@@ -1049,9 +1209,19 @@
 		
 	}
 	olap.Member.prototype = {
+  		/**
+		* returns the name of this Member
+		* @method getName
+		* @return {String}
+		*/
 		getName: function getName(){
 			return this.MEMBER_NAME;
 		},
+  		/**
+		* returns the UNIQUE_NAME of this Member
+		* @method getUniqueName
+		* @return {String}
+		*/
 		getUniqueName: function getUniqueName(){
 			return this.MEMBER_UNIQUE_NAME;
 		},
@@ -1071,8 +1241,12 @@
 		}
 	}
 
-		/* olap.NamedSet
-	  *
+	/** olap.NamedSet
+	* A Named Set describes a set whose value is determined by an MDX expression. It belongs to a cube.
+	*   @class olap.Namedset
+	*   @constructor
+	*   @param {Object} Set object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Cube} Cube The olap.Cube that this Named Set belongs to
 	*/
 	olap.NamedSet = function CellSet($namedset, $cube){
 		//console.debug('func Call: ' + arguments.callee.name);
@@ -1098,18 +1272,43 @@
 	    return olap.NamedSet.instances[id];
 	};
 	olap.NamedSet.prototype = {
+  		/**
+		* returns the Expression for this Named Set
+		* @method getExpression
+		* @return {String}
+		*/
 		getExpression: function getExpression(){
 			return this.EXPRESSION;
 		},
+  		/**
+		* returns the cube that is the parent of this Set
+		* @method getCube
+		* @return {olap.Cube}
+		*/
 		getCube: function getCube(){
 			return this.cube;
 		},
+  		/**
+		* returns the name of this Named Set
+		* @method getName
+		* @return {String}
+		*/
 		getName: function getName(){
 			return this.SET_NAME;
 		},
+  		/**
+		* returns the caption of this Named Set
+		* @method getCaption
+		* @return {String}
+		*/
 		getCaption: function getCaption(){
 			return this.SET_CAPTION;
 		},
+  		/**
+		* returns the Description of this Named Set
+		* @method getDescription
+		* @return {String}
+		*/
 		getDescription: function getDescription(){
 			return this.DESCRIPTION;
 		}
@@ -1117,7 +1316,11 @@
 	}
 	
 	/** olap.CellSet
-	  *
+	* CellSet is the result of executing an olap.Query
+	*   @class olap.CellSet
+	*   @constructor
+	*   @param {Object} Cellset Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {String} Catalog The CATALOG_NAME that this CellSet is being executed for
 	*/
 	olap.CellSet = function CellSet($cellset, $catalog){
 		//console.debug('func Call: ' + arguments.callee.name);
@@ -1203,7 +1406,11 @@
 	}
 
 	/** olap.Cell
-	  *
+	* A Cell is a cell returned from an CellSet
+	*   @class olap.Cell
+	*   @constructor
+	*   @param {Object} Cell Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.CellSet} Cellset The Cellset that this Cell belongs to
 	*/
 	olap.Cell = function Cell($cell, $cellset) {
 		var cell = $cell || {};
@@ -1241,7 +1448,10 @@
 	}
 
 	/** olap.Position
-		*
+	*   @class olap.Position
+	*   @constructor
+	*   @param {Object} Position Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.CellSetAxis} Axis The Axis that this Position belongs to
 	*/
 	olap.Position = function Position($position, $axis) {
 		//console.debug('func Call: ' + arguments.callee.name);	
@@ -1279,7 +1489,10 @@
 	}
 	
 	/** olap.CellSetAxis
-	  *
+	*   @class olap.CellSetAxis
+	*   @constructor
+	*   @param {Object} CellSetAxis Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.CellSet} CellSet The CellSet that this Axis belongs to
 	*/
 	olap.CellSetAxis = function CellSetAxis($axis, $cellset) {
 		//console.debug('func Call: ' + arguments.callee.name);	
@@ -1375,7 +1588,10 @@
 	}
 
 	/** olap.Query
-	  *
+	*   @class olap.Query
+	*   @constructor
+	*   @param {Object} Query Object representing object properties.  Often used to rehydrate objects after external persistence
+	*   @param {olap.Cube} Cube The Cube that this Query is defined to operate on
 	*/
 	olap.Query = function Query(query, $cube) {
 		var idx, axis;
