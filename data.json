@@ -12,7 +12,8 @@
                 "olapXmla": 1
             },
             "classes": {
-                "olapXmla.Connection": 1
+                "olapXmla.Connection": 1,
+                "olapXmla.Datasource": 1
             },
             "fors": {},
             "namespaces": {}
@@ -26,12 +27,19 @@
                 "olap.Connection": 1,
                 "olap.Datasource": 1,
                 "olap.Catalog": 1,
+                "olap.Schema": 1,
                 "olap.Cube": 1,
                 "olap.Measure": 1,
                 "olap.Dimension": 1,
                 "olap.Hierarchy": 1,
                 "olap.Level": 1,
-                "olap.Member": 1
+                "olap.Member": 1,
+                "olap.Namedset": 1,
+                "olap.CellSet": 1,
+                "olap.Cell": 1,
+                "olap.Position": 1,
+                "olap.CellSetAxis": 1,
+                "olap.Query": 1
             },
             "fors": {},
             "namespaces": {}
@@ -42,13 +50,14 @@
             "name": "olapXmla",
             "submodules": {},
             "classes": {
-                "olapXmla.Connection": 1
+                "olapXmla.Connection": 1,
+                "olapXmla.Datasource": 1
             },
             "fors": {},
             "namespaces": {},
             "tag": "module",
             "file": "olap-xmla.js",
-            "line": 18,
+            "line": 132,
             "description": "The Xmla specific implementation of the olap4js API",
             "title": "OlapXmla"
         },
@@ -59,18 +68,25 @@
                 "olap.Connection": 1,
                 "olap.Datasource": 1,
                 "olap.Catalog": 1,
+                "olap.Schema": 1,
                 "olap.Cube": 1,
                 "olap.Measure": 1,
                 "olap.Dimension": 1,
                 "olap.Hierarchy": 1,
                 "olap.Level": 1,
-                "olap.Member": 1
+                "olap.Member": 1,
+                "olap.Namedset": 1,
+                "olap.CellSet": 1,
+                "olap.Cell": 1,
+                "olap.Position": 1,
+                "olap.CellSetAxis": 1,
+                "olap.Query": 1
             },
             "fors": {},
             "namespaces": {},
             "tag": "module",
             "file": "olap.js",
-            "line": 989,
+            "line": 1590,
             "description": "This is olap4js - a javascript library for working with OLAP datasources.",
             "title": "Olap"
         }
@@ -88,7 +104,44 @@
             "namespace": "",
             "file": "olap-xmla.js",
             "line": 18,
-            "is_constructor": 1
+            "description": "Provides Xmla specific implementation for Xmla specific connections",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "source",
+                    "description": "JS object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                }
+            ],
+            "extends": "olap.Connection"
+        },
+        "olapXmla.Datasource": {
+            "name": "olapXmla.Datasource",
+            "shortname": "olapXmla.Datasource",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olapXmla",
+            "namespace": "",
+            "file": "olap-xmla.js",
+            "line": 132,
+            "description": "Provides Xmla specific implementation for Xmla specific datasources",
+            "is_constructor": 1,
+            "extends": "olap.Datasource",
+            "params": [
+                {
+                    "name": "source",
+                    "description": "JS object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "conn",
+                    "description": "The olap.Connection instance to be used to communicate with the server",
+                    "type": "olap.Connection"
+                }
+            ]
         },
         "olap.Connection": {
             "name": "olap.Connection",
@@ -122,7 +175,7 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 157,
+            "line": 162,
             "description": "A Datasource is the highest level element in the hierarchy of metadata objects. A database contains one or more catalogs.\nSome OLAP servers may only have one database. Mondrian is one such OLAP server.\nTo obtain the collection of databases in the current server, call the olap.Connection.getOlapDatabases() method.",
             "is_constructor": 1,
             "params": [
@@ -149,7 +202,7 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 278,
+            "line": 283,
             "description": "A Catalog is the second highest level element in the hierarchy of metadata objects. A catalog belongs to a database and contains one or more schemas.\nSome OLAP servers may only have one catalog. Mondrian is one such OLAP server; its sole catalog is always called \"LOCALDB\".\nTo obtain the collection of catalogs in the current server, call the olap.Connection.getOlapCatalogs() method.",
             "is_constructor": 1,
             "params": [
@@ -165,6 +218,33 @@
                 }
             ]
         },
+        "olap.Schema": {
+            "name": "olap.Schema",
+            "shortname": "olap.Schema",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 365,
+            "description": "A Schema is a collection of database objects that contain structural information, or metadata, about a database.\nIt belongs to a catalog and contains a number of cubes and shared dimensions",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Schema",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "catalog",
+                    "description": "The olap.Catalog that this Schema belongs to",
+                    "type": "olap.Catalog"
+                }
+            ]
+        },
         "olap.Cube": {
             "name": "olap.Cube",
             "shortname": "olap.Cube",
@@ -176,13 +256,13 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 356,
-            "description": "<p>\nWrapper for OLAP Cubes\n</p>",
+            "line": 389,
+            "description": "A Cube is the central metadata object for representing multidimensional data.\nIt belongs to an olap.Schema, and is described by a list of dimensions and a list of measures. It may also have a collection of named sets, each defined by a formula.",
             "is_constructor": 1,
             "params": [
                 {
-                    "name": "JS",
-                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "name": "Cube",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
                     "type": "Object"
                 },
                 {
@@ -203,7 +283,7 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 539,
+            "line": 619,
             "description": "<p>\nWrapper for OLAP Measures\n</p>",
             "is_constructor": 1,
             "params": [
@@ -230,18 +310,18 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 620,
-            "description": "<p>\nWrapper for OLAP Dimensions\n</p>",
+            "line": 715,
+            "description": "An organized hierarchy of categories, known as levels, that describes data in a cube.\nA Dimension typically describes a similar set of members upon which the user wants to base an analysis\nA Dimension must have at least one Hierarchy, and may have more than one.",
             "is_constructor": 1,
             "params": [
                 {
-                    "name": "JS",
+                    "name": "Dimension",
                     "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
                     "type": "Object"
                 },
                 {
-                    "name": "cube",
-                    "description": "The olap.Cube that this Dimension belongs to",
+                    "name": "Cube",
+                    "description": "The cube that this Dimension belongs to",
                     "type": "olap.Cube"
                 }
             ]
@@ -257,18 +337,18 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 722,
+            "line": 836,
             "description": "<p>\nWrapper for OLAP Hierarchies\n</p>",
             "is_constructor": 1,
             "params": [
                 {
-                    "name": "JS",
+                    "name": "Hierarchy",
                     "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
                     "type": "Object"
                 },
                 {
-                    "name": "dimension",
-                    "description": "The olap.Dimension that this Hierarchy belongs to",
+                    "name": "Dimension",
+                    "description": "The dimension that this Hierarchy belongs to",
                     "type": "olap.Dimension"
                 }
             ]
@@ -284,17 +364,17 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 854,
-            "description": "<p>\nWrapper for OLAP Levels\n</p>",
+            "line": 988,
+            "description": "Group of Member objects in a Hierarchy, all with the same attributes and at the same depth in the hierarchy",
             "is_constructor": 1,
             "params": [
                 {
-                    "name": "JS",
+                    "name": "Level",
                     "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
                     "type": "Object"
                 },
                 {
-                    "name": "hierarchy",
+                    "name": "Hierarchy",
                     "description": "The olap.Hierarchy that this Level belongs to",
                     "type": "olap.Hierarchy"
                 }
@@ -311,19 +391,178 @@
             "module": "olap",
             "namespace": "",
             "file": "olap.js",
-            "line": 989,
-            "description": "<p>\nWrapper for OLAP Members\n</p>",
+            "line": 1151,
+            "description": "Member is a data value in an OLAP dimension",
             "is_constructor": 1,
             "params": [
                 {
-                    "name": "JS",
+                    "name": "Member",
                     "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
                     "type": "Object"
                 },
                 {
-                    "name": "level",
+                    "name": "Level",
                     "description": "The olap.Level that this Member belongs to",
                     "type": "olap.Level"
+                }
+            ]
+        },
+        "olap.Namedset": {
+            "name": "olap.Namedset",
+            "shortname": "olap.Namedset",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 1244,
+            "description": "A Named Set describes a set whose value is determined by an MDX expression. It belongs to a cube.",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Set",
+                    "description": "object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "Cube",
+                    "description": "The olap.Cube that this Named Set belongs to",
+                    "type": "olap.Cube"
+                }
+            ]
+        },
+        "olap.CellSet": {
+            "name": "olap.CellSet",
+            "shortname": "olap.CellSet",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 1318,
+            "description": "CellSet is the result of executing an olap.Query",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Cellset",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "Catalog",
+                    "description": "The CATALOG_NAME that this CellSet is being executed for",
+                    "type": "String"
+                }
+            ]
+        },
+        "olap.Cell": {
+            "name": "olap.Cell",
+            "shortname": "olap.Cell",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 1408,
+            "description": "A Cell is a cell returned from an CellSet",
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Cell",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "Cellset",
+                    "description": "The Cellset that this Cell belongs to",
+                    "type": "olap.CellSet"
+                }
+            ]
+        },
+        "olap.Position": {
+            "name": "olap.Position",
+            "shortname": "olap.Position",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 1450,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Position",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "Axis",
+                    "description": "The Axis that this Position belongs to",
+                    "type": "olap.CellSetAxis"
+                }
+            ]
+        },
+        "olap.CellSetAxis": {
+            "name": "olap.CellSetAxis",
+            "shortname": "olap.CellSetAxis",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 1491,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "CellSetAxis",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "CellSet",
+                    "description": "The CellSet that this Axis belongs to",
+                    "type": "olap.CellSet"
+                }
+            ]
+        },
+        "olap.Query": {
+            "name": "olap.Query",
+            "shortname": "olap.Query",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "olap",
+            "namespace": "",
+            "file": "olap.js",
+            "line": 1590,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "Query",
+                    "description": "Object representing object properties.  Often used to rehydrate objects after external persistence",
+                    "type": "Object"
+                },
+                {
+                    "name": "Cube",
+                    "description": "The Cube that this Query is defined to operate on",
+                    "type": "olap.Cube"
                 }
             ]
         }
@@ -331,9 +570,9 @@
     "classitems": [
         {
             "file": "olap-xmla.js",
-            "line": 152,
+            "line": 167,
             "description": "olapXmla.Catalog",
-            "class": "olapXmla.Connection",
+            "class": "olapXmla.Datasource",
             "module": "olapXmla"
         },
         {
@@ -354,7 +593,7 @@
         },
         {
             "file": "olap.js",
-            "line": 73,
+            "line": 77,
             "description": "executes an MDX statement",
             "itemtype": "method",
             "name": "executeOlapQuery",
@@ -363,7 +602,7 @@
         },
         {
             "file": "olap.js",
-            "line": 82,
+            "line": 86,
             "description": "Describes the structure of cubes within a database",
             "itemtype": "method",
             "name": "getCubes",
@@ -379,7 +618,7 @@
         },
         {
             "file": "olap.js",
-            "line": 195,
+            "line": 200,
             "description": "returns the current connection",
             "itemtype": "method",
             "name": "getOlapConnection",
@@ -388,7 +627,7 @@
         },
         {
             "file": "olap.js",
-            "line": 202,
+            "line": 207,
             "description": "returns the name of this database",
             "itemtype": "method",
             "name": "getName",
@@ -397,7 +636,7 @@
         },
         {
             "file": "olap.js",
-            "line": 209,
+            "line": 214,
             "description": "returns the description of this database",
             "itemtype": "method",
             "name": "getDescription",
@@ -406,7 +645,7 @@
         },
         {
             "file": "olap.js",
-            "line": 216,
+            "line": 221,
             "description": "returns the name of the underlying OLAP provider",
             "itemtype": "method",
             "name": "getProviderName",
@@ -415,7 +654,7 @@
         },
         {
             "file": "olap.js",
-            "line": 223,
+            "line": 228,
             "description": "returns the redirection URL, if this database is a proxy to another server",
             "itemtype": "method",
             "name": "getURL",
@@ -424,7 +663,7 @@
         },
         {
             "file": "olap.js",
-            "line": 230,
+            "line": 235,
             "description": "returns provider-specific information",
             "itemtype": "method",
             "name": "getDataSourceInfo",
@@ -433,7 +672,7 @@
         },
         {
             "file": "olap.js",
-            "line": 237,
+            "line": 242,
             "description": "returns the types of data that are supported by this provider",
             "itemtype": "method",
             "name": "getProviderTypes",
@@ -442,7 +681,7 @@
         },
         {
             "file": "olap.js",
-            "line": 244,
+            "line": 249,
             "description": "returns the modes of authentication that are supported by this provider",
             "itemtype": "method",
             "name": "getAuthenticationModes",
@@ -451,7 +690,7 @@
         },
         {
             "file": "olap.js",
-            "line": 251,
+            "line": 256,
             "description": "returns a list of catalogs in this database",
             "itemtype": "method",
             "name": "getCatalogs",
@@ -460,7 +699,7 @@
         },
         {
             "file": "olap.js",
-            "line": 312,
+            "line": 317,
             "description": "returns the name of this catalog",
             "itemtype": "method",
             "name": "getName",
@@ -469,7 +708,7 @@
         },
         {
             "file": "olap.js",
-            "line": 319,
+            "line": 324,
             "description": "returns a list of schemas in this catalog",
             "itemtype": "method",
             "name": "getSchemas",
@@ -478,7 +717,7 @@
         },
         {
             "file": "olap.js",
-            "line": 326,
+            "line": 331,
             "description": "returns this catalog's parent database",
             "itemtype": "method",
             "name": "getDatabase",
@@ -487,89 +726,481 @@
         },
         {
             "file": "olap.js",
-            "line": 1119,
+            "line": 349,
+            "description": "returns a list of cubes in this catalog",
+            "itemtype": "method",
+            "name": "getCubes",
+            "class": "olap.Catalog",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 433,
+            "description": "returns a Cube's parent olap.Schema",
+            "itemtype": "method",
+            "name": "getCatalog",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 440,
+            "description": "returns a Cube's parent olap.Schema",
+            "itemtype": "method",
+            "name": "getSchema",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 448,
+            "description": "returns the name of this Cube",
+            "itemtype": "method",
+            "name": "getName",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 455,
+            "description": "returns the description of this cube",
+            "itemtype": "method",
+            "name": "getDescription",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 488,
+            "description": "returns the hierarchy in this cube with a specific UNIQUE_NAME",
+            "itemtype": "method",
+            "name": "getHierarchyByUniqueName",
+            "return": {
+                "description": "",
+                "type": "olap.Hierarchy"
+            },
+            "params": [
+                {
+                    "name": "UNIQUE_NAME",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 509,
+            "description": "returns the level in this cube with a specific LEVEL_UNIQUE_NAME and HIERARCHY_UNIQUE_NAME",
+            "itemtype": "method",
+            "name": "getLevelByUniqueName",
+            "return": {
+                "description": "",
+                "type": "olap.Level"
+            },
+            "params": [
+                {
+                    "name": "LEVEL_UNIQUE_NAME",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "HIERARCHY_UNIQUE_NAME",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 541,
+            "description": "returns a list of olap.Measures in this cube",
+            "itemtype": "method",
+            "name": "getMeasures",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 556,
+            "description": "returns a list of olap.Dimensions in this cube",
+            "itemtype": "method",
+            "name": "getDimensions",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 570,
+            "description": "returns a list of olap.Hierarchies in this cube",
+            "itemtype": "method",
+            "name": "getHierarchies",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 590,
+            "description": "recursively gets all metadata (except for olap.Members) in this cube",
+            "itemtype": "method",
+            "name": "getMetadata",
+            "class": "olap.Cube",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 689,
+            "description": "returns the name of this Measure's parent Hierarchy",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "olap.Hierarchy"
+            },
+            "class": "olap.Measure",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 697,
+            "description": "returns the name of this Measure",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Measure",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 705,
+            "description": "returns the unique name of this Measure within the cube",
+            "itemtype": "method",
+            "name": "getUniqueName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Measure",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 791,
+            "description": "returns the unique name of this Dimension within the cube",
+            "itemtype": "method",
+            "name": "getUniqueName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Dimension",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 799,
+            "description": "returns the name of this Dimension",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Dimension",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 807,
+            "description": "returns the Type of this Dimension",
+            "itemtype": "method",
+            "name": "getDimensionType",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Dimension",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 815,
+            "description": "returns a list of hierarchies in this cube",
+            "itemtype": "method",
+            "name": "getHierarchies",
+            "return": {
+                "description": "Array of hierarchies",
+                "type": "olap.Hierarchy"
+            },
+            "class": "olap.Dimension",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 943,
+            "description": "returns the parent Dimension of this hierarchy",
+            "itemtype": "method",
+            "name": "getDimension",
+            "return": {
+                "description": "",
+                "type": "olap.Dimension"
+            },
+            "class": "olap.Hierarchy",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 951,
+            "description": "returns the name of this Hierarchy",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Hierarchy",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 959,
+            "description": "returns the unique name of this Hierarchy within the cube",
+            "itemtype": "method",
+            "name": "getUniqueName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Hierarchy",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 967,
+            "description": "returns a list of Levels in this hierarchy",
+            "itemtype": "method",
+            "name": "getLevels",
+            "return": {
+                "description": "Array of levels",
+                "type": "olap.Level"
+            },
+            "class": "olap.Hierarchy",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1077,
+            "description": "returns the name of this Level",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Level",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1085,
+            "description": "returns the type of this Level",
+            "itemtype": "method",
+            "name": "getLevelType",
+            "return": {
+                "description": "",
+                "type": "Integer"
+            },
+            "class": "olap.Level",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1093,
+            "description": "returns the depth of this Level in the Hierarchy",
+            "itemtype": "method",
+            "name": "getDepth",
+            "return": {
+                "description": "",
+                "type": "Integer"
+            },
+            "class": "olap.Level",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1101,
+            "description": "returns the approximate members of this Level in the Hierarchy",
+            "itemtype": "method",
+            "name": "getCardinality",
+            "return": {
+                "description": "",
+                "type": "Integer"
+            },
+            "class": "olap.Level",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1109,
+            "description": "returns the UNIQUE_NAME of this Level",
+            "itemtype": "method",
+            "name": "getUniqueName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Level",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1128,
+            "description": "returns a list of the members of this Level",
+            "itemtype": "method",
+            "name": "getMembers",
+            "return": {
+                "description": "An array of Members",
+                "type": "olap.Member"
+            },
+            "class": "olap.Level",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1212,
+            "description": "returns the name of this Member",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
             "class": "olap.Member",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1205,
+            "line": 1220,
+            "description": "returns the UNIQUE_NAME of this Member",
+            "itemtype": "method",
+            "name": "getUniqueName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
             "class": "olap.Member",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1243,
-            "class": "olap.Member",
+            "line": 1275,
+            "description": "returns the Expression for this Named Set",
+            "itemtype": "method",
+            "name": "getExpression",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Namedset",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1281,
-            "class": "olap.Member",
+            "line": 1283,
+            "description": "returns the cube that is the parent of this Set",
+            "itemtype": "method",
+            "name": "getCube",
+            "return": {
+                "description": "",
+                "type": "olap.Cube"
+            },
+            "class": "olap.Namedset",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1377,
-            "class": "olap.Member",
+            "line": 1291,
+            "description": "returns the name of this Named Set",
+            "itemtype": "method",
+            "name": "getName",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Namedset",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1480,
-            "class": "olap.Member",
+            "line": 1299,
+            "description": "returns the caption of this Named Set",
+            "itemtype": "method",
+            "name": "getCaption",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Namedset",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1562,
-            "class": "olap.Member",
+            "line": 1307,
+            "description": "returns the Description of this Named Set",
+            "itemtype": "method",
+            "name": "getDescription",
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "olap.Namedset",
             "module": "olap"
         },
         {
             "file": "olap.js",
-            "line": 1631,
-            "class": "olap.Member",
+            "line": 1696,
+            "class": "olap.Query",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1778,
+            "class": "olap.Query",
+            "module": "olap"
+        },
+        {
+            "file": "olap.js",
+            "line": 1847,
+            "class": "olap.Query",
             "module": "olap"
         }
     ],
     "warnings": [
         {
+            "message": "param name/type/descript missing",
+            "line": " olap-xmla.js:18"
+        },
+        {
             "message": "Missing item type\nolapXmla.Catalog",
-            "line": " olap-xmla.js:152"
+            "line": " olap-xmla.js:167"
         },
         {
             "message": "Missing item type",
-            "line": " olap.js:1119"
+            "line": " olap.js:1696"
         },
         {
             "message": "Missing item type",
-            "line": " olap.js:1205"
+            "line": " olap.js:1778"
         },
         {
             "message": "Missing item type",
-            "line": " olap.js:1243"
-        },
-        {
-            "message": "Missing item type",
-            "line": " olap.js:1281"
-        },
-        {
-            "message": "Missing item type",
-            "line": " olap.js:1377"
-        },
-        {
-            "message": "Missing item type",
-            "line": " olap.js:1480"
-        },
-        {
-            "message": "Missing item type",
-            "line": " olap.js:1562"
-        },
-        {
-            "message": "Missing item type",
-            "line": " olap.js:1631"
+            "line": " olap.js:1847"
         }
     ]
 }

@@ -43,6 +43,12 @@
             
                 <li><a href="..&#x2F;classes/olap.Catalog.html">olap.Catalog</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Cell.html">olap.Cell</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSet.html">olap.CellSet</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSetAxis.html">olap.CellSetAxis</a></li>
+            
                 <li><a href="..&#x2F;classes/olap.Connection.html">olap.Connection</a></li>
             
                 <li><a href="..&#x2F;classes/olap.Cube.html">olap.Cube</a></li>
@@ -59,7 +65,17 @@
             
                 <li><a href="..&#x2F;classes/olap.Member.html">olap.Member</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Namedset.html">olap.Namedset</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Position.html">olap.Position</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Query.html">olap.Query</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Schema.html">olap.Schema</a></li>
+            
                 <li><a href="..&#x2F;classes/olapXmla.Connection.html">olapXmla.Connection</a></li>
+            
+                <li><a href="..&#x2F;classes/olapXmla.Datasource.html">olapXmla.Datasource</a></li>
             
             </ul>
 
@@ -112,7 +128,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l989"><code>olap.js:989</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l1151"><code>olap.js:1151</code></a>
         </div>
     
 
@@ -128,9 +144,7 @@
 
 
 <div class="box intro">
-    <p>
-Wrapper for OLAP Members
-</p>
+    <p>Member is a data value in an OLAP dimension</p>
 </div>
 
 
@@ -145,13 +159,13 @@ Wrapper for OLAP Members
             
                 <li class="arg">
                     
-                        <code>JS</code>
+                        <code>Member</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>level</code>
+                        <code>Level</code>
                     
                 </li>
             
@@ -184,7 +198,7 @@ Wrapper for OLAP Members
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l989"><code>olap.js:989</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1151"><code>olap.js:1151</code></a>
         
         </p>
 
@@ -206,7 +220,7 @@ Wrapper for OLAP Members
             
                 <li class="param">
                     
-                        <code class="param-name">JS</code>
+                        <code class="param-name">Member</code>
                         <span class="type">Object</span>
                     
 
@@ -221,7 +235,7 @@ Wrapper for OLAP Members
             
                 <li class="param">
                     
-                        <code class="param-name">level</code>
+                        <code class="param-name">Level</code>
                         <span class="type"><a href="../classes/olap.Level.html" class="crosslink">olap.Level</a></span>
                     
 
@@ -251,6 +265,8 @@ Wrapper for OLAP Members
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
         
         
         
@@ -261,6 +277,28 @@ Wrapper for OLAP Members
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getUniqueName">getUniqueName</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
 
             
 
@@ -269,6 +307,152 @@ Wrapper for OLAP Members
             
         </div>
 
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1212"><code>olap.js:1212</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the name of this Member</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getUniqueName" class="method item">
+    <h3 class="name"><code>getUniqueName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1220"><code>olap.js:1220</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the UNIQUE_NAME of this Member</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

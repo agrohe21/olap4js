@@ -43,6 +43,12 @@
             
                 <li><a href="..&#x2F;classes/olap.Catalog.html">olap.Catalog</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Cell.html">olap.Cell</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSet.html">olap.CellSet</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.CellSetAxis.html">olap.CellSetAxis</a></li>
+            
                 <li><a href="..&#x2F;classes/olap.Connection.html">olap.Connection</a></li>
             
                 <li><a href="..&#x2F;classes/olap.Cube.html">olap.Cube</a></li>
@@ -59,7 +65,17 @@
             
                 <li><a href="..&#x2F;classes/olap.Member.html">olap.Member</a></li>
             
+                <li><a href="..&#x2F;classes/olap.Namedset.html">olap.Namedset</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Position.html">olap.Position</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Query.html">olap.Query</a></li>
+            
+                <li><a href="..&#x2F;classes/olap.Schema.html">olap.Schema</a></li>
+            
                 <li><a href="..&#x2F;classes/olapXmla.Connection.html">olapXmla.Connection</a></li>
+            
+                <li><a href="..&#x2F;classes/olapXmla.Datasource.html">olapXmla.Datasource</a></li>
             
             </ul>
 
@@ -112,7 +128,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l620"><code>olap.js:620</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l715"><code>olap.js:715</code></a>
         </div>
     
 
@@ -128,9 +144,9 @@
 
 
 <div class="box intro">
-    <p>
-Wrapper for OLAP Dimensions
-</p>
+    <p>An organized hierarchy of categories, known as levels, that describes data in a cube.
+A Dimension typically describes a similar set of members upon which the user wants to base an analysis
+A Dimension must have at least one Hierarchy, and may have more than one.</p>
 </div>
 
 
@@ -145,13 +161,13 @@ Wrapper for OLAP Dimensions
             
                 <li class="arg">
                     
-                        <code>JS</code>
+                        <code>Dimension</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>cube</code>
+                        <code>Cube</code>
                     
                 </li>
             
@@ -184,7 +200,7 @@ Wrapper for OLAP Dimensions
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l620"><code>olap.js:620</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l715"><code>olap.js:715</code></a>
         
         </p>
 
@@ -206,7 +222,7 @@ Wrapper for OLAP Dimensions
             
                 <li class="param">
                     
-                        <code class="param-name">JS</code>
+                        <code class="param-name">Dimension</code>
                         <span class="type">Object</span>
                     
 
@@ -221,14 +237,14 @@ Wrapper for OLAP Dimensions
             
                 <li class="param">
                     
-                        <code class="param-name">cube</code>
+                        <code class="param-name">Cube</code>
                         <span class="type"><a href="../classes/olap.Cube.html" class="crosslink">olap.Cube</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The olap.Cube that this Dimension belongs to</p>
+                        <p>The cube that this Dimension belongs to</p>
                     </div>
 
                     
@@ -251,6 +267,8 @@ Wrapper for OLAP Dimensions
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+        
         
         
         
@@ -261,6 +279,42 @@ Wrapper for OLAP Dimensions
             <h2 class="off-left">Item Index</h2>
 
             
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                        
+                            <li class="index-item method">
+                                <a href="#method_getDimensionType">getDimensionType</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getHierarchies">getHierarchies</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getName">getName</a>
+
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_getUniqueName">getUniqueName</a>
+
+                                
+                                
+                            </li>
+                        
+                    </ul>
+                </div>
+            
 
             
 
@@ -269,6 +323,293 @@ Wrapper for OLAP Dimensions
             
         </div>
 
+        
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+                
+                    <div id="method_getDimensionType" class="method item">
+    <h3 class="name"><code>getDimensionType</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l807"><code>olap.js:807</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the Type of this Dimension</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getHierarchies" class="method item">
+    <h3 class="name"><code>getHierarchies</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/olap.Hierarchy.html" class="crosslink">olap.Hierarchy</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l815"><code>olap.js:815</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns a list of hierarchies in this cube</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/olap.Hierarchy.html" class="crosslink">olap.Hierarchy</a></span>:
+                    
+                    Array of hierarchies
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getName" class="method item">
+    <h3 class="name"><code>getName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l799"><code>olap.js:799</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the name of this Dimension</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_getUniqueName" class="method item">
+    <h3 class="name"><code>getUniqueName</code></h3>
+
+    
+        <span class="paren">()</span>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type">String</span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="..&#x2F;files&#x2F;olap.js.html#l791"><code>olap.js:791</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>returns the unique name of this Dimension within the cube</p>
+    </div>
+
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type">String</span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+            </div>
         
 
         

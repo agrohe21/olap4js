@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>olap.Catalog - OLAP4JS API</title>
+    <title>olap.CellSetAxis - OLAP4JS API</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.7.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -120,7 +120,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>olap.Catalog Class</h1>
+                        <h1>olap.CellSetAxis Class</h1>
 <div class="box meta">
     
 
@@ -128,7 +128,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l283"><code>olap.js:283</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l1491"><code>olap.js:1491</code></a>
         </div>
     
 
@@ -144,16 +144,14 @@
 
 
 <div class="box intro">
-    <p>A Catalog is the second highest level element in the hierarchy of metadata objects. A catalog belongs to a database and contains one or more schemas.
-Some OLAP servers may only have one catalog. Mondrian is one such OLAP server; its sole catalog is always called "LOCALDB".
-To obtain the collection of catalogs in the current server, call the olap.Connection.getOlapCatalogs() method.</p>
+    
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_olap.Catalog" class="method item">
-    <h3 class="name"><code>olap.Catalog</code></h3>
+        <div id="method_olap.CellSetAxis" class="method item">
+    <h3 class="name"><code>olap.CellSetAxis</code></h3>
 
     
         <div class="args">
@@ -161,13 +159,13 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
             
                 <li class="arg">
                     
-                        <code>Catalog</code>
+                        <code>CellSetAxis</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>Datasource</code>
+                        <code>CellSet</code>
                     
                 </li>
             
@@ -200,7 +198,7 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l283"><code>olap.js:283</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1491"><code>olap.js:1491</code></a>
         
         </p>
 
@@ -222,7 +220,7 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
             
                 <li class="param">
                     
-                        <code class="param-name">Catalog</code>
+                        <code class="param-name">CellSetAxis</code>
                         <span class="type">Object</span>
                     
 
@@ -237,14 +235,14 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
             
                 <li class="param">
                     
-                        <code class="param-name">Datasource</code>
-                        <span class="type"><a href="../classes/olap.Datasource.html" class="crosslink">olap.Datasource</a></span>
+                        <code class="param-name">CellSet</code>
+                        <span class="type"><a href="../classes/olap.CellSet.html" class="crosslink">olap.CellSet</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The olap.Datasource that this catalog belongs to</p>
+                        <p>The CellSet that this Axis belongs to</p>
                     </div>
 
                     
@@ -267,8 +265,6 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
         <li class="api-class-tab index"><a href="#index">Index</a></li>
 
         
-            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
-        
         
         
         
@@ -279,42 +275,6 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
             <h2 class="off-left">Item Index</h2>
 
             
-                <div class="index-section methods">
-                    <h3>Methods</h3>
-
-                    <ul class="index-list methods">
-                        
-                            <li class="index-item method">
-                                <a href="#method_getCubes">getCubes</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_getDatabase">getDatabase</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_getName">getName</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_getSchemas">getSchemas</a>
-
-                                
-                                
-                            </li>
-                        
-                    </ul>
-                </div>
-            
 
             
 
@@ -323,228 +283,6 @@ To obtain the collection of catalogs in the current server, call the olap.Connec
             
         </div>
 
-        
-            <div id="methods" class="api-class-tabpanel">
-                <h2 class="off-left">Methods</h2>
-
-                
-                    <div id="method_getCubes" class="method item">
-    <h3 class="name"><code>getCubes</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="..&#x2F;files&#x2F;olap.js.html#l349"><code>olap.js:349</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>returns a list of cubes in this catalog</p>
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_getDatabase" class="method item">
-    <h3 class="name"><code>getDatabase</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="..&#x2F;files&#x2F;olap.js.html#l331"><code>olap.js:331</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>returns this catalog's parent database</p>
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_getName" class="method item">
-    <h3 class="name"><code>getName</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="..&#x2F;files&#x2F;olap.js.html#l317"><code>olap.js:317</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>returns the name of this catalog</p>
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-                    <div id="method_getSchemas" class="method item">
-    <h3 class="name"><code>getSchemas</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="..&#x2F;files&#x2F;olap.js.html#l324"><code>olap.js:324</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>returns a list of schemas in this catalog</p>
-    </div>
-
-    
-
-    
-
-    
-</div>
-
-                
-            </div>
         
 
         

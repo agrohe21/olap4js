@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>olap.Level - OLAP4JS API</title>
+    <title>olap.Namedset - OLAP4JS API</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.7.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -120,7 +120,7 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>olap.Level Class</h1>
+                        <h1>olap.Namedset Class</h1>
 <div class="box meta">
     
 
@@ -128,7 +128,7 @@
 
     
         <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l988"><code>olap.js:988</code></a>
+            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l1244"><code>olap.js:1244</code></a>
         </div>
     
 
@@ -144,14 +144,14 @@
 
 
 <div class="box intro">
-    <p>Group of Member objects in a Hierarchy, all with the same attributes and at the same depth in the hierarchy</p>
+    <p>A Named Set describes a set whose value is determined by an MDX expression. It belongs to a cube.</p>
 </div>
 
 
     <div class="constructor">
         <h2>Constructor</h2>
-        <div id="method_olap.Level" class="method item">
-    <h3 class="name"><code>olap.Level</code></h3>
+        <div id="method_olap.Namedset" class="method item">
+    <h3 class="name"><code>olap.Namedset</code></h3>
 
     
         <div class="args">
@@ -159,13 +159,13 @@
             
                 <li class="arg">
                     
-                        <code>Level</code>
+                        <code>Set</code>
                     
                 </li>
             
                 <li class="arg">
                     
-                        <code>Hierarchy</code>
+                        <code>Cube</code>
                     
                 </li>
             
@@ -198,7 +198,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l988"><code>olap.js:988</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1244"><code>olap.js:1244</code></a>
         
         </p>
 
@@ -220,7 +220,7 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Level</code>
+                        <code class="param-name">Set</code>
                         <span class="type">Object</span>
                     
 
@@ -235,14 +235,14 @@
             
                 <li class="param">
                     
-                        <code class="param-name">Hierarchy</code>
-                        <span class="type"><a href="../classes/olap.Hierarchy.html" class="crosslink">olap.Hierarchy</a></span>
+                        <code class="param-name">Cube</code>
+                        <span class="type"><a href="../classes/olap.Cube.html" class="crosslink">olap.Cube</a></span>
                     
 
                     
 
                     <div class="param-description">
-                        <p>The olap.Hierarchy that this Level belongs to</p>
+                        <p>The olap.Cube that this Named Set belongs to</p>
                     </div>
 
                     
@@ -283,28 +283,28 @@
                     <ul class="index-list methods">
                         
                             <li class="index-item method">
-                                <a href="#method_getCardinality">getCardinality</a>
+                                <a href="#method_getCaption">getCaption</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getDepth">getDepth</a>
+                                <a href="#method_getCube">getCube</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getLevelType">getLevelType</a>
+                                <a href="#method_getDescription">getDescription</a>
 
                                 
                                 
                             </li>
                         
                             <li class="index-item method">
-                                <a href="#method_getMembers">getMembers</a>
+                                <a href="#method_getExpression">getExpression</a>
 
                                 
                                 
@@ -312,13 +312,6 @@
                         
                             <li class="index-item method">
                                 <a href="#method_getName">getName</a>
-
-                                
-                                
-                            </li>
-                        
-                            <li class="index-item method">
-                                <a href="#method_getUniqueName">getUniqueName</a>
 
                                 
                                 
@@ -340,8 +333,8 @@
                 <h2 class="off-left">Methods</h2>
 
                 
-                    <div id="method_getCardinality" class="method item">
-    <h3 class="name"><code>getCardinality</code></h3>
+                    <div id="method_getCaption" class="method item">
+    <h3 class="name"><code>getCaption</code></h3>
 
     
         <span class="paren">()</span>
@@ -349,7 +342,7 @@
 
     
         <span class="returns-inline">
-            <span class="type">Integer</span>
+            <span class="type">String</span>
         </span>
     
 
@@ -376,7 +369,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1101"><code>olap.js:1101</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1299"><code>olap.js:1299</code></a>
         
         </p>
 
@@ -387,7 +380,7 @@
     </div>
 
     <div class="description">
-        <p>returns the approximate members of this Level in the Hierarchy</p>
+        <p>returns the caption of this Named Set</p>
     </div>
 
     
@@ -399,7 +392,7 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">Integer</span>:
+                        <span class="type">String</span>:
                     
                 
             </div>
@@ -410,8 +403,8 @@
 </div>
 
                 
-                    <div id="method_getDepth" class="method item">
-    <h3 class="name"><code>getDepth</code></h3>
+                    <div id="method_getCube" class="method item">
+    <h3 class="name"><code>getCube</code></h3>
 
     
         <span class="paren">()</span>
@@ -419,7 +412,7 @@
 
     
         <span class="returns-inline">
-            <span class="type">Integer</span>
+            <span class="type"><a href="../classes/olap.Cube.html" class="crosslink">olap.Cube</a></span>
         </span>
     
 
@@ -446,7 +439,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1093"><code>olap.js:1093</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1283"><code>olap.js:1283</code></a>
         
         </p>
 
@@ -457,7 +450,7 @@
     </div>
 
     <div class="description">
-        <p>returns the depth of this Level in the Hierarchy</p>
+        <p>returns the cube that is the parent of this Set</p>
     </div>
 
     
@@ -469,7 +462,7 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">Integer</span>:
+                        <span class="type"><a href="../classes/olap.Cube.html" class="crosslink">olap.Cube</a></span>:
                     
                 
             </div>
@@ -480,8 +473,8 @@
 </div>
 
                 
-                    <div id="method_getLevelType" class="method item">
-    <h3 class="name"><code>getLevelType</code></h3>
+                    <div id="method_getDescription" class="method item">
+    <h3 class="name"><code>getDescription</code></h3>
 
     
         <span class="paren">()</span>
@@ -489,7 +482,7 @@
 
     
         <span class="returns-inline">
-            <span class="type">Integer</span>
+            <span class="type">String</span>
         </span>
     
 
@@ -516,7 +509,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1085"><code>olap.js:1085</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1307"><code>olap.js:1307</code></a>
         
         </p>
 
@@ -527,7 +520,7 @@
     </div>
 
     <div class="description">
-        <p>returns the type of this Level</p>
+        <p>returns the Description of this Named Set</p>
     </div>
 
     
@@ -539,7 +532,7 @@
             <div class="returns-description">
                 
                     
-                        <span class="type">Integer</span>:
+                        <span class="type">String</span>:
                     
                 
             </div>
@@ -550,8 +543,8 @@
 </div>
 
                 
-                    <div id="method_getMembers" class="method item">
-    <h3 class="name"><code>getMembers</code></h3>
+                    <div id="method_getExpression" class="method item">
+    <h3 class="name"><code>getExpression</code></h3>
 
     
         <span class="paren">()</span>
@@ -559,7 +552,7 @@
 
     
         <span class="returns-inline">
-            <span class="type"><a href="../classes/olap.Member.html" class="crosslink">olap.Member</a></span>
+            <span class="type">String</span>
         </span>
     
 
@@ -586,7 +579,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1128"><code>olap.js:1128</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1275"><code>olap.js:1275</code></a>
         
         </p>
 
@@ -597,7 +590,7 @@
     </div>
 
     <div class="description">
-        <p>returns a list of the members of this Level</p>
+        <p>returns the Expression for this Named Set</p>
     </div>
 
     
@@ -609,9 +602,8 @@
             <div class="returns-description">
                 
                     
-                        <span class="type"><a href="../classes/olap.Member.html" class="crosslink">olap.Member</a></span>:
+                        <span class="type">String</span>:
                     
-                    An array of Members
                 
             </div>
         </div>
@@ -657,7 +649,7 @@
             
         
         
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1077"><code>olap.js:1077</code></a>
+        <a href="..&#x2F;files&#x2F;olap.js.html#l1291"><code>olap.js:1291</code></a>
         
         </p>
 
@@ -668,77 +660,7 @@
     </div>
 
     <div class="description">
-        <p>returns the name of this Level</p>
-    </div>
-
-    
-
-    
-        <div class="returns">
-            <h4>Returns:</h4>
-
-            <div class="returns-description">
-                
-                    
-                        <span class="type">String</span>:
-                    
-                
-            </div>
-        </div>
-    
-
-    
-</div>
-
-                
-                    <div id="method_getUniqueName" class="method item">
-    <h3 class="name"><code>getUniqueName</code></h3>
-
-    
-        <span class="paren">()</span>
-    
-
-    
-        <span class="returns-inline">
-            <span class="type">String</span>
-        </span>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    <div class="meta">
-        
-            
-                
-                <p>
-                
-                Defined in
-                
-            
-        
-        
-        <a href="..&#x2F;files&#x2F;olap.js.html#l1109"><code>olap.js:1109</code></a>
-        
-        </p>
-
-
-        
-
-        
-    </div>
-
-    <div class="description">
-        <p>returns the UNIQUE_NAME of this Level</p>
+        <p>returns the name of this Named Set</p>
     </div>
 
     
