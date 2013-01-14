@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>olap - OLAP4JS API</title>
+    <title>olap-QueryLevel.js - OLAP4JS API</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.7.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -122,109 +122,96 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>olap Module</h1>
-<div class="box clearfix meta">
+                        <h1 class="file-heading">File: olap-QueryLevel.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+olap.QueryLevel = function QueryLevel(hierarchy, level){
+  this.hierarchy = hierarchy;
+  this.level     = level;
+  this.inclusions = [];
+  this.exclusions = [];
+}
+
+olap.QueryLevel.prototype = {
+
+     &#x2F;**
+     * @method getQuery
+     * @return {olap.Query}
+     *&#x2F;
+    getQuery: function getQuery() {
+        return this.query;
+    },
+
+    &#x2F;**
+     * @method getName
+     * @returns String
+     *&#x2F;
+    getName: function getName() {
+        return this.level.getName();
+    },
     
+    &#x2F;**
+     * @method getUniqueName&#x27;
+     * @returns String
+     *&#x2F;
+    getUniqueName: function getUniqueName() {
+    	return this.level.getUniqueName();
+    },
+    
+    &#x2F;**
+     * @method getUniqueName&#x27;
+     * @returns String
+    *&#x2F;    
+    getCaption: function getCaption() {
+    	return this.level.getCaption();
+    },
+    
+    &#x2F;**
+     * @method getHierarchy
+     * @returns {olap.Hierarchy}
+     *&#x2F;
+    getQueryHierarchy: function getQueryHierarchy() {
+        return this.hierarchy;
+    },
 
     
+    &#x2F;**
+     * Returns the underlying Level object onto which
+     * this query Level is based.
+     * &lt;p&gt;Returns a mutable object so operations on it have
+     * unpredictable consequences.
+     * @return {olap.Level}
+     *&#x2F;
+    getLevel: function getLevel() {
+        return this.level;
+    },
 
+    getInclusions: function getInclusions() {
+    	return this.inclusions;
+    },
     
-        <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l1260"><code>olap.js:1260</code></a>
-        </div>
+    getExclusions: function getExclusions() {
+    	return this.exclusions;
+    },
     
-
+    include: function include(m) {
+    	if(this.inclusions.indexOf(m) == -1) {
+    		this.inclusions.push(m);
+    	}
+    },
     
-</div>
+    exclude: function exclude(m) {
+    	if (this.inclusions.indexOf(m) != -1) {
+    		this.inclusions.splice(this.inclusions.indexOf(m));
+    	}
+    	if(this.exclusions.indexOf(m) == -1) {
+    		this.exclusions.push(m);
+    	}
+    }
 
-
-
-<div class="box intro">
-    <p>This is olap4js - a javascript library for working with OLAP datasources.</p>
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Catalog.html">
-                        olap.Catalog
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Connection.html">
-                        olap.Connection
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Cube.html">
-                        olap.Cube
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Datasource.html">
-                        olap.Datasource
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Dimension.html">
-                        olap.Dimension
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Hierarchy.html">
-                        olap.Hierarchy
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Level.html">
-                        olap.Level
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Measure.html">
-                        olap.Measure
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Member.html">
-                        olap.Member
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Namedset.html">
-                        olap.Namedset
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Schema.html">
-                        olap.Schema
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+}
+    </pre>
 </div>
 
                     </div>

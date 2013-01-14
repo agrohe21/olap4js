@@ -71,6 +71,8 @@
             
                 <li><a href="..&#x2F;classes/olap.Query.html">olap.Query</a></li>
             
+                <li><a href="..&#x2F;classes/olap.QueryAxis.html">olap.QueryAxis</a></li>
+            
                 <li><a href="..&#x2F;classes/olap.Schema.html">olap.Schema</a></li>
             
                 <li><a href="..&#x2F;classes/olapXmla.Connection.html">olapXmla.Connection</a></li>
@@ -538,29 +540,6 @@
     }
     
     inheritPrototype(olapXmla.Measure, olap.Measure);
-    
-    olapXmla.Query= function XmlaQuery($Query, $cube, $connection, $catalog){
-	olap.Query.call(this, $Query, $cube);
-	this.connection = $connection || {};
-    }
-    
-    inheritPrototype(olapXmla.Query, olap.Query);
-    
-    olapXmla.Query.prototype.execute = function execute(callback) {
-	    var that=this, properties = {}, mdx, results, dataset, cells, tmp_results, axis;
-	    
-	    mdx = this.getMDX();
-	    dataset = this.getCube().getCatalog().getDatabase().getOlapConnection().executeOlapQuery({
-		    mdx: mdx,
-		    catalog: this.getCube().getCatalog().getName(),
-		    success: function(results){
-			if (typeof callback == &#x27;function&#x27;) {
-			    callback.call(this, results);
-			}
-		    }
-	    });
-    }
-
 
 })(this);
 

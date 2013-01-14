@@ -6,16 +6,40 @@
     </head>
     <body>
         <h1>OLAP Xmla Query Model Testing</h1>
-        <script src="../build/olap-min.js"></script>
+        <script src="../src/olap.js"></script>
+        <script src="../samples/Xmla.js"></script>
+        <script src="../src/olap-xmla.js"></script>
+        <script src="../src/olap-Query.js"></script>
+        <script src="../src/olap-QueryAxis.js"></script>
+        <script src="../src/olap-QueryHierarchy.js"></script>
+        <script src="../src/olap-QueryLevel.js"></script>
 	<script src="../lib/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript" src="../samples/prettyprint.js"></script>
         <script type="text/javascript">
-		YUI().use('test', function (Y) {
+
+	var getCubeByName = function (catalogName, cubeName) {
+	    var olapConn = new olapXmla.Connection(), cubes, cube = {};
+		//get all cubes for active connection
+		cubes = olapConn.getCubes();
+		//filter cubes array down to only CATALOG_NAME = SteelWheels
+		cubes = filterProperty.apply(cubes, [{type:'equal', property:'CATALOG_NAME', value:catalogName}]);
+		cube = filterProperty.apply(cubes, [{type:'equal', property:'CUBE_NAME',    value:cubeName}]);
+		return cube;
+	}
+        
+		YUI({ logInclude: { TestRunner: true } }).use('test', 'JSON', 'json', function (Y) {
+		//YUI().use('test', function (Y) {
 
 		    var suite = new Y.Test.Suite("Test of olap4js Query Objects");
+		    var cube = getCubeByName("SteelWheels", "SteelWheelsSales");
+		    var qry = new olap.Query("test", cube);
 		    var testCase1 = new Y.Test.Case({
 			name: "Create basic query",
 			setUp : function () {
-			    this.qry = new olap.Query({name:"test", axes:[{name:'cols', location:0}]}, {CUBE_NAME:'TEST_NAME'});
+			    this.qry = qry;
+			    var qa = this.qry.createAxis(0);
+			    var products = this.qry.getHierarchy("Product");
+			    qa.addHierarchy(products);
 			},
 			tearDown: function() {
 			    delete this.qry;
@@ -24,198 +48,52 @@
 			    Y.Assert.areEqual('test', this.qry.getName());
 			},
 			testCubeName: function () {
-			    var cube = this.qry.getCube();
-			    Y.Assert.areEqual('TEST_NAME', cube.getName());
+			    var _cube = this.qry.getCube();
+			    //Y.Assert.isInstanceOf(olap.Cube, _cube)
+			    Y.Assert.areEqual("SteelWheelsSales", cube.getName());
 			},
-			testAxisColName: function () {
-			    var axes = this.qry.getAxes();
-			    Y.Assert.areEqual('cols', axes[0].getName());
+			testHierarchyName: function () {
+			    var qa = this.qry.getAxis(0);
+			    Y.Assert.isInstanceOf(olap.QueryAxis, qa)
 			},
-			testAxisColLocation: function () {
-			    var axes = this.qry.getAxes();
-			    Y.Assert.areEqual('0', axes[0].getLocation());
+			testHierarchyCount: function () {
+			    var qa = this.qry.getAxis(0);
+			    Y.Assert.areEqual(1, qa.getQueryHierarchies().length)
 			},
-			testAxisType: function () {
-			    Y.Assert.areEqual(true, this.qry.getAxes()[0] instanceof olap.Axis);
-			}			
+			testLevelCount: function () {
+			    var qa = this.qry.getAxis(0);
+			    var qh = qa.getQueryHierarchies()[0];
+			    Y.Assert.areEqual(4, qh.queryLevels.length)
+			}
 		    });
-		    suite.add(testCase1);
+		    suite.add(testCase1);	    
 
 		    var testCase2 = new Y.Test.Case({
-			name: "Add member to column axis",
+			name: "Create basic query",
 			setUp : function () {
-			    this.qry = new olap.Query({
-				name:"All Customers",
-				axes:[{
-				    name:'COLUMN',
-				    location:0,
-				    members:[
-					{
-					MEMBER_UNIQUE_NAME: '[Customers].[All Customers]',
-					MEMBER_NAME: 'All Customers'
-					}
-				    ]
-				}]},
-				{CUBE_NAME:'SteelWheelsSales'});
-			    this.result = this.qry.execute();   
+			    this.qry = qry;
+			    var qa = this.qry.createAxis(0);
+			    var products = this.qry.getHierarchy("Product");
+                            products.includeLevel("Product Family");
+			    qa.addHierarchy(products);
 			},
 			tearDown: function() {
 			    delete this.qry;
 			},
 			testName: function () {
-			    Y.Assert.areEqual('All Customers', this.qry.getName());
-			},
-			testCubeName: function () {
-			    Y.Assert.areEqual('SteelWheelsSales', this.qry.getCube().getName());
-			},
-			testAxisColName: function () {
-			    var axes = this.qry.getAxes();
-			    Y.Assert.areEqual('COLUMN', axes[0].getName());
-			},
-			testAxisColLocation: function () {
-			    var axes = this.qry.getAxes();
-			    Y.Assert.areEqual('0', axes[0].getLocation());
-			},
-			testMemberCount: function () {
-			    var axes = this.qry.getAxes();
-			    Y.Assert.areEqual(1, axes[0].members.length);
-			},
-			testResult: function () {
-			    Y.Assert.areEqual(true, this.result instanceof olap.CellSet);
-			}
-			
-		    });
-		    suite.add(testCase2);
-		    
-		    var testCase3 = new Y.Test.Case({
-			name: "Test Query Cellset",
-			setUp : function () {
-			    this.qry = new olap.Query({name:"All Customers"});
-			},
-			tearDown: function() {
-			    delete this.qry;
-			},
-			"Is query.result a CellSet": function () {
-			    var result = this.qry.execute();
-			    Y.Assert.areEqual(true, result instanceof olap.CellSet);
-			},
-			"CellSet length is 0": function () {
-			    var result = this.qry.execute();
-			    Y.Assert.areEqual(0, result.cells.length);
-			},
-			"Axes length is 0": function () {
-			    var result = this.qry.execute();
-			    var axes = result.getAxes();
-			    Y.Assert.areEqual(0, axes.length);
+			    //Y.Assert.areEqual('test', this.qry.getName());
 			}
 		    });
-		    suite.add(testCase3);
-		    
-		    var testCase4 = new Y.Test.Case({
-			name: "Test API Query Manipulation",
-			setUp : function () {
-			    this.qry = new olap.Query({name:"All Customers"});
-			    this.qry.createAxis({name:'COLUMN',location:0});
-			},
-			tearDown: function() {
-			    delete this.qry;
-			},
-			"Axes length is 1": function () {
-			    var axes = this.qry.getAxes();
-			    Y.Assert.areEqual(1, axes.length);
-			},
-			"Axis is olapAxis": function () {
-			    var axes = this.qry.getAxes()
-			    Y.Assert.areEqual(true, axes[0] instanceof olap.Axis);
-			}
-		    });
-		    suite.add(testCase4);
-
-		    var testCase5 = new Y.Test.Case({
-			name: "API Query-Add Member Expression",
-			setUp : function () {
-			    this.qry = new olap.Query({name:"All Customers"});
-			    this.qry.createAxis({name:'COLUMN',location:0});
-			    var axes = this.qry.getAxes()
-			    var axis = axes[0];
-			    var member = new olap.Member({
-				MEMBER_UNIQUE_NAME: '[Customers].[All Customers]',
-				MEMBER_NAME: 'All Customers'
-			    });
-			    axis.addExpression({expFunction:'Children', expBase:member})
-			},
-			tearDown: function() {
-			    delete this.qry;
-			},
-			"Member is Expression Object": function () {
-			    var axis = this.qry.getAxes()[0];
-			    Y.Assert.areEqual(true, axis.getMember(0) instanceof olap.Expression);
-			},
-			"Expression function is Children": function () {
-			    var axis = this.qry.getAxes()[0];
-			    var member =axis.getMember(0);
-			    Y.Assert.areEqual("Children", member.getFunction());
-			}
-		    });
-		    suite.add(testCase5);
-
-		    var testCase6 = new Y.Test.Case({
-			name: "API Query-Add Expression PrevNext Mebers",
-			setUp : function () {
-			    this.qry = new olap.Query({name:"All Customers"});
-			    this.qry.createAxis({name:'COLUMN',location:0});
-			    var axes = this.qry.getAxes()
-			    var axis = axes[0];
-			    var member = new olap.Member({
-				MEMBER_UNIQUE_NAME: '[Customers].[ANG Resellers]',
-				MEMBER_NAME: 'ANG Resellers'
-			    });
-			    axis.addExpression({expFunction:'PrevMember', expBase:member})
-			},
-			tearDown: function() {
-			    delete this.qry;
-			},
-			"Member is Expression Object": function () {
-			    var axis = this.qry.getAxes()[0];
-			    Y.Assert.areEqual(true, axis.getMember(0) instanceof olap.Expression);
-			},
-			"Expression function is PrevMember": function () {
-			    var axis = this.qry.getAxes()[0];
-			    var member =axis.getMember(0);
-			    Y.Assert.areEqual("PrevMember", member.getFunction());
-			}
-		    });
-		    suite.add(testCase6);
-
-		    var testCase7 = new Y.Test.Case({
-			name: "API Query-Add Expression Invalid Function",
-			setUp : function () {
-			    this.qry = new olap.Query({name:"All Customers"});
-			    this.qry.createAxis({name:'COLUMN',location:0});
-			},
-			tearDown: function() {
-			    delete this.qry;
-			},
-			_should: {
-			    error: {
-				"Unknown function": new Error("Member Expressions must have a valid function")
-			    }
-			},
-			"Unknown function": function () {
-			    var axes = this.qry.getAxes()
-			    var axis = axes[0];
-			    var member = new olap.Member({
-				MEMBER_UNIQUE_NAME: '[Customers].[ANG Resellers]',
-				MEMBER_NAME: 'ANG Resellers'
-			    });
-			    axis.addExpression({expFunction:'UnknownFunction', expBase:member})
-			}
-		    });
-		    suite.add(testCase7);
-		    
+		    suite.add(testCase2);	    
 		      
 		    //add the test cases and suites
 		    Y.Test.Runner.add(suite);
+		    var getResults = function(){
+			    //get object of results
+			    resultsObject = Y.Test.Runner.getResults();
+			    document.body.appendChild(prettyPrint(resultsObject, { maxDepth:10 } ));
+		    }
+		    Y.Test.TestRunner.subscribe(Y.Test.TestRunner.COMPLETE_EVENT, getResults);			
 		    
 		    //run all tests
 		    Y.Test.Runner.run();

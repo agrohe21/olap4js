@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>olap - OLAP4JS API</title>
+    <title>olap-QueryAxis.js - OLAP4JS API</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.7.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -122,109 +122,65 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>olap Module</h1>
-<div class="box clearfix meta">
-    
+                        <h1 class="file-heading">File: olap-QueryAxis.js</h1>
 
-    
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x2F;** olap.QueryAxis
+  *
+  * @class olap.QueryAxis
+  * @constructor
+*&#x2F;
+olap.QueryAxis = function QueryAxis($query, axis){
+	this.query       = $query           || {};
+	this.location    = axis || 0;
+	this.hierarchies =  [];
+}
+olap.QueryAxis.prototype = {
+	getLocation: function getLocation() {
+		return this.location;
+	},	
+	getName: function getName() {
+		return this.name;
+	},
+	getQuery: function getQuery() {
+	    return this.query;
+	},
+	getQueryHierarchies: function getQueryHierarchies() {
+	    return this.hierarchies;
+	},
+	addHierarchy: function addHierarchy(index, hierarchy) {
+	    if (typeof(index) != &quot;number&quot;) {
+	      hierarchy = index;
+	      index = -1;
+	    }
+	    if (hierarchy instanceof olap.QueryHierarchy){
+	      if (this.getQueryHierarchies().indexOf(hierarchy) != -1) {
+		  throw new Error(&quot;hierarchy already on this axis&quot;);
+	      }
+	      if (hierarchy.getAxis() != null
+		  &amp;&amp; hierarchy.getAxis() != this)
+	      {
+		  &#x2F;&#x2F; careful! potential for loop
+		      var qa = hierarchy.getAxis();
+		      &#x2F;&#x2F;console.log(hierarchy.getAxis());
+		      &#x2F;&#x2F;console.log(qa);
+		      qa.getQueryHierarchies().remove(hierarchy);
+	      }
+	      hierarchy.setAxis(this);
+	      if (index &gt;= this.hierarchies.length || index &lt; 0) {
+		      this.hierarchies.push(hierarchy);
+	      } else {
+		      this.hierarchies.splice(index, 0, hierarchy);
+	      }
+	    } else {
+	      throw new Error(&quot;Must pass a valid olap.QueryHierarchy instance to olap.QueryAxis.addHierarchy&quot;);
+	    }	      
+	}
+	
+}
 
-    
-        <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l1260"><code>olap.js:1260</code></a>
-        </div>
-    
-
-    
-</div>
-
-
-
-<div class="box intro">
-    <p>This is olap4js - a javascript library for working with OLAP datasources.</p>
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Catalog.html">
-                        olap.Catalog
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Connection.html">
-                        olap.Connection
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Cube.html">
-                        olap.Cube
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Datasource.html">
-                        olap.Datasource
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Dimension.html">
-                        olap.Dimension
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Hierarchy.html">
-                        olap.Hierarchy
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Level.html">
-                        olap.Level
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Measure.html">
-                        olap.Measure
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Member.html">
-                        olap.Member
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Namedset.html">
-                        olap.Namedset
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Schema.html">
-                        olap.Schema
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>

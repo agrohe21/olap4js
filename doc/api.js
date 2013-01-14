@@ -16,6 +16,7 @@ YUI.add("yuidoc-meta", function(Y) {
         "olap.Namedset",
         "olap.Position",
         "olap.Query",
+        "olap.QueryAxis",
         "olap.Schema",
         "olapXmla.Connection",
         "olapXmla.Datasource"

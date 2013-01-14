@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>olap - OLAP4JS API</title>
+    <title>olap-Query.js - OLAP4JS API</title>
     <link rel="stylesheet" href="http:&#x2F;&#x2F;yui.yahooapis.com&#x2F;3.7.0&#x2F;build&#x2F;cssgrids&#x2F;cssgrids-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/vendor/prettify/prettify-min.css">
     <link rel="stylesheet" href="..&#x2F;assets/css/main.css" id="site_styles">
@@ -122,109 +122,123 @@
             <div class="apidocs">
                 <div id="docs-main">
                     <div class="content">
-                        <h1>olap Module</h1>
-<div class="box clearfix meta">
-    
+                        <h1 class="file-heading">File: olap-Query.js</h1>
 
-    
+<div class="file">
+    <pre class="code prettyprint linenums">
+&#x2F;** olap.Query
+*   @class olap.Query
+*   @constructor
+*   @param {Object} Query Object representing object properties.  Often used to rehydrate objects after external persistence
+*   @param {olap.Cube} Cube The Cube that this Query is defined to operate on
+*&#x2F;
+olap.Query = function Query($name, $cube) {
+	var idx, axis, hierarchies, hier, qh;
+	if ($cube instanceof Object){
+		if ($cube instanceof olap.Cube) {
+			this.cube = $cube;
+		} else {
+			this.cube = new olap.Cube($cube);
+		}
+	}
+	this.axes = [];
+	this.hierarchies = [];
+	if (!this.cube instanceof olap.Cube) {
+		throw new Error(&#x27;Unable to create query: invalid cube&#x27;);
+	}
+	hierarchies = this.cube.getHierarchies();
+	for (var i=0,j=hierarchies.length;i&lt;j;i++){
+	  hier = hierarchies[i];
+	  qh = new olap.QueryHierarchy(this, hier);
+	  this.hierarchies[qh.getName()] = qh;
+	}
+	this.id   = olap.Query.id++;
+	this.name = $name || &#x27;query&#x27; + this.id; 
+	olap.Query.instances[this.id] = this;				
+}
+olap.Query.id = 1;
+olap.Query.prefix = &quot;olap.query&quot;;
+olap.Query.instances = {};
+olap.Query.getInstance = function(id){
+    return olap.Query.instances[id];
+};	
+olap.Query.prototype = {
+	addAxis: function addAxis(axis){
+		if (axis instanceof Object){
+			if (axis instanceof olap.Axis == false) { &#x2F;&#x2F;do we have an object as param and it is not already an Axis
+				axis = new olap.Axis(axis, this);
+			}
+		}
+		if (axis instanceof olap.Axis){
+			this.axes.push(axis);
+		}
+	},
+	getAxes: function getAxes(){
+		if (this.axes.length == 0) {
+			this.fetchAxes();
+		}		
+		return this.axes;
+	},
+	fetchAxes: function fetchAxes(){
+		&#x2F;&#x2F;empty function that does not fetch anything
+	},
+	getAxis: function getAxis(axis){
+		if (this.axes.length == 0) {
+			this.fetchAxes();
+		}		
+		return this.axes[axis];
+	},
+	getCube: function getCube(){
+		return this.cube;
+	},
+	getName: function getName(){
+		return this.name;
+	},
+	createAxis: function createAxis(axis) {
+		var axis = new olap.QueryAxis(this, axis);
+		this.axes.push(axis);
+		return axis;
+	},
+	&#x2F;**
+	 * @method getHierarchy
+	 * @return {olap.QueryHierarchy}
+	 *&#x2F;
+	getHierarchy: function getHierarchy(hierarchy) {
+	    if (hierarchy instanceof olap.Hierarchy) {
+	      return this.hierarchies[hierarchy.getName()];
+	    } else {
+	      return this.hierarchies[hierarchy];
+	    }
+	},
 
-    
-        <div class="foundat">
-            Defined in: <a href="..&#x2F;files&#x2F;olap.js.html#l1260"><code>olap.js:1260</code></a>
-        </div>
-    
+	getMDX: function getMDX(){
+		&#x2F;&#x2F;return &#x27;SELECT Measures.members on columns from &#x27; + this.getCube().getName();
+		var mdx = &quot;&quot;, axes = this.getAxes(), axis, axisMdx;
+		
+		for (var i=0, j=axes.length;i&lt;j;i++){
+			axisMdx = this.getAxis(i).getMdx();
+			mdx += &quot; &quot; + axisMdx;
+		}
+		if (mdx.length) {
+		    mdx = &quot;SELECT&quot; + mdx +
+			&quot;\nFROM   [&quot; + this.getCube().getName() + &quot;]&quot;;
+		}
+		console.debug(mdx);
+		return mdx;
+	},
+	execute: function execute(callback){
+		&#x2F;&#x2F;default implementation does not create results
+		var results = this.results || new olap.CellSet({});
+		if (typeof callback == &#x27;function&#x27;) {
+			callback.call(this, results);
+			delete results;
+		} else {
+			return results;
+		}
+	}
+}
 
-    
-</div>
-
-
-
-<div class="box intro">
-    <p>This is olap4js - a javascript library for working with OLAP datasources.</p>
-</div>
-
-
-
-<div class="yui3-g">
-    <div class="yui3-u-1-2">
-        
-            <p>This module provides the following classes:</p>
-
-            <ul class="module-classes">
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Catalog.html">
-                        olap.Catalog
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Connection.html">
-                        olap.Connection
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Cube.html">
-                        olap.Cube
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Datasource.html">
-                        olap.Datasource
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Dimension.html">
-                        olap.Dimension
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Hierarchy.html">
-                        olap.Hierarchy
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Level.html">
-                        olap.Level
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Measure.html">
-                        olap.Measure
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Member.html">
-                        olap.Member
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Namedset.html">
-                        olap.Namedset
-                    </a>
-                </li>
-            
-                <li class="module-class">
-                    <a href="..&#x2F;classes/olap.Schema.html">
-                        olap.Schema
-                    </a>
-                </li>
-            
-            </ul>
-        
-    </div>
-
-    <div class="yui3-u-1-2">
-        
-    </div>
+    </pre>
 </div>
 
                     </div>

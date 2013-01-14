@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>OLAP4JS: Xmla Discover Sample</title>
+    </head>
+    <body>
+        <h1>Discover all cubes for active Connection and get metadata for SteelWheels</h1>
+        <script src="../src/olap.js"></script>
+        <script src="../samples/Xmla.js"></script>
+        <script src="../src/olap-xmla.js"></script>
+        <script src="../src/olap-Query.js"></script>
+        <script src="../src/olap-QueryAxis.js"></script>
+        <script src="../src/olap-QueryHierarchy.js"></script>
+        <script src="../src/olap-QueryLevel.js"></script>
+	<script src="../lib/yui/yui/yui-min.js"></script>	
+        <script type="text/javascript" src="../samples/prettyprint.js"></script>
+        <script type="text/javascript">
+	var getCubeByName = function (catalogName, cubeName) {
+	    var olapConn = new olapXmla.Connection(), cubes, cube = {};
+		//get all cubes for active connection
+		cubes = olapConn.getCubes();
+		//filter cubes array down to only CATALOG_NAME = SteelWheels
+		cubes = filterProperty.apply(cubes, [{type:'equal', property:'CATALOG_NAME', value:catalogName}]);
+		cube = filterProperty.apply(cubes, [{type:'equal', property:'CUBE_NAME',    value:cubeName}]);
+		return cube;
+	}
+        
+	var cube = getCubeByName("SteelWheels", "SteelWheelsSales");
+	var qry  = new olap.Query("test", cube);
+	var qa   = qry.createAxis(0);
+	var products = this.qry.getHierarchy("Product");
+	qa.addHierarchy(products);
+
+	document.body.appendChild(prettyPrint(qa.hierarchies, { maxDepth:3 } ));	
+	</script>
+    </body>
+</html>
