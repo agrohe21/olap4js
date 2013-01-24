@@ -1,8 +1,8 @@
-olap.QueryLevel = function QueryLevel(hierarchy, level){
-  this.hierarchy = hierarchy;
-  this.level     = level;
-  this.inclusions = [];
-  this.exclusions = [];
+olap.QueryLevel   = function QueryLevel(hierarchy, level){
+  this.hierarchy  = hierarchy;
+  this.level      = level;
+  this.inclusions = {};
+  this.exclusions = {};
 }
 
 olap.QueryLevel.prototype = {
@@ -68,18 +68,14 @@ olap.QueryLevel.prototype = {
     },
     
     include: function include(m) {
-    	if(this.inclusions.indexOf(m) == -1) {
-    		this.inclusions.push(m);
-    	}
+		//console.debug('func Call: ' + arguments.callee.name);
+    	this.inclusions[m.getUniqueName()] = m;
+		return this;
     },
     
     exclude: function exclude(m) {
-    	if (this.inclusions.indexOf(m) != -1) {
-    		this.inclusions.splice(this.inclusions.indexOf(m));
-    	}
-    	if(this.exclusions.indexOf(m) == -1) {
-    		this.exclusions.push(m);
-    	}
+		//console.debug('func Call: ' + arguments.callee.name);
+		this.exclusions[m.getUniqueName()] = m;
+		return this;
     }
-
 }

@@ -998,6 +998,21 @@
 		fetchLevels: function fetchLevels() {	
 			//empty function that does not fetch anything
 			throw new Error('You must provide an implementation for: ' + arguments.callee.name)
+		},
+		lookupMember: function lookupMember(memberName) {
+			//console.debug('func Call: ' + arguments.callee.name);		
+			var levels = this.getLevels(), level, lvl_idx, members, member, m, mem_idx;
+			for (lvl_idx in levels){
+				level = levels[lvl_idx];
+				members = level.getMembers();
+				for (mem_idx in members){
+					member = members[mem_idx];
+					if (member.getUniqueName() == memberName) {
+						m = member;
+						return m;
+					}
+				}
+			}
 		}
 	}
 	
@@ -1254,6 +1269,22 @@
 					  return this.getUniqueName();
 				}
 			}
+		},
+  		/**
+		* returns parent Level of this member
+		* @method getLevel
+		* @return {olap.Level}
+		*/
+		getLevel: function getLevel() {
+			return this.level;
+		},
+  		/**
+		* returns parent Hierarchy of this member
+		* @method getHierarchy
+		* @return {olap.Hierarchy}
+		*/
+		getHierarchy: function getHierarchy() {
+			return this.level.getHierarchy();
 		}
 	}
 

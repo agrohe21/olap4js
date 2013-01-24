@@ -107,5 +107,22 @@ olap.Query.prototype = {
 		} else {
 			return results;
 		}
-	}
+	},
+    createCalculatedMember: function createCalculatedMember(queryHierarchy, name, formula, properties) {
+    	var h = queryHierarchy.getHierarchy();
+    	var cm = new olap.CalculatedMember(
+    			h.getDimension(), 
+    			h, 
+    			name, 
+    			name,
+    			null,
+    			null, //ask Paul what this is... Type.FORMULA,
+    			formula,
+    			null);
+    	this.addCalculatedMember(queryHierarchy, cm);
+    	return cm;
+    },
+	addCalculatedMember: function addCalculatedMember(hierarchy, cm) {
+    	hierarchy.addCalculatedMember(cm);
+    }
 }

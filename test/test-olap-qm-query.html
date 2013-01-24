@@ -59,30 +59,37 @@
 			testHierarchyCount: function () {
 			    var qa = this.qry.getAxis(0);
 			    Y.Assert.areEqual(1, qa.getQueryHierarchies().length)
-			},
+			}/*,
 			testLevelCount: function () {
 			    var qa = this.qry.getAxis(0);
 			    var qh = qa.getQueryHierarchies()[0];
 			    Y.Assert.areEqual(4, qh.queryLevels.length)
-			}
+			}*/
 		    });
 		    suite.add(testCase1);	    
 
 		    var testCase2 = new Y.Test.Case({
-			name: "Create basic query",
-			setUp : function () {
-			    this.qry = qry;
-			    var qa = this.qry.createAxis(0);
-			    var products = this.qry.getHierarchy("Product");
-                            products.includeLevel("Product Family");
-			    qa.addHierarchy(products);
-			},
-			tearDown: function() {
-			    delete this.qry;
-			},
-			testName: function () {
-			    //Y.Assert.areEqual('test', this.qry.getName());
-			}
+				name: "Create basic query",
+				setUp : function () {
+					this.qry = qry;
+				},
+				tearDown: function() {
+					delete this.qry;
+				},
+				testLevel: function () {
+					var qa = this.qry.createAxis(0), ql;
+					var products = this.qry.getHierarchy("Product");
+					ql = products.includeLevel("Line");
+					//qa.addHierarchy(products);
+					Y.Assert.areEqual('Line', ql.getName());
+				},
+				testAxisHierarchy: function () {
+					var qa = this.qry.createAxis(0), ql;
+					var products = this.qry.getHierarchy("Product");
+					ql = products.includeLevel("Line");
+					qa.addHierarchy(products);
+					Y.Assert.areEqual('Line', ql.getName());
+				}
 		    });
 		    suite.add(testCase2);	    
 		      

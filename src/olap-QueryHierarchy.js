@@ -1,15 +1,15 @@
 olap.QueryHierarchy = function QueryHierarchy(query, hierarchy){
   var levels=[], lvl_idx, level, lvl_count;
-  this.queryLevels = [];
   this.query = query;
   this.hierarchy = hierarchy;
+  this.queryLevels = {};
   this.calculatedMembers=[];
   this.activeCalculatedMembers=[]
   this.activeLevels={};
   levels = this.hierarchy.getLevels();
   for (lvl_idx=0, lvl_count=levels.length;lvl_idx<lvl_count;lvl_idx++) {
       level = new olap.QueryLevel(this, levels[lvl_idx]);
-      this.queryLevels.push(level);
+      this.queryLevels[level.getName()] = level;
   }
 }
 
@@ -94,107 +94,106 @@ olap.QueryHierarchy.prototype = {
     },
     
     includeLevel: function includeLevel(levelName) {
-    	var ql = this.queryLevels.get(levelName);
-    	if (this.activeLevels.indexOf(ql) == -1) {
-    		this.activeLevels.push(ql);
-    	}
+		var ql;
+		if (levelName instanceof olap.QueryLevel) {
+			ql = levelName;
+		} else {
+			ql = this.queryLevels[levelName];
+		}
+   		this.activeLevels[ql.getName()] = ql;
     	return ql;
     },
 /*
-    public QueryLevel includeLevel(Level l) throws OlapException {
-    	if (!l.getHierarchy().equals(hierarchy)) {
-    		throw new OlapException(
-    				"You cannot include level " + l.getUniqueName() 
-    				+ " on hierarchy " + hierarchy.getUniqueName());
-    	}
-    	QueryLevel ql = queryLevels.get(l.getName());
-    	if (!activeLevels.contains(l)) {
-    		activeLevels.add(ql);
-    	}
-    	return ql;
-    }
-    
     public void includeMembers(List<Member> members) throws OlapException {
     	for (Member m : members) {
     		includeMember(m);
     	}
     }
-
-    public void include(String uniqueMemberName) throws OlapException {
-    	List<IdentifierSegment> nameParts = IdentifierParser.parseIdentifier(uniqueMemberName);
-    	this.include(nameParts);
-    }
+*/
+    include: function include(uniqueMemberName) {
+		var member;
+		if (typeof(uniqueMemberName) == 'string') {
+			member = this.hierarchy.lookupMember(uniqueMemberName);
+			if (member == null) {
+				throw new Error(
+					"Unable to find a member with name " + uniqueMemberName);
+			}
+			this.includeMember(member);
+		} else {
+			if (uniqueMemberName instanceof olap.member) {
+				includeMember(uniqueMemberName)
+			} else {
+				throw new Error('Invalid Member Name: ' + uniqueMemberName);
+			}
+		}
+    },
     
-    public void include(List<IdentifierSegment> nameParts) throws OlapException {
-        Member member = this.query.getCube().lookupMember(nameParts);
-        if (member == null) {
-            throw new OlapException(
-                "Unable to find a member with name " + nameParts);
-        }
-        this.includeMember(member);
-    }
-
-
-    public void includeCalculatedMember(CalculatedMember m) throws OlapException {
-    	Hierarchy h = m.getHierarchy();
-    	if (!h.equals(hierarchy)) {
-    		throw new OlapException(
-    				"You cannot include the calculated member " + m.getUniqueName() 
-    				+ " on hierarchy " + hierarchy.getUniqueName());
-    	}
-    	if(!calculatedMembers.contains(m)) {
-    		calculatedMembers.add(m);
-    	}
-    	activeCalculatedMembers.add(m);
-    }
-    public void includeMember(Member m) throws OlapException {
-    	Level l = m.getLevel();
-    	if (!l.getHierarchy().equals(hierarchy)) {
-    		throw new OlapException(
+    includeMember: function includeMember(m) {
+		//console.debug('func Call: ' + arguments.callee.name);		
+		var ql, l;
+		if (!m instanceof olap.Member) {
+			throw new Error('must pass an olap.Member to includeMember');
+		}
+    	l = m.getLevel();
+    	if (!l.getHierarchy() == this.hierarchy) {
+    		throw new Error(
     				"You cannot include member " + m.getUniqueName() 
-    				+ " on hierarchy " + hierarchy.getUniqueName());
+    				+ " on hierarchy " + this.hierarchy.getUniqueName());
     	}
-    	QueryLevel ql = queryLevels.get(l.getName());
-    	if (!activeLevels.contains(ql)) {
-    		activeLevels.add(ql);
-    	}
+    	ql = this.queryLevels[l.getName()];
+    	this.activeLevels[ql.getName()] = ql;
     	ql.include(m);
-    }
-    
-    public void exclude(String uniqueMemberName) throws OlapException {
-    	List<IdentifierSegment> nameParts = IdentifierParser.parseIdentifier(uniqueMemberName);
-    	this.exclude(nameParts);
-    }
-    
-    public void exclude(List<IdentifierSegment> nameParts) throws OlapException {
-        Member member = this.query.getCube().lookupMember(nameParts);
-        if (member == null) {
-            throw new OlapException(
-                "Unable to find a member with name " + nameParts);
-        }
-        this.exclude(member);
-    }
-    
-    public void excludeMembers(List<Member> members) {
-    	for (Member m : members) {
-    		exclude(m);
-    	}
-    }
+    },
 
-    public void exclude(Member m) {
-    	Level l = m.getLevel();
-    	if (!l.getHierarchy().equals(hierarchy)) {
-    		throw new IllegalArgumentException("You cannot exclude member " + m.getUniqueName() + " on hierarchy " + hierarchy.getUniqueName());
+    exclude: function exclude(uniqueMemberName)  {
+		var member;
+		if (typeof(uniqueMemberName) == 'string') {
+			member = this.hierarchy.lookupMember(uniqueMemberName);
+			if (member == null) {
+				throw new Error(
+					"Unable to find a member with name " + uniqueMemberName);
+			}
+			this.excludeMember(member);
+		} else {
+			if (uniqueMemberName instanceof olap.member) {
+				this.excludeMember(uniqueMemberName)
+			} else {
+				throw new Error('Invalid Member Name: ' + uniqueMemberName);
+			}
+		}
+    },
+	
+    excludeMember: function excludeMember(m) {
+		//console.debug('func Call: ' + arguments.callee.name);		
+		var ql, l;
+		if (!m instanceof olap.Member) {
+			throw new Error('must pass an olap.Member to includeMember');
+		}
+    	l = m.getLevel();
+    	if (!l.getHierarchy() == this.hierarchy) {
+    		throw new Error(
+    				"You cannot include member " + m.getUniqueName() 
+    				+ " on hierarchy " + this.hierarchy.getUniqueName());
     	}
-    	QueryLevel ql = queryLevels.get(l.getName());
-    	if (!activeLevels.contains(ql)) {
-    		activeLevels.add(ql);
-    	}
+    	ql = this.queryLevels[l.getName()];
+    	this.activeLevels[ql.getName()] = ql;
     	ql.exclude(m);
-    }
-      */
+    },
+
+    includeCalculatedMember: function includeCalculatedMember(m) {
+    	var h = this.getHierarchy();
+    	if (h !== this.hierarchy) {
+    		throw new Error(
+    				"You cannot include the calculated member " + m.getUniqueName() 
+    				+ " on hierarchy " + this.hierarchy.getUniqueName());
+    	}
+    	if(this.calculatedMembers.indexOf(m) == -1) {
+    		this.calculatedMembers.push(m);
+    	}
+    	this.activeCalculatedMembers.push(m);
+    },
+
 	toString: function toString() {
 		return this.hierarchy.getUniqueName();
 	}
-   
 }

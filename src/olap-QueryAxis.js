@@ -28,17 +28,19 @@ olap.QueryAxis.prototype = {
 	    }
 	    if (hierarchy instanceof olap.QueryHierarchy){
 	      if (this.getQueryHierarchies().indexOf(hierarchy) != -1) {
-		  throw new Error("hierarchy already on this axis");
+			throw new Error("hierarchy already on this axis");
 	      }
-	      if (hierarchy.getAxis() != null
-		  && hierarchy.getAxis() != this)
+		  //console.log(hierarchy.getAxis());
+	      /*
+		  if (hierarchy.getAxis() != null
+			&& hierarchy.getAxis() != this)
 	      {
 		  // careful! potential for loop
 		      var qa = hierarchy.getAxis();
 		      //console.log(hierarchy.getAxis());
 		      //console.log(qa);
 		      qa.getQueryHierarchies().remove(hierarchy);
-	      }
+	      }*/
 	      hierarchy.setAxis(this);
 	      if (index >= this.hierarchies.length || index < 0) {
 		      this.hierarchies.push(hierarchy);
@@ -49,5 +51,10 @@ olap.QueryAxis.prototype = {
 	      throw new Error("Must pass a valid olap.QueryHierarchy instance to olap.QueryAxis.addHierarchy");
 	    }	      
 	}
-	
+/*
+qa.setMdxSetExpression("Product.Drink.Children");
+			qa.addFilter(new GenericFilter("[Measures].[Unit Sales] > 1"));
+			qa.addFilter(new NFilter(MdxFunctionType.TopPercent, 100, "[Measures].[Customer Count]"));
+			qa.setHierarchizeMode(HierarchizeMode.PRE);	
+*/	
 }

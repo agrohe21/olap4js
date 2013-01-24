@@ -13,26 +13,32 @@
         <script src="../src/olap-QueryAxis.js"></script>
         <script src="../src/olap-QueryHierarchy.js"></script>
         <script src="../src/olap-QueryLevel.js"></script>
-	<script src="../lib/yui/yui/yui-min.js"></script>	
+        <script src="../src/olap-CalculatedMember.js"></script>
+		<script src="../lib/yui/yui/yui-min.js"></script>	
         <script type="text/javascript" src="../samples/prettyprint.js"></script>
         <script type="text/javascript">
-	var getCubeByName = function (catalogName, cubeName) {
-	    var olapConn = new olapXmla.Connection(), cubes, cube = {};
-		//get all cubes for active connection
-		cubes = olapConn.getCubes();
-		//filter cubes array down to only CATALOG_NAME = SteelWheels
-		cubes = filterProperty.apply(cubes, [{type:'equal', property:'CATALOG_NAME', value:catalogName}]);
-		cube = filterProperty.apply(cubes, [{type:'equal', property:'CUBE_NAME',    value:cubeName}]);
-		return cube;
-	}
-        
-	var cube = getCubeByName("SteelWheels", "SteelWheelsSales");
-	var qry  = new olap.Query("test", cube);
-	var qa   = qry.createAxis(0);
-	var products = this.qry.getHierarchy("Product");
-	qa.addHierarchy(products);
+		var getCubeByName = function (catalogName, cubeName) {
+			var olapConn = new olapXmla.Connection(), cubes, cube = {};
+			//get all cubes for active connection
+			cubes = olapConn.getCubes();
+			//filter cubes array down to only CATALOG_NAME = SteelWheels
+			cubes = filterProperty.apply(cubes, [{type:'equal', property:'CATALOG_NAME', value:catalogName}]);
+			cube = filterProperty.apply(cubes, [{type:'equal', property:'CUBE_NAME',    value:cubeName}]);
+			return cube;
+		}
+			
+		var cube = getCubeByName("SteelWheels", "SteelWheelsSales");
+		var qry  = new olap.Query("test", cube);
+		var qa   = qry.createAxis(0);
+		var products = this.qry.getHierarchy("Product");
+		products.includeLevel("Vendor");
+		products.include("[Product].[Trains]");
+		products.exclude("[Product].[Classic Cars]");
+		var cm = qry.createCalculatedMember(products, "Sky and Rail", "Aggregate({Product.Trains, Product.Planes})", null);
+		products.includeCalculatedMember(cm);
+		qa.addHierarchy(products);
 
-	document.body.appendChild(prettyPrint(qa.hierarchies, { maxDepth:3 } ));	
+		document.body.appendChild(prettyPrint(products, { maxDepth:3 } ));
 	</script>
     </body>
 </html>
