@@ -33,7 +33,8 @@ olap.Query.prefix = "olap.query";
 olap.Query.instances = {};
 olap.Query.getInstance = function(id){
     return olap.Query.instances[id];
-};	
+};
+
 olap.Query.prototype = {
 	addAxis: function addAxis(axis){
 		if (axis instanceof Object){
@@ -57,7 +58,7 @@ olap.Query.prototype = {
 	getAxis: function getAxis(axis){
 		if (this.axes.length == 0) {
 			this.fetchAxes();
-		}		
+		}
 		return this.axes[axis];
 	},
 	getCube: function getCube(){
@@ -82,24 +83,26 @@ olap.Query.prototype = {
 	      return this.hierarchies[hierarchy];
 	    }
 	},
-
-	getMDX: function getMDX(){
-		//return 'SELECT Measures.members on columns from ' + this.getCube().getName();
+	toString: function toString(){
 		var mdx = "", axes = this.getAxes(), axis, axisMdx;
 		
 		for (var i=0, j=axes.length;i<j;i++){
-			axisMdx = this.getAxis(i).getMdx();
+			axis = axes[i];
+			axisMdx = axis.toString();
 			mdx += " " + axisMdx;
 		}
 		if (mdx.length) {
 		    mdx = "SELECT" + mdx +
-			"\nFROM   [" + this.getCube().getName() + "]";
+			"\nFROM [" + this.getCube().getName() + "]";
 		}
-		console.debug(mdx);
+		if  (this.hasFilterAxis()) {
+			mdx += "\nWHERE " + this.getFilterAxis().toString();
+		}
 		return mdx;
 	},
 	execute: function execute(callback){
 		//default implementation does not create results
+		//driver specific implemenation should override this
 		var results = this.results || new olap.CellSet({});
 		if (typeof callback == 'function') {
 			callback.call(this, results);
